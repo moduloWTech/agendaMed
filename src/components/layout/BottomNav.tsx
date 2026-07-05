@@ -2,14 +2,18 @@ import { CalendarHeart, FolderHeart, User } from 'lucide-react';
 
 interface BottomNavProps {
   currentTab?: 'agenda' | 'cofre' | 'perfil';
+  onChangeTab?: (tab: 'agenda' | 'cofre' | 'perfil') => void;
 }
 
-export function BottomNav({ currentTab = 'agenda' }: BottomNavProps) {
+export function BottomNav({ currentTab = 'agenda', onChangeTab }: BottomNavProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.02)] z-50 pb-safe">
       <nav className="flex justify-between items-center max-w-md mx-auto px-6 h-20">
 
-        <button className="flex flex-col items-center justify-center min-h-[48px] min-w-[48px] gap-1 group w-20">
+        <button 
+          onClick={() => onChangeTab?.('agenda')}
+          className="flex flex-col items-center justify-center min-h-[48px] min-w-[48px] gap-1 group w-20"
+        >
           <CalendarHeart
             className={`w-7 h-7 transition-colors ${currentTab === 'agenda' ? 'text-[var(--color-primary)]' : 'text-gray-400 group-hover:text-gray-600'}`}
             strokeWidth={currentTab === 'agenda' ? 2.5 : 2}
@@ -19,7 +23,10 @@ export function BottomNav({ currentTab = 'agenda' }: BottomNavProps) {
           </span>
         </button>
 
-        <button className="flex flex-col items-center justify-center min-h-[48px] min-w-[48px] gap-1 group w-20">
+        <button 
+          onClick={() => onChangeTab?.('cofre')}
+          className="flex flex-col items-center justify-center min-h-[48px] min-w-[48px] gap-1 group w-20"
+        >
           <FolderHeart
             className={`w-7 h-7 transition-colors ${currentTab === 'cofre' ? 'text-[var(--color-primary)]' : 'text-gray-400 group-hover:text-gray-600'}`}
             strokeWidth={currentTab === 'cofre' ? 2.5 : 2}
@@ -29,7 +36,10 @@ export function BottomNav({ currentTab = 'agenda' }: BottomNavProps) {
           </span>
         </button>
 
-        <button className="flex flex-col items-center justify-center min-h-[48px] min-w-[48px] gap-1 group w-20">
+        <button 
+          onClick={() => onChangeTab?.('perfil')}
+          className="flex flex-col items-center justify-center min-h-[48px] min-w-[48px] gap-1 group w-20"
+        >
           <User
             className={`w-7 h-7 transition-colors ${currentTab === 'perfil' ? 'text-[var(--color-primary)]' : 'text-gray-400 group-hover:text-gray-600'}`}
             strokeWidth={currentTab === 'perfil' ? 2.5 : 2}

@@ -5,8 +5,7 @@ import { ProfileHeader } from '../components/agenda/ProfileHeader';
 
 export function AgendaScreen() {
   return (
-    <AuthLayout>
-      <div className="flex flex-col w-full h-full min-h-screen bg-[var(--color-primary)]">
+    <div className="flex flex-col w-full h-full min-h-screen bg-[var(--color-primary)]">
         <ProfileHeader />
         
         {/* Container Branco Inferior (Sobrepõe a imagem) */}
@@ -16,6 +15,5 @@ export function AgendaScreen() {
           <MedicationList />
         </div>
       </div>
-    </AuthLayout>
   );
 }
