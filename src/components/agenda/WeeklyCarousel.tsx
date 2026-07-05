@@ -11,7 +11,7 @@ const daysOfWeek = [
 
 export function WeeklyCarousel() {
   return (
-    <div className="w-full bg-white px-6 py-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.03)] sticky top-0 z-40 rounded-b-[40px]">
+    <div className="w-full px-6 py-4">
       <div className="flex items-center justify-between mb-8">
         <div>
           <p className="text-gray-400 font-medium text-sm mb-1 uppercase tracking-wider">Select Date</p>
