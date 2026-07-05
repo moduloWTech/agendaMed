@@ -11,30 +11,34 @@ const daysOfWeek = [
 
 export function WeeklyCarousel() {
   return (
-    <div className="w-full bg-white px-4 py-6 shadow-sm border-b border-gray-100 sticky top-0 z-40">
-      <div className="flex items-center justify-between mb-4">
+    <div className="w-full bg-white px-6 py-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.03)] sticky top-0 z-40 rounded-b-[40px]">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Novembro</h2>
-          <p className="text-gray-500 font-medium">Hoje é Terça, 13</p>
+          <p className="text-gray-400 font-medium text-sm mb-1 uppercase tracking-wider">Select Date</p>
+          <div className="flex items-center gap-2">
+            <h2 className="text-3xl font-extrabold text-[var(--color-primary)] tracking-tight">Novembro</h2>
+            <span className="text-2xl font-bold text-gray-300">/</span>
+            <p className="text-gray-500 font-bold text-xl mt-1">13</p>
+          </div>
         </div>
       </div>
 
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x">
+      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x">
         {daysOfWeek.map((day, idx) => (
           <button
             key={idx}
             className={`
-              flex flex-col items-center justify-center min-w-[72px] h-[88px] rounded-2xl transition-colors snap-center
+              flex flex-col items-center justify-center min-w-[72px] h-[96px] rounded-full transition-all duration-300 snap-center
               ${day.isToday
-                ? 'bg-[var(--color-primary)] text-white shadow-md'
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-100'}
+                ? 'bg-[var(--color-secondary)] text-[var(--color-primary)] shadow-md shadow-[var(--color-secondary)]/30 scale-105'
+                : 'bg-transparent text-gray-400 hover:bg-gray-50 border border-transparent hover:border-gray-100'}
             `}
           >
-            <span className={`text-sm font-semibold mb-1 ${day.isToday ? 'text-blue-100' : 'text-gray-400'}`}>
-              {day.dayName}
-            </span>
-            <span className={`text-2xl font-bold ${day.isToday ? 'text-white' : 'text-gray-800'}`}>
+            <span className={`text-2xl font-bold ${day.isToday ? 'text-[var(--color-primary)]' : 'text-gray-700'}`}>
               {day.date}
+            </span>
+            <span className={`text-sm font-semibold mt-1 ${day.isToday ? 'text-[var(--color-accent)]' : 'text-gray-400'}`}>
+              {day.dayName}
             </span>
           </button>
         ))}

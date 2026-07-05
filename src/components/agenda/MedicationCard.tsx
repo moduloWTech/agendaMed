@@ -30,36 +30,36 @@ export function MedicationCard({ time, name, dosage, status, onCheck }: Medicati
 
       {/* Card do Medicamento */}
       <div className={`
-        flex-1 bg-white p-5 rounded-2xl border flex items-center justify-between shadow-sm transition-all
-        ${isCompleted ? 'border-green-100 opacity-75' : isLate ? 'border-red-200 shadow-red-100/50' : 'border-gray-100'}
+        flex-1 bg-white p-6 rounded-[32px] flex items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300
+        ${isCompleted ? 'opacity-60' : isLate ? 'border border-red-100 shadow-[0_8px_30px_rgba(225,29,72,0.1)]' : 'border border-transparent'}
       `}>
         <div>
-          <h3 className={`text-xl font-bold ${isCompleted ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
+          <h3 className={`text-xl font-bold ${isCompleted ? 'text-gray-400 line-through' : 'text-[var(--color-primary)]'}`}>
             {name}
           </h3>
-          <p className="text-gray-500 font-medium text-md mt-1">{dosage}</p>
+          <p className="text-gray-500 font-medium text-[15px] mt-1">{dosage}</p>
 
           {isLate && (
-            <p className="text-[var(--color-alert)] text-sm font-semibold flex items-center gap-1 mt-2">
+            <p className="text-[var(--color-alert)] text-sm font-bold flex items-center gap-1 mt-2">
               <Clock className="w-4 h-4" /> Atrasado
             </p>
           )}
         </div>
 
-        {/* Botão de Check Grande */}
+        {/* Botão de Check Grande (Estilo Premium) */}
         {!isCompleted && (
           <button
             onClick={onCheck}
-            className="w-16 h-16 rounded-full flex items-center justify-center bg-[var(--color-success)] text-white hover:bg-emerald-600 active:scale-95 transition-transform shadow-md flex-shrink-0"
+            className="w-16 h-16 rounded-[24px] flex items-center justify-center bg-[var(--color-primary)] text-white hover:bg-[var(--color-accent)] active:scale-95 transition-all duration-300 shadow-xl shadow-[var(--color-primary)]/20 flex-shrink-0"
             aria-label="Confirmar medicação"
           >
-            <CheckCircle2 className="w-10 h-10" />
+            <CheckCircle2 className="w-8 h-8" strokeWidth={2.5} />
           </button>
         )}
 
         {isCompleted && (
-          <div className="w-16 h-16 rounded-full flex items-center justify-center bg-green-50 text-[var(--color-success)] flex-shrink-0">
-            <CheckCircle2 className="w-10 h-10" />
+          <div className="w-16 h-16 rounded-[24px] flex items-center justify-center bg-[var(--color-secondary)]/50 text-[var(--color-primary)] flex-shrink-0">
+            <CheckCircle2 className="w-8 h-8" strokeWidth={2.5} />
           </div>
         )}
       </div>
