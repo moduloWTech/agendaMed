@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { User, Users, Settings, Lock, LogOut } from 'lucide-react';
+import { User, Settings, Lock, LogOut } from 'lucide-react';
 import { ProfileMenuItem } from '../components/profile/ProfileMenuItem';
 import { UserDataModal } from '../components/profile/UserDataModal';
+import { SettingsModal } from '../components/profile/SettingsModal';
 
 interface ProfileScreenProps {
   onLogout?: () => void;
@@ -9,6 +10,7 @@ interface ProfileScreenProps {
 
 export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   const [isUserDataModalOpen, setIsUserDataModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-gray-50 pb-24 relative animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -42,11 +44,6 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             subtitle="Informações pessoais e contato"
             onClick={() => setIsUserDataModalOpen(true)}
           />
-          <ProfileMenuItem 
-            icon={<Users />}
-            title="Familiares"
-            subtitle="Gerenciar perfis dependentes"
-          />
           
           <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Preferências</h2>
           
@@ -54,6 +51,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             icon={<Settings />}
             title="Configurações"
             subtitle="Notificações e aparência"
+            onClick={() => setIsSettingsModalOpen(true)}
           />
           <ProfileMenuItem 
             icon={<Lock />}
@@ -76,9 +74,12 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
 
       </div>
 
-      {/* Modal Renderizado Condicionalmente */}
+      {/* Modais Renderizados Condicionalmente */}
       {isUserDataModalOpen && (
         <UserDataModal onClose={() => setIsUserDataModalOpen(false)} />
+      )}
+      {isSettingsModalOpen && (
+        <SettingsModal onClose={() => setIsSettingsModalOpen(false)} />
       )}
     </div>
   );
