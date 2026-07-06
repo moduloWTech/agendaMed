@@ -3,6 +3,7 @@ import { User, Settings, Lock, LogOut } from 'lucide-react';
 import { ProfileMenuItem } from '../components/profile/ProfileMenuItem';
 import { UserDataModal } from '../components/profile/UserDataModal';
 import { SettingsModal } from '../components/profile/SettingsModal';
+import { PrivacyModal } from '../components/profile/PrivacyModal';
 
 interface ProfileScreenProps {
   onLogout?: () => void;
@@ -11,6 +12,7 @@ interface ProfileScreenProps {
 export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   const [isUserDataModalOpen, setIsUserDataModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-gray-50 pb-24 relative animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -57,6 +59,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             icon={<Lock />}
             title="Privacidade"
             subtitle="Senhas e segurança da conta"
+            onClick={() => setIsPrivacyModalOpen(true)}
           />
 
           <div className="mt-8 mb-4">
@@ -80,6 +83,9 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
       )}
       {isSettingsModalOpen && (
         <SettingsModal onClose={() => setIsSettingsModalOpen(false)} />
+      )}
+      {isPrivacyModalOpen && (
+        <PrivacyModal onClose={() => setIsPrivacyModalOpen(false)} />
       )}
     </div>
   );
