@@ -28,7 +28,7 @@ export default function App() {
   if (isAuthenticated) {
     let CurrentScreen = <AgendaScreen />;
     if (activeTab === 'cofre') CurrentScreen = <VaultScreen />;
-    if (activeTab === 'perfil') CurrentScreen = <ProfileScreen />;
+    if (activeTab === 'perfil') CurrentScreen = <ProfileScreen onLogout={() => setIsAuthenticated(false)} />;
 
     return (
       <AuthLayout currentTab={activeTab} onChangeTab={setActiveTab}>
