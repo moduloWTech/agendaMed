@@ -1,11 +1,15 @@
+import { useState } from 'react';
 import { User, Users, Settings, Lock, LogOut } from 'lucide-react';
 import { ProfileMenuItem } from '../components/profile/ProfileMenuItem';
+import { UserDataModal } from '../components/profile/UserDataModal';
 
 interface ProfileScreenProps {
   onLogout?: () => void;
 }
 
 export function ProfileScreen({ onLogout }: ProfileScreenProps) {
+  const [isUserDataModalOpen, setIsUserDataModalOpen] = useState(false);
+
   return (
     <div className="flex flex-col w-full min-h-screen bg-gray-50 pb-24 relative animate-in fade-in slide-in-from-bottom-2 duration-500">
       
@@ -36,6 +40,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             icon={<User />}
             title="Meus Dados"
             subtitle="Informações pessoais e contato"
+            onClick={() => setIsUserDataModalOpen(true)}
           />
           <ProfileMenuItem 
             icon={<Users />}
@@ -70,6 +75,11 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
         </div>
 
       </div>
+
+      {/* Modal Renderizado Condicionalmente */}
+      {isUserDataModalOpen && (
+        <UserDataModal onClose={() => setIsUserDataModalOpen(false)} />
+      )}
     </div>
   );
 }
