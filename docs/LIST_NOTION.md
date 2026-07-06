@@ -6,3 +6,5 @@
 - 📘 O Guia Definitivo MW Technology: SDD & Arquitetura Multi-Agentes
 - 🧬 DNA MW Technology | Manual de Cultura e Operação
 - 📘 Manual de Arquitetura e Negócios: Micro-SaaS e Licenciamento Escalonável
+- Guia de Instalação e Inicialização do GitHub Spec Kit (specify-cli)
+- Arquitetura de desenvolvimento de produtos MWT

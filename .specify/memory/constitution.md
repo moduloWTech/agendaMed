@@ -27,7 +27,22 @@ Você deve proativamente evitar falhas comuns e implementar padrões robustos de
 7. **Tokens JWT com Expiração Curta:** Usar tokens com vida útil de, no máximo, 15 minutos e implementar Refresh Tokens rotativos (evitar validade longa).
 8. **Insecure Direct Object Reference (IDOR):** Evitar endpoints que executam ações baseadas unicamente em parâmetros de URL sem verificar as permissões. Sempre cruzar ID requisitado com permissão do usuário autenticado.
 
-## 5. Regras Comportamentais Estritas para Agente de IA
+## 5. Padrão Organizacional do Backend (Layered R-U-R)
+Todo microsserviço Node.js/TypeScript deve ser estruturado em 3 camadas (Router, UseCase, Repositorie):
+- **`*.router.ts`:** Expõe rotas, aplica middlewares, valida dados imediatamente com Zod (fail-fast) e NÃO possui regras de negócio.
+- **`*.usecase.ts`:** Lógica de negócio pura, orquestrando repositórios e serviços (agnóstico ao framework web).
+- **`*.repositorie.ts`:** Acesso direto ao banco de dados, isolando a dependência do ORM (Prisma/TypeORM).
+
+## 6. Arquitetura Stateless e Otimização
+- O backend deve ser cego quanto à infraestrutura e totalmente configurável via `.env` para evitar Vendor Lock-in.
+- **Prevenção OOM (Out Of Memory):** Não processar uploads e compressão de grandes buffers de imagens na RAM do backend. A compressão deve ser feita estritamente no cliente (browser/app) antes do envio, enquanto o backend funciona apenas como repassador (para o S3/CDN).
+
+## 7. Fluxo de Deploy e CI/CD
+- Todo push na branch `main` ativa o pipeline do GitHub Actions, que levanta um banco efêmero e roda obrigatoriamente testes automatizados.
+- O build gera uma imagem Docker que é enviada ao GHCR (GitHub Container Registry).
+- O deploy ocorre automaticamente via conexão SSH na máquina virtual (GCP), puxando a nova imagem Docker, injetando as variáveis via `--env-file` e limpando os resíduos (prune).
+
+## 8. Regras Comportamentais Estritas para Agente de IA
 - **Idioma:** Sempre se comunicar em `pt-br`.
 - **Componentização Estrita:** Sempre componentizar a estrutura para evitar ter arquivos com mais de 150 linhas de código.
 - **Verificação de Regressão Obrigatória:** Sempre que for fazer uma alteração, o agente deve se perguntar ativamente: *"Essa alteração vai modificar o que já está funcionando na aplicação?"* e mitigar riscos.
