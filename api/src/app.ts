@@ -2,6 +2,10 @@ import fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 
+import { UserRouter } from './routes/user.router';
+import { UserUseCase } from './usecases/user.usecase';
+import { UserRepository } from './repositories/user.repository';
+
 export class App {
   private app: FastifyInstance;
   public PORT: number;
@@ -46,10 +50,13 @@ export class App {
       return { status: 'ok', message: 'AgendaMed Backend (OOP MWT R-U-R) rodando 100%' };
     });
 
-    // Aqui vamos registrar as instâncias dos nossos Routers
-    // Exemplo futuro: 
-    // const userRouter = new UserRouter(new UserUseCase(new UserRepository()));
-    // userRouter.register(this.app);
+    // Injeção de Dependências Manual (OOP)
+    const userRepository = new UserRepository();
+    const userUseCase = new UserUseCase(userRepository);
+    const userRouter = new UserRouter(userUseCase);
+
+    // Registrando rotas
+    userRouter.register(this.app);
   }
 
   public async start() {
