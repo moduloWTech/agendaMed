@@ -14,6 +14,10 @@ import { MedicationRouter } from './routes/medication.router';
 import { MedicationUseCase } from './usecases/medication.usecase';
 import { MedicationRepository } from './repositories/medication.repository';
 
+import { DocumentRouter } from './routes/document.router';
+import { DocumentUseCase } from './usecases/document.usecase';
+import { DocumentRepository } from './repositories/document.repository';
+
 export class App {
   private app: FastifyInstance;
   public PORT: number;
@@ -73,10 +77,16 @@ export class App {
     const medicationUseCase = new MedicationUseCase(medicationRepository, patientRepository);
     const medicationRouter = new MedicationRouter(medicationUseCase);
 
+    // Injeção de Dependências Manual (OOP) - DOCUMENT
+    const documentRepository = new DocumentRepository();
+    const documentUseCase = new DocumentUseCase(documentRepository, patientRepository);
+    const documentRouter = new DocumentRouter(documentUseCase);
+
     // Registrando rotas
     userRouter.register(this.app);
     patientRouter.register(this.app);
     medicationRouter.register(this.app);
+    documentRouter.register(this.app);
   }
 
   public async start() {
