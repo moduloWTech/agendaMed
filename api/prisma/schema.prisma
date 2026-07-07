@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  role      String   @default("CARE_GIVER") // CARE_GIVER, ADMIN
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patients Patient[]
+}
+
+model Patient {
+  id        String   @id @default(uuid())
+  name      String
+  birthDate DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  medications Medication[]
+  documents   Document[]
+}
+
+model Medication {
+  id        String   @id @default(uuid())
+  name      String
+  dosage    String
+  frequency String   // e.g. "8h", "daily", "single"
+  startDate DateTime
+  startTime String   // e.g. "08:00"
+  times     String[] // Para horários manuais ["08:00", "12:00"]
+  active    Boolean  @default(true)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patientId String
+  patient   Patient  @relation(fields: [patientId], references: [id])
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  title     String
+  category  String   // "recipe", "exam", "report", "other"
+  date      DateTime
+  fileUrl   String   // URL do S3/Bucket
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patientId String
+  patient   Patient  @relation(fields: [patientId], references: [id])
+}
