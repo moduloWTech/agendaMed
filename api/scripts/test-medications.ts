@@ -7,6 +7,7 @@ async function runMedicationTests() {
     // 1. Setup Mock User
     console.log('➡️ [1/8] Setup: Criando Cuidador MOCK...');
     const mockUser = {
+      phoneWhats: `5511777${Math.floor(100000 + Math.random() * 900000)}`,
       name: 'Cuidador Remédios',
       email: `cuidador-med-${Date.now()}@mwt.com`,
       role: 'CARE_GIVER'

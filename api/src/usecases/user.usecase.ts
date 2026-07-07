@@ -8,17 +8,23 @@ export class UserUseCase {
   async createUser(data: any): Promise<User> {
     // Regra de Negócio: Validação estrita via Zod
     const schema = z.object({
-      name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
-      email: z.string().email('E-mail inválido'),
+      phoneWhats: z.string().min(10, 'O telefone deve ter pelo menos 10 dígitos'),
+      name: z.string().optional(),
+      email: z.string().email('E-mail inválido').optional(),
       role: z.string().optional(),
     });
 
     const parsedData = schema.parse(data);
 
     // Regra de Negócio: Verificar se o usuário já existe
-    const existingUser = await this.userRepository.findByEmail(parsedData.email);
+    const existingUser = await this.userRepository.findByPhoneWhats(parsedData.phoneWhats);
     if (existingUser) {
-      throw new Error('E-mail já cadastrado na plataforma.');
+      throw new Error('Telefone já cadastrado na plataforma.');
+    }
+    
+    if (parsedData.email) {
+      const existingEmail = await this.userRepository.findByEmail(parsedData.email);
+      if (existingEmail) throw new Error('E-mail já cadastrado na plataforma.');
     }
 
     // Regras de negócio passaram, enviar para o repositório salvar
@@ -35,7 +41,9 @@ export class UserUseCase {
 
   async updateUser(id: string, data: any): Promise<User> {
     const schema = z.object({
+      phoneWhats: z.string().optional(),
       name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres').optional(),
+      email: z.string().email('E-mail inválido').optional(),
       role: z.string().optional(),
     });
 

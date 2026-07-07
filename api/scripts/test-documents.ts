@@ -7,6 +7,7 @@ async function runDocumentTests() {
     // 1. Setup Mock User
     console.log('➡️ [1/8] Setup: Criando Cuidador MOCK...');
     const mockUser = {
+      phoneWhats: `5511666${Math.floor(100000 + Math.random() * 900000)}`,
       name: 'Cuidador Documentos',
       email: `cuidador-doc-${Date.now()}@mwt.com`,
       role: 'CARE_GIVER'
