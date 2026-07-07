@@ -6,6 +6,10 @@ import { UserRouter } from './routes/user.router';
 import { UserUseCase } from './usecases/user.usecase';
 import { UserRepository } from './repositories/user.repository';
 
+import { PatientRouter } from './routes/patient.router';
+import { PatientUseCase } from './usecases/patient.usecase';
+import { PatientRepository } from './repositories/patient.repository';
+
 export class App {
   private app: FastifyInstance;
   public PORT: number;
@@ -50,13 +54,19 @@ export class App {
       return { status: 'ok', message: 'AgendaMed Backend (OOP MWT R-U-R) rodando 100%' };
     });
 
-    // Injeção de Dependências Manual (OOP)
+    // Injeção de Dependências Manual (OOP) - USER
     const userRepository = new UserRepository();
     const userUseCase = new UserUseCase(userRepository);
     const userRouter = new UserRouter(userUseCase);
 
+    // Injeção de Dependências Manual (OOP) - PATIENT
+    const patientRepository = new PatientRepository();
+    const patientUseCase = new PatientUseCase(patientRepository, userRepository);
+    const patientRouter = new PatientRouter(patientUseCase);
+
     // Registrando rotas
     userRouter.register(this.app);
+    patientRouter.register(this.app);
   }
 
   public async start() {
