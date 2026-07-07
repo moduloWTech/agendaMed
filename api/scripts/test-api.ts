@@ -14,12 +14,13 @@ async function runTests() {
       throw new Error('Falha no Health-Check');
     }
 
-    // 2. Teste de Criação de Usuário (POST)
-    console.log('\n➡️ [2/5] Testando criação de usuário (POST /users)...');
+    // 2. Criar Usuário (POST)
+    console.log('\n➡️ [2/6] Testando criação de Usuário (POST /users)...');
     const newUser = {
-      name: 'Tester da Silva',
-      email: `tester-${Date.now()}@mwt.com`,
-      role: 'CARE_GIVER'
+      phoneWhats: `5511999${Math.floor(100000 + Math.random() * 900000)}`,
+      name: 'Beth Lima',
+      email: `beth-${Date.now()}@mwt.com`,
+      role: 'ADMIN'
     };
     
     const createRes = await fetch(`${BASE_URL}/users`, {

@@ -8,8 +8,9 @@ export class UserRepository implements IUserRepository {
   async create(data: IUserCreate): Promise<User> {
     return await prisma.user.create({
       data: {
-        name: data.name,
-        email: data.email,
+        phoneWhats: data.phoneWhats,
+        name: data.name || null,
+        email: data.email || null,
         role: data.role || 'CARE_GIVER',
       },
     });
@@ -18,6 +19,12 @@ export class UserRepository implements IUserRepository {
   async findByEmail(email: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: { email },
+    });
+  }
+
+  async findByPhoneWhats(phoneWhats: string): Promise<User | null> {
+    return await prisma.user.findUnique({
+      where: { phoneWhats },
     });
   }
 

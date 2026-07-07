@@ -18,6 +18,11 @@ import { DocumentRouter } from './routes/document.router';
 import { DocumentUseCase } from './usecases/document.usecase';
 import { DocumentRepository } from './repositories/document.repository';
 
+import { AuthRouter } from './routes/auth.router';
+import { AuthUseCase } from './usecases/auth.usecase';
+
+import { WhatsappRouter } from './routes/whatsapp.router';
+
 export class App {
   private app: FastifyInstance;
   public PORT: number;
@@ -82,11 +87,20 @@ export class App {
     const documentUseCase = new DocumentUseCase(documentRepository, patientRepository);
     const documentRouter = new DocumentRouter(documentUseCase);
 
+    // Injeção de Dependências Manual (OOP) - AUTH
+    const authUseCase = new AuthUseCase(userRepository);
+    const authRouter = new AuthRouter(authUseCase);
+
+    // Injeção de Dependências Manual (OOP) - WHATSAPP
+    const whatsappRouter = new WhatsappRouter();
+
     // Registrando rotas
     userRouter.register(this.app);
     patientRouter.register(this.app);
     medicationRouter.register(this.app);
     documentRouter.register(this.app);
+    authRouter.register(this.app);
+    whatsappRouter.register(this.app);
   }
 
   public async start() {

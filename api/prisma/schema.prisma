@@ -8,10 +8,11 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  role      String   @default("CARE_GIVER") // CARE_GIVER, ADMIN
+  id         String   @id @default(uuid())
+  phoneWhats String   @unique
+  email      String?  @unique // Deixamos email opcional para o Onboarding
+  name       String?          // Opcional para preencher no Onboarding
+  role       String   @default("CARE_GIVER") // CARE_GIVER, ADMIN
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
