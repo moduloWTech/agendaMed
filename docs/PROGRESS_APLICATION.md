@@ -32,13 +32,17 @@ Neste exato momento, o esqueleto central do projeto (Frontend ↔ Backend ↔ Ba
 
 ---
 
+- [x] **Upload Real de Arquivos:** Rota construída e enviando as fotos diretamente para o Supabase Storage. O Frontend já recebe a URL final gerada e a salva na criação do Documento.
+
+---
+
 ## 3. O que ainda precisamos fazer (Próximos Passos) 🚀
 
 Para o MVP atingir a sua plenitude, as seguintes funcionalidades críticas estão na fila:
 
 - [ ] **Baixa de Medicamentos (Histórico):** Criar a lógica para quando a pessoa clicar na bolinha do remédio na Agenda, o sistema gravar que a dose daquele horário específico foi "Tomada" por fulano.
 - [ ] **Avisos pelo WhatsApp (Cron Jobs):** Implementar um motor no backend que roda a cada minuto (ou usa agenda) para ler os horários e disparar mensagens automáticas de alerta ("Hora do remédio X!") no WhatsApp.
-- [ ] **Upload Real de Arquivos:** No cofre, substituir a "URL Falsa" da foto por um upload real de imagem (para o servidor, AWS S3, Firebase ou Supabase Storage).
+- [ ] **Foto do Medicamento:** Permitir anexar foto/imagem da caixa do remédio no fluxo de cadastro da Agenda.
 - [ ] **Gestão de Cuidadores (Convites):** Criar a funcionalidade para o Administrador adicionar outros números de WhatsApp na família para que eles também possam pedir o "Magic Link".
 - [ ] **Desconexão por Inatividade/Segurança:** Tratar com mais robustez a queda do bot do WhatsApp ou quando o número admin for removido.
 - [ ] **Testes em Dispositivo Real:** Fazer deploy do Frontend e Backend em uma infraestrutura (ex: Render, Vercel) para testes pesados simulando o dia a dia.

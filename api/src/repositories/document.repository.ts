@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { IDocumentRepository, IDocumentCreate, IDocumentUpdate } from '../interfaces/document.interface';
-import type { Document } from '@prisma/client';
+import type { Document } from '../generated/prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '../DB/prisma.config';
 
 export class DocumentRepository implements IDocumentRepository {
   async create(data: IDocumentCreate): Promise<Document> {

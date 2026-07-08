@@ -1,6 +1,6 @@
 import { IUserRepository, IUserCreate } from '../interfaces/user.interface';
 import { z } from 'zod';
-import type { User } from '@prisma/client';
+import type { User } from '../generated/prisma/client';
 
 export class UserUseCase {
   constructor(private userRepository: IUserRepository) {}

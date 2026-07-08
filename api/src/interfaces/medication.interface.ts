@@ -1,4 +1,4 @@
-import type { Medication } from '@prisma/client';
+import type { Medication } from '../generated/prisma/client';
 
 export interface IMedicationCreate {
   name: string;

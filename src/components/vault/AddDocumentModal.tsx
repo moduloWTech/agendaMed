@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { X, Camera, FileText, FlaskConical, Stethoscope, FilePlus2 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -15,6 +15,8 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
   const [category, setCategory] = useState('recipe');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = async () => {
     if (!activePatient) {
@@ -28,17 +30,40 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
     setIsLoading(true);
     try {
+      let finalFileUrl = 'https://example.com/mock-doc.pdf'; // Fallback
+
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        const uploadRes = await api.post('/api/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        
+        if (uploadRes.fileUrl) {
+          finalFileUrl = uploadRes.fileUrl;
+        }
+      }
+
       await api.post('/api/documents', {
         title,
         category,
         date: new Date(date).toISOString(),
-        fileUrl: 'https://example.com/mock-doc.pdf', // MVP: Mock URL
+        fileUrl: finalFileUrl,
         patientId: activePatient.id
       });
       window.location.reload();
     } catch (error: any) {
       alert('Erro ao salvar documento: ' + (error.message || 'Erro desconhecido'));
       setIsLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
     }
   };
 
@@ -68,11 +93,29 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar">
 
           {/* Câmera / Área de Foto */}
-          <div className="w-full h-40 border-2 border-dashed border-[var(--color-primary)]/40 bg-[var(--color-primary)]/5 rounded-[32px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-[var(--color-primary)]/10 transition-colors">
-            <div className="p-4 bg-white rounded-full shadow-sm text-[var(--color-primary)]">
-              <Camera className="w-8 h-8" />
-            </div>
-            <span className="font-semibold text-[var(--color-primary)]">Tirar foto do documento</span>
+          <div 
+            className="w-full h-40 border-2 border-dashed border-[var(--color-primary)]/40 bg-[var(--color-primary)]/5 rounded-[32px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-[var(--color-primary)]/10 transition-colors overflow-hidden relative"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {selectedFile ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/5">
+                <span className="font-medium text-gray-700 px-4 text-center">{selectedFile.name}</span>
+              </div>
+            ) : (
+              <>
+                <div className="p-4 bg-white rounded-full shadow-sm text-[var(--color-primary)]">
+                  <Camera className="w-8 h-8" />
+                </div>
+                <span className="font-semibold text-[var(--color-primary)]">Tirar foto do documento</span>
+              </>
+            )}
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*,application/pdf" 
+              className="hidden" 
+            />
           </div>
 
           {/* Nome do Documento */}
