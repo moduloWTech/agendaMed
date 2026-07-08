@@ -4,13 +4,14 @@ import { LoginScreen } from './screens/LoginScreen';
 import { AgendaScreen } from './screens/AgendaScreen';
 import { VaultScreen } from './screens/VaultScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
+import { AppointmentsScreen } from './screens/AppointmentsScreen';
 import { AuthLayout } from './components/layout/AuthLayout';
 import { useAuth } from './contexts/AuthContext';
 
 export default function App() {
   const { isAuthenticated, isLoading, login, logout } = useAuth();
   const [isVerifyingToken, setIsVerifyingToken] = useState(false);
-  const [activeTab, setActiveTab] = useState<'agenda' | 'cofre' | 'perfil'>('agenda');
+  const [activeTab, setActiveTab] = useState<'agenda' | 'consultas' | 'cofre' | 'perfil'>('agenda');
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -45,6 +46,7 @@ export default function App() {
 
   if (isAuthenticated) {
     let CurrentScreen = <AgendaScreen />;
+    if (activeTab === 'consultas') CurrentScreen = <AppointmentsScreen />;
     if (activeTab === 'cofre') CurrentScreen = <VaultScreen />;
     if (activeTab === 'perfil') CurrentScreen = <ProfileScreen onLogout={logout} />;
 

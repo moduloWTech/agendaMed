@@ -20,6 +20,10 @@ import { DocumentRouter } from './routes/document.router';
 import { DocumentUseCase } from './usecases/document.usecase';
 import { DocumentRepository } from './repositories/document.repository';
 
+import { AppointmentRouter } from './routes/appointment.router';
+import { AppointmentUseCase } from './usecases/appointment.usecase';
+import { AppointmentRepository } from './repositories/appointment.repository';
+
 import { AuthRouter } from './routes/auth.router';
 import { AuthUseCase } from './usecases/auth.usecase';
 
@@ -96,6 +100,11 @@ export class App {
     const documentUseCase = new DocumentUseCase(documentRepository, patientRepository);
     const documentRouter = new DocumentRouter(documentUseCase);
 
+    // Injeção de Dependências Manual (OOP) - APPOINTMENT
+    const appointmentRepository = new AppointmentRepository();
+    const appointmentUseCase = new AppointmentUseCase(appointmentRepository);
+    const appointmentRouter = new AppointmentRouter(appointmentUseCase);
+
     // Injeção de Dependências Manual (OOP) - AUTH
     const authUseCase = new AuthUseCase(userRepository);
     const authRouter = new AuthRouter(authUseCase);
@@ -108,6 +117,7 @@ export class App {
     patientRouter.register(this.app);
     medicationRouter.register(this.app);
     documentRouter.register(this.app);
+    appointmentRouter.register(this.app);
     authRouter.register(this.app);
     whatsappRouter.register(this.app);
 

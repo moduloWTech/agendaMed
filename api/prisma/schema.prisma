@@ -31,6 +31,7 @@ model Patient {
 
   medications Medication[]
   documents   Document[]
+  appointments Appointment[]
 }
 
 model Medication {
@@ -64,4 +65,25 @@ model Document {
 
   patientId String
   patient   Patient @relation(fields: [patientId], references: [id])
+}
+
+model Appointment {
+  id               String   @id @default(uuid())
+  specialty        String   // Ex: Cardiologista, Fisioterapia, Exame
+  doctorName       String?  
+  date             DateTime // Data da consulta
+  time             String   // Horário (ex: "14:30")
+  location         String?  // Clínica ou Endereço
+  notes            String?  // Recomendações
+  
+  // Configurações de Alerta
+  alertEnabled     Boolean  @default(true)
+  alertHoursBefore Int      @default(24) // Alerta padrão inicial (ex: 24h antes)
+  intensiveAlerts  Boolean  @default(false) // Alerta em Cascata (45m, 30m, 15m, 0m)
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  patientId        String
+  patient          Patient  @relation(fields: [patientId], references: [id])
 }

@@ -3,8 +3,8 @@ import { BottomNav } from './BottomNav';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
-  currentTab?: 'agenda' | 'cofre' | 'perfil';
-  onChangeTab?: (tab: 'agenda' | 'cofre' | 'perfil') => void;
+  currentTab?: 'agenda' | 'consultas' | 'cofre' | 'perfil';
+  onChangeTab?: (tab: 'agenda' | 'consultas' | 'cofre' | 'perfil') => void;
 }
 
 export function AuthLayout({ children, currentTab = 'agenda', onChangeTab }: AuthLayoutProps) {
