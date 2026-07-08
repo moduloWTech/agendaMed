@@ -1,7 +1,7 @@
 import { IPatientRepository } from '../interfaces/patient.interface';
 import { IUserRepository } from '../interfaces/user.interface';
 import { z } from 'zod';
-import type { Patient } from '@prisma/client';
+import type { Patient } from '../generated/prisma/client';
 
 export class PatientUseCase {
   constructor(

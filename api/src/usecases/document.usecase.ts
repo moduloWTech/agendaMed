@@ -1,7 +1,7 @@
 import { IDocumentRepository } from '../interfaces/document.interface';
 import { IPatientRepository } from '../interfaces/patient.interface';
 import { z } from 'zod';
-import type { Document } from '@prisma/client';
+import type { Document } from '../generated/prisma/client';
 
 export class DocumentUseCase {
   constructor(

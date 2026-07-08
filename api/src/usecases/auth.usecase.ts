@@ -2,10 +2,9 @@ import { IUserRepository } from '../interfaces/user.interface';
 import { whatsappService } from '../services/whatsapp.service';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
-const prisma = new PrismaClient(); // Apenas para a checagem de banco vazio
+import { prisma } from '../DB/prisma.config';
 
 export class AuthUseCase {
   constructor(private userRepository: IUserRepository) {}

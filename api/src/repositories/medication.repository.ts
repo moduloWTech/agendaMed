@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { IMedicationRepository, IMedicationCreate, IMedicationUpdate } from '../interfaces/medication.interface';
-import type { Medication } from '@prisma/client';
+import type { Medication } from '../generated/prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '../DB/prisma.config';
 
 export class MedicationRepository implements IMedicationRepository {
   async create(data: IMedicationCreate): Promise<Medication> {

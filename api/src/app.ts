@@ -1,6 +1,8 @@
 import fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
+import multipart from '@fastify/multipart';
+import { uploadRoutes } from './routes/upload.router';
 
 import { UserRouter } from './routes/user.router';
 import { UserUseCase } from './usecases/user.usecase';
@@ -55,6 +57,13 @@ export class App {
     // Middlewares de Segurança (Constituição MWT)
     this.app.register(helmet);
 
+    // Multipart para aceitar envio de arquivos
+    this.app.register(multipart, {
+      limits: {
+        fileSize: 10 * 1024 * 1024 // 10MB limit
+      }
+    });
+
     this.app.register(cors, {
       origin: '*', // Em produção, usar whitelist
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -101,6 +110,8 @@ export class App {
     documentRouter.register(this.app);
     authRouter.register(this.app);
     whatsappRouter.register(this.app);
+
+    this.app.register(uploadRoutes, { prefix: '/api/upload' });
   }
 
   public async start() {

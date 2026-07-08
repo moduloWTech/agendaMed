@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { IPatientRepository, IPatientCreate, IPatientUpdate } from '../interfaces/patient.interface';
-import type { Patient } from '@prisma/client';
+import type { Patient } from '../generated/prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '../DB/prisma.config';
 
 export class PatientRepository implements IPatientRepository {
   async create(data: IPatientCreate): Promise<Patient> {

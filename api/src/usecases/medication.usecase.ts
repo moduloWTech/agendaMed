@@ -1,7 +1,7 @@
 import { IMedicationRepository } from '../interfaces/medication.interface';
 import { IPatientRepository } from '../interfaces/patient.interface';
 import { z } from 'zod';
-import type { Medication } from '@prisma/client';
+import type { Medication } from '../generated/prisma/client';
 
 export class MedicationUseCase {
   constructor(

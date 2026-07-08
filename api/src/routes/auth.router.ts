@@ -1,9 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import { AuthUseCase } from '../usecases/auth.usecase';
 
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '../DB/prisma.config';
 
 export class AuthRouter {
   constructor(private authUseCase: AuthUseCase) {}
