@@ -143,11 +143,13 @@ exports.Prisma.MedicationScalarFieldEnum = {
   id: 'id',
   name: 'name',
   dosage: 'dosage',
+  instructions: 'instructions',
   frequency: 'frequency',
   startDate: 'startDate',
   startTime: 'startTime',
   times: 'times',
   active: 'active',
+  photoUrl: 'photoUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   patientId: 'patientId'

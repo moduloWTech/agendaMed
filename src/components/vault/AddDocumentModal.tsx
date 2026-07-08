@@ -37,9 +37,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
         formData.append('file', selectedFile);
 
         const uploadRes = await api.post('/api/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+          isMultipart: true,
         });
         
         if (uploadRes.fileUrl) {
@@ -94,12 +92,29 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
           {/* Câmera / Área de Foto */}
           <div 
-            className="w-full h-40 border-2 border-dashed border-[var(--color-primary)]/40 bg-[var(--color-primary)]/5 rounded-[32px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-[var(--color-primary)]/10 transition-colors overflow-hidden relative"
+            className="w-full h-40 min-h-[160px] flex-shrink-0 border-2 border-dashed border-[var(--color-primary)]/40 bg-[var(--color-primary)]/5 rounded-[32px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-[var(--color-primary)]/10 transition-colors overflow-hidden relative"
             onClick={() => fileInputRef.current?.click()}
           >
             {selectedFile ? (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/5">
-                <span className="font-medium text-gray-700 px-4 text-center">{selectedFile.name}</span>
+              <div className="absolute inset-0 group">
+                {selectedFile.type.startsWith('image/') ? (
+                  <>
+                    <img 
+                      src={URL.createObjectURL(selectedFile)} 
+                      alt="Preview" 
+                      className="w-full h-full object-cover rounded-[30px]"
+                    />
+                    <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-[30px]">
+                      <Camera className="w-10 h-10 text-white mb-2" />
+                      <span className="text-white font-semibold text-center px-4">Tocar para trocar a foto</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center w-full h-full bg-black/5">
+                    <FileText className="w-10 h-10 text-[var(--color-primary)] mb-2" />
+                    <span className="font-medium text-gray-700 px-4 text-center">{selectedFile.name}</span>
+                  </div>
+                )}
               </div>
             ) : (
               <>

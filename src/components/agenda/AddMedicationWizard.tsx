@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import { X, Camera, Plus, Trash2, ArrowRight, Check } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { X, ArrowRight, Check } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
 import { api } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { FeedbackModal } from '../ui/FeedbackModal';
+import { Step1BasicInfo } from './wizard/Step1BasicInfo';
+import { Step2Photo } from './wizard/Step2Photo';
+import { Step3Frequency } from './wizard/Step3Frequency';
 
 interface AddMedicationWizardProps {
   onClose: () => void;
@@ -13,10 +16,20 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
   const { activePatient } = useAuth();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [feedback, setFeedback] = useState<{ isOpen: boolean; title: string; message: string; type: 'success'|'error'|'warning'|'info' }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
 
   // States
   const [name, setName] = useState('');
   const [dosage, setDosage] = useState('');
+  const [instructions, setInstructions] = useState('');
 
   // Novos estados para a Lógica de Frequência
   const [frequency, setFrequency] = useState('8h');
@@ -46,31 +59,69 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
 
   const handleFinish = async () => {
     if (!activePatient) {
-      alert('Selecione um paciente ativo primeiro.');
+      setFeedback({
+        isOpen: true,
+        title: 'Atenção',
+        message: 'Selecione um paciente ativo primeiro.',
+        type: 'warning'
+      });
       return;
     }
     if (!name || !dosage) {
-      alert('Preencha o nome e a dosagem do medicamento.');
+      setFeedback({
+        isOpen: true,
+        title: 'Dados Incompletos',
+        message: 'Preencha o nome e a dosagem do medicamento.',
+        type: 'warning'
+      });
       setStep(1);
       return;
     }
 
     setIsLoading(true);
     try {
+      let photoUrl = null;
+
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        const uploadRes = await api.post('/api/upload', formData, {
+          isMultipart: true,
+        });
+        
+        if (uploadRes.fileUrl) {
+          photoUrl = uploadRes.fileUrl;
+        }
+      }
+
       await api.post('/api/medications', {
         name,
         dosage,
+        instructions,
         frequency,
         startDate: frequency === 'manual' ? new Date().toISOString() : new Date(startDate).toISOString(),
         startTime: frequency === 'manual' ? times[0] : startTime,
         times: frequency === 'manual' ? times : [],
         patientId: activePatient.id,
+        photoUrl,
         active: true
       });
       window.location.reload(); // Recarrega a tela para buscar novos dados
     } catch (error: any) {
-      alert('Erro ao salvar medicamento: ' + (error.message || 'Erro desconhecido'));
+      setFeedback({
+        isOpen: true,
+        title: 'Erro ao Salvar',
+        message: error.message || 'Ocorreu um erro desconhecido.',
+        type: 'error'
+      });
       setIsLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
     }
   };
 
@@ -108,134 +159,34 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
 
           {/* Passo 1: Informações Básicas */}
           {step === 1 && (
-            <div className="flex flex-col gap-5 animate-in slide-in-from-right-4 duration-300">
-              <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-1">Qual o medicamento?</h3>
-                <p className="text-gray-500 text-sm mb-4">Informe o nome exatamente como está na receita.</p>
-                <Input
-                  label="Nome do Remédio"
-                  placeholder="Ex: Losartana Potássica"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div>
-                <Input
-                  label="Dosagem / Instruções"
-                  placeholder="Ex: 50mg - 1 comprimido"
-                  value={dosage}
-                  onChange={(e) => setDosage(e.target.value)}
-                />
-              </div>
-            </div>
+            <Step1BasicInfo 
+              name={name} setName={setName}
+              dosage={dosage} setDosage={setDosage}
+              instructions={instructions} setInstructions={setInstructions}
+            />
           )}
 
           {/* Passo 2: Foto */}
           {step === 2 && (
-            <div className="flex flex-col gap-5 animate-in slide-in-from-right-4 duration-300 h-full">
-              <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-1">Foto da Caixa</h3>
-                <p className="text-gray-500 text-sm mb-4">Ajuda o cuidador a não confundir os remédios.</p>
-              </div>
-
-              <div className="flex-1 min-h-[200px] border-2 border-dashed border-[var(--color-primary)]/40 bg-[var(--color-primary)]/5 rounded-[32px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-[var(--color-primary)]/10 transition-colors">
-                <div className="p-4 bg-white rounded-full shadow-sm text-[var(--color-primary)]">
-                  <Camera className="w-8 h-8" />
-                </div>
-                <span className="font-semibold text-[var(--color-primary)]">Tirar foto agora</span>
-              </div>
-            </div>
+            <Step2Photo
+              selectedFile={selectedFile}
+              fileInputRef={fileInputRef}
+              handleFileChange={handleFileChange}
+            />
           )}
 
           {/* Passo 3: Horários */}
           {step === 3 && (
-            <div className="flex flex-col gap-5 animate-in slide-in-from-right-4 duration-300">
-              <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-1">Frequência</h3>
-                <p className="text-gray-500 text-sm mb-4">De quanto em quanto tempo?</p>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-gray-700 font-medium text-[15px] ml-1">Intervalo</label>
-                  <select
-                    value={frequency}
-                    onChange={(e) => setFrequency(e.target.value)}
-                    className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-lg outline-none transition-all cursor-pointer"
-                  >
-                    <option value="4h">A cada 4 horas</option>
-                    <option value="6h">A cada 6 horas</option>
-                    <option value="8h">A cada 8 horas</option>
-                    <option value="12h">A cada 12 horas</option>
-                    <option value="daily">Diário</option>
-                    <option value="weekly">Semanal</option>
-                    <option value="monthly">Mensal</option>
-                    <option value="single">Dose Única</option>
-                    <option value="manual">Adicionar horários manualmente</option>
-                  </select>
-                </div>
-
-                {frequency === 'manual' && (
-                  <div className="flex flex-col gap-3">
-                    <label className="text-gray-700 font-medium text-[15px] ml-1">Quais horários?</label>
-                    {times.map((time, index) => (
-                      <div key={index} className="flex items-center gap-3 bg-[#F8FAFC] p-2 pr-4 rounded-[24px] border border-gray-100">
-                        <input
-                          type="time"
-                          value={time}
-                          onChange={(e) => updateTime(index, e.target.value)}
-                          className="flex-1 bg-transparent text-xl font-bold text-gray-800 outline-none px-4 py-2"
-                        />
-                        {times.length > 1 && (
-                          <button
-                            onClick={() => handleRemoveTime(index)}
-                            className="p-2 text-red-400 hover:text-red-600 transition-colors"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-
-                    <button
-                      onClick={handleAddTime}
-                      className="flex items-center justify-center gap-2 py-4 border-2 border-dashed border-gray-300 rounded-[24px] text-gray-500 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all"
-                    >
-                      <Plus className="w-5 h-5" />
-                      Adicionar outro horário
-                    </button>
-                  </div>
-                )}
-
-                {frequency !== 'manual' && (
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-gray-700 font-medium text-[15px] ml-1">Data da Primeira Dose</label>
-                      <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-base outline-none transition-all cursor-pointer"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="text-gray-700 font-medium text-[15px] ml-1">Horário da Primeira Dose</label>
-                      <input
-                        type="time"
-                        value={startTime}
-                        onChange={(e) => setStartTime(e.target.value)}
-                        className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-base outline-none transition-all cursor-pointer text-center"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="bg-[var(--color-primary)]/5 text-[var(--color-primary)] p-4 rounded-[20px] text-sm text-center border border-[var(--color-primary)]/20 mt-2">
-                  <span className="font-semibold block mb-1">Como funciona:</span>
-                  <span className="opacity-90 leading-relaxed">{getNextDoseText()}</span>
-                </div>
-              </div>
-            </div>
+            <Step3Frequency
+              frequency={frequency} setFrequency={setFrequency}
+              startDate={startDate} setStartDate={setStartDate}
+              startTime={startTime} setStartTime={setStartTime}
+              times={times}
+              handleAddTime={handleAddTime}
+              handleRemoveTime={handleRemoveTime}
+              updateTime={updateTime}
+              getNextDoseText={getNextDoseText}
+            />
           )}
 
         </div>
@@ -271,8 +222,15 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
             </Button>
           )}
         </div>
-
       </div>
+
+      <FeedbackModal 
+        isOpen={feedback.isOpen}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+        title={feedback.title}
+        message={feedback.message}
+        type={feedback.type}
+      />
     </div>
   );
 }

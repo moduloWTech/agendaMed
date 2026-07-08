@@ -34,14 +34,16 @@ model Patient {
 }
 
 model Medication {
-  id        String   @id @default(uuid())
-  name      String
-  dosage    String
-  frequency String // e.g. "8h", "daily", "single"
-  startDate DateTime
-  startTime String // e.g. "08:00"
-  times     String[] // Para horários manuais ["08:00", "12:00"]
-  active    Boolean  @default(true)
+  id           String   @id @default(uuid())
+  name         String
+  dosage       String // e.g. "50mg", "10ml"
+  instructions String // e.g. "1 comprimido", "20 gotas"
+  frequency    String // e.g. "8h", "daily", "single"
+  startDate    DateTime
+  startTime    String // e.g. "08:00"
+  times        String[] // Para horários manuais ["08:00", "12:00"]
+  active       Boolean  @default(true)
+  photoUrl     String? // URL da foto da caixa do medicamento
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

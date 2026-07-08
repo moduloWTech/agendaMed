@@ -45,21 +45,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const patients = await api.get(`/api/users/${parsedUser.id}/patients`);
           if (patients && patients.length > 0) {
             setActivePatient(patients[0]);
-          } else if (parsedUser.role === 'ADMIN') {
-            // Se não tem paciente e é ADMIN, cria o paciente padrão nos bastidores
-            try {
-              const newPatient = await api.post('/api/patients', {
-                name: 'Meu paciente',
-                userId: parsedUser.id,
-                dateOfBirth: '1980-01-01'
-              });
-              setActivePatient(newPatient);
-            } catch (e) {
-              console.error('Falha ao auto-criar paciente', e);
-            }
+          } else {
+            // Se o usuário não tem paciente, ele foi deletado do banco (ex: reset do DB)
+            // Mas o token ficou salvo no navegador
+            console.warn('Nenhum paciente encontrado para este usuário. Deslogando...');
+            localStorage.removeItem('@agendaMed:token');
+            localStorage.removeItem('@agendaMed:user');
+            setUser(null);
           }
         } catch (error) {
           console.error('Falha ao carregar pacientes no AuthContext', error);
+          // Auto-desloga se houver erro (usuário inválido)
+          localStorage.removeItem('@agendaMed:token');
+          localStorage.removeItem('@agendaMed:user');
+          setUser(null);
         }
       }
       setIsLoading(false);
@@ -68,10 +67,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadStoredData();
   }, []);
 
-  const login = (token: string, userData: User) => {
+  const login = async (token: string, userData: User) => {
     localStorage.setItem('@agendaMed:token', token);
     localStorage.setItem('@agendaMed:user', JSON.stringify(userData));
     setUser(userData);
+
+    // Busca o paciente assim que loga (para não ter que dar F5)
+    try {
+      const patients = await api.get(`/api/users/${userData.id}/patients`);
+      if (patients && patients.length > 0) {
+        setActivePatient(patients[0]);
+      } else {
+        console.warn('Nenhum paciente encontrado para o usuário no login.');
+      }
+    } catch (err) {
+      console.error('Erro ao buscar pacientes no login:', err);
+    }
   };
 
   const logout = () => {

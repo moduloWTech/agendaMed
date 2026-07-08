@@ -69,18 +69,26 @@ export class AuthUseCase {
       phoneWhats: z.string().min(10, 'O telefone deve ter pelo menos 10 dígitos'),
       name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
       email: z.string().email('E-mail inválido'),
+      patientName: z.string().min(2, 'O nome do paciente deve ter no mínimo 2 caracteres'),
     });
 
     const parsed = schema.parse(data);
 
-    await this.userRepository.create({
-      phoneWhats: parsed.phoneWhats,
-      name: parsed.name,
-      email: parsed.email,
-      role: 'ADMIN',
+    await prisma.user.create({
+      data: {
+        phoneWhats: parsed.phoneWhats,
+        name: parsed.name,
+        email: parsed.email,
+        role: 'ADMIN',
+        patients: {
+          create: {
+            name: parsed.patientName,
+          }
+        }
+      }
     });
 
-    return { message: 'Administrador cadastrado com sucesso.' };
+    return { message: 'Administrador e Paciente cadastrados com sucesso.' };
   }
 
   /**

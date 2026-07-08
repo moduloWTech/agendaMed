@@ -3458,10 +3458,12 @@ export namespace Prisma {
     id: string | null
     name: string | null
     dosage: string | null
+    instructions: string | null
     frequency: string | null
     startDate: Date | null
     startTime: string | null
     active: boolean | null
+    photoUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
     patientId: string | null
@@ -3471,10 +3473,12 @@ export namespace Prisma {
     id: string | null
     name: string | null
     dosage: string | null
+    instructions: string | null
     frequency: string | null
     startDate: Date | null
     startTime: string | null
     active: boolean | null
+    photoUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
     patientId: string | null
@@ -3484,11 +3488,13 @@ export namespace Prisma {
     id: number
     name: number
     dosage: number
+    instructions: number
     frequency: number
     startDate: number
     startTime: number
     times: number
     active: number
+    photoUrl: number
     createdAt: number
     updatedAt: number
     patientId: number
@@ -3500,10 +3506,12 @@ export namespace Prisma {
     id?: true
     name?: true
     dosage?: true
+    instructions?: true
     frequency?: true
     startDate?: true
     startTime?: true
     active?: true
+    photoUrl?: true
     createdAt?: true
     updatedAt?: true
     patientId?: true
@@ -3513,10 +3521,12 @@ export namespace Prisma {
     id?: true
     name?: true
     dosage?: true
+    instructions?: true
     frequency?: true
     startDate?: true
     startTime?: true
     active?: true
+    photoUrl?: true
     createdAt?: true
     updatedAt?: true
     patientId?: true
@@ -3526,11 +3536,13 @@ export namespace Prisma {
     id?: true
     name?: true
     dosage?: true
+    instructions?: true
     frequency?: true
     startDate?: true
     startTime?: true
     times?: true
     active?: true
+    photoUrl?: true
     createdAt?: true
     updatedAt?: true
     patientId?: true
@@ -3613,11 +3625,13 @@ export namespace Prisma {
     id: string
     name: string
     dosage: string
+    instructions: string
     frequency: string
     startDate: Date
     startTime: string
     times: string[]
     active: boolean
+    photoUrl: string | null
     createdAt: Date
     updatedAt: Date
     patientId: string
@@ -3644,11 +3658,13 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     dosage?: boolean
+    instructions?: boolean
     frequency?: boolean
     startDate?: boolean
     startTime?: boolean
     times?: boolean
     active?: boolean
+    photoUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     patientId?: boolean
@@ -3659,11 +3675,13 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     dosage?: boolean
+    instructions?: boolean
     frequency?: boolean
     startDate?: boolean
     startTime?: boolean
     times?: boolean
     active?: boolean
+    photoUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     patientId?: boolean
@@ -3674,11 +3692,13 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     dosage?: boolean
+    instructions?: boolean
     frequency?: boolean
     startDate?: boolean
     startTime?: boolean
     times?: boolean
     active?: boolean
+    photoUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     patientId?: boolean
@@ -3689,17 +3709,19 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     dosage?: boolean
+    instructions?: boolean
     frequency?: boolean
     startDate?: boolean
     startTime?: boolean
     times?: boolean
     active?: boolean
+    photoUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     patientId?: boolean
   }
 
-  export type MedicationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "dosage" | "frequency" | "startDate" | "startTime" | "times" | "active" | "createdAt" | "updatedAt" | "patientId", ExtArgs["result"]["medication"]>
+  export type MedicationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "dosage" | "instructions" | "frequency" | "startDate" | "startTime" | "times" | "active" | "photoUrl" | "createdAt" | "updatedAt" | "patientId", ExtArgs["result"]["medication"]>
   export type MedicationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     patient?: boolean | PatientDefaultArgs<ExtArgs>
   }
@@ -3719,11 +3741,13 @@ export namespace Prisma {
       id: string
       name: string
       dosage: string
+      instructions: string
       frequency: string
       startDate: Date
       startTime: string
       times: string[]
       active: boolean
+      photoUrl: string | null
       createdAt: Date
       updatedAt: Date
       patientId: string
@@ -4154,11 +4178,13 @@ export namespace Prisma {
     readonly id: FieldRef<"Medication", 'String'>
     readonly name: FieldRef<"Medication", 'String'>
     readonly dosage: FieldRef<"Medication", 'String'>
+    readonly instructions: FieldRef<"Medication", 'String'>
     readonly frequency: FieldRef<"Medication", 'String'>
     readonly startDate: FieldRef<"Medication", 'DateTime'>
     readonly startTime: FieldRef<"Medication", 'String'>
     readonly times: FieldRef<"Medication", 'String[]'>
     readonly active: FieldRef<"Medication", 'Boolean'>
+    readonly photoUrl: FieldRef<"Medication", 'String'>
     readonly createdAt: FieldRef<"Medication", 'DateTime'>
     readonly updatedAt: FieldRef<"Medication", 'DateTime'>
     readonly patientId: FieldRef<"Medication", 'String'>
@@ -5726,11 +5752,13 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     dosage: 'dosage',
+    instructions: 'instructions',
     frequency: 'frequency',
     startDate: 'startDate',
     startTime: 'startTime',
     times: 'times',
     active: 'active',
+    photoUrl: 'photoUrl',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     patientId: 'patientId'
@@ -5972,11 +6000,13 @@ export namespace Prisma {
     id?: StringFilter<"Medication"> | string
     name?: StringFilter<"Medication"> | string
     dosage?: StringFilter<"Medication"> | string
+    instructions?: StringFilter<"Medication"> | string
     frequency?: StringFilter<"Medication"> | string
     startDate?: DateTimeFilter<"Medication"> | Date | string
     startTime?: StringFilter<"Medication"> | string
     times?: StringNullableListFilter<"Medication">
     active?: BoolFilter<"Medication"> | boolean
+    photoUrl?: StringNullableFilter<"Medication"> | string | null
     createdAt?: DateTimeFilter<"Medication"> | Date | string
     updatedAt?: DateTimeFilter<"Medication"> | Date | string
     patientId?: StringFilter<"Medication"> | string
@@ -5987,11 +6017,13 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     dosage?: SortOrder
+    instructions?: SortOrder
     frequency?: SortOrder
     startDate?: SortOrder
     startTime?: SortOrder
     times?: SortOrder
     active?: SortOrder
+    photoUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     patientId?: SortOrder
@@ -6005,11 +6037,13 @@ export namespace Prisma {
     NOT?: MedicationWhereInput | MedicationWhereInput[]
     name?: StringFilter<"Medication"> | string
     dosage?: StringFilter<"Medication"> | string
+    instructions?: StringFilter<"Medication"> | string
     frequency?: StringFilter<"Medication"> | string
     startDate?: DateTimeFilter<"Medication"> | Date | string
     startTime?: StringFilter<"Medication"> | string
     times?: StringNullableListFilter<"Medication">
     active?: BoolFilter<"Medication"> | boolean
+    photoUrl?: StringNullableFilter<"Medication"> | string | null
     createdAt?: DateTimeFilter<"Medication"> | Date | string
     updatedAt?: DateTimeFilter<"Medication"> | Date | string
     patientId?: StringFilter<"Medication"> | string
@@ -6020,11 +6054,13 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     dosage?: SortOrder
+    instructions?: SortOrder
     frequency?: SortOrder
     startDate?: SortOrder
     startTime?: SortOrder
     times?: SortOrder
     active?: SortOrder
+    photoUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     patientId?: SortOrder
@@ -6040,11 +6076,13 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Medication"> | string
     name?: StringWithAggregatesFilter<"Medication"> | string
     dosage?: StringWithAggregatesFilter<"Medication"> | string
+    instructions?: StringWithAggregatesFilter<"Medication"> | string
     frequency?: StringWithAggregatesFilter<"Medication"> | string
     startDate?: DateTimeWithAggregatesFilter<"Medication"> | Date | string
     startTime?: StringWithAggregatesFilter<"Medication"> | string
     times?: StringNullableListFilter<"Medication">
     active?: BoolWithAggregatesFilter<"Medication"> | boolean
+    photoUrl?: StringNullableWithAggregatesFilter<"Medication"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Medication"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Medication"> | Date | string
     patientId?: StringWithAggregatesFilter<"Medication"> | string
@@ -6268,11 +6306,13 @@ export namespace Prisma {
     id?: string
     name: string
     dosage: string
+    instructions: string
     frequency: string
     startDate: Date | string
     startTime: string
     times?: MedicationCreatetimesInput | string[]
     active?: boolean
+    photoUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     patient: PatientCreateNestedOneWithoutMedicationsInput
@@ -6282,11 +6322,13 @@ export namespace Prisma {
     id?: string
     name: string
     dosage: string
+    instructions: string
     frequency: string
     startDate: Date | string
     startTime: string
     times?: MedicationCreatetimesInput | string[]
     active?: boolean
+    photoUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     patientId: string
@@ -6296,11 +6338,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     dosage?: StringFieldUpdateOperationsInput | string
+    instructions?: StringFieldUpdateOperationsInput | string
     frequency?: StringFieldUpdateOperationsInput | string
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     startTime?: StringFieldUpdateOperationsInput | string
     times?: MedicationUpdatetimesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patient?: PatientUpdateOneRequiredWithoutMedicationsNestedInput
@@ -6310,11 +6354,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     dosage?: StringFieldUpdateOperationsInput | string
+    instructions?: StringFieldUpdateOperationsInput | string
     frequency?: StringFieldUpdateOperationsInput | string
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     startTime?: StringFieldUpdateOperationsInput | string
     times?: MedicationUpdatetimesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patientId?: StringFieldUpdateOperationsInput | string
@@ -6324,11 +6370,13 @@ export namespace Prisma {
     id?: string
     name: string
     dosage: string
+    instructions: string
     frequency: string
     startDate: Date | string
     startTime: string
     times?: MedicationCreatetimesInput | string[]
     active?: boolean
+    photoUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     patientId: string
@@ -6338,11 +6386,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     dosage?: StringFieldUpdateOperationsInput | string
+    instructions?: StringFieldUpdateOperationsInput | string
     frequency?: StringFieldUpdateOperationsInput | string
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     startTime?: StringFieldUpdateOperationsInput | string
     times?: MedicationUpdatetimesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6351,11 +6401,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     dosage?: StringFieldUpdateOperationsInput | string
+    instructions?: StringFieldUpdateOperationsInput | string
     frequency?: StringFieldUpdateOperationsInput | string
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     startTime?: StringFieldUpdateOperationsInput | string
     times?: MedicationUpdatetimesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patientId?: StringFieldUpdateOperationsInput | string
@@ -6672,11 +6724,13 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     dosage?: SortOrder
+    instructions?: SortOrder
     frequency?: SortOrder
     startDate?: SortOrder
     startTime?: SortOrder
     times?: SortOrder
     active?: SortOrder
+    photoUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     patientId?: SortOrder
@@ -6686,10 +6740,12 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     dosage?: SortOrder
+    instructions?: SortOrder
     frequency?: SortOrder
     startDate?: SortOrder
     startTime?: SortOrder
     active?: SortOrder
+    photoUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     patientId?: SortOrder
@@ -6699,10 +6755,12 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     dosage?: SortOrder
+    instructions?: SortOrder
     frequency?: SortOrder
     startDate?: SortOrder
     startTime?: SortOrder
     active?: SortOrder
+    photoUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     patientId?: SortOrder
@@ -7180,11 +7238,13 @@ export namespace Prisma {
     id?: string
     name: string
     dosage: string
+    instructions: string
     frequency: string
     startDate: Date | string
     startTime: string
     times?: MedicationCreatetimesInput | string[]
     active?: boolean
+    photoUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7193,11 +7253,13 @@ export namespace Prisma {
     id?: string
     name: string
     dosage: string
+    instructions: string
     frequency: string
     startDate: Date | string
     startTime: string
     times?: MedicationCreatetimesInput | string[]
     active?: boolean
+    photoUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7296,11 +7358,13 @@ export namespace Prisma {
     id?: StringFilter<"Medication"> | string
     name?: StringFilter<"Medication"> | string
     dosage?: StringFilter<"Medication"> | string
+    instructions?: StringFilter<"Medication"> | string
     frequency?: StringFilter<"Medication"> | string
     startDate?: DateTimeFilter<"Medication"> | Date | string
     startTime?: StringFilter<"Medication"> | string
     times?: StringNullableListFilter<"Medication">
     active?: BoolFilter<"Medication"> | boolean
+    photoUrl?: StringNullableFilter<"Medication"> | string | null
     createdAt?: DateTimeFilter<"Medication"> | Date | string
     updatedAt?: DateTimeFilter<"Medication"> | Date | string
     patientId?: StringFilter<"Medication"> | string
@@ -7488,11 +7552,13 @@ export namespace Prisma {
     id?: string
     name: string
     dosage: string
+    instructions: string
     frequency: string
     startDate: Date | string
     startTime: string
     times?: MedicationCreatetimesInput | string[]
     active?: boolean
+    photoUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7511,11 +7577,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     dosage?: StringFieldUpdateOperationsInput | string
+    instructions?: StringFieldUpdateOperationsInput | string
     frequency?: StringFieldUpdateOperationsInput | string
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     startTime?: StringFieldUpdateOperationsInput | string
     times?: MedicationUpdatetimesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7524,11 +7592,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     dosage?: StringFieldUpdateOperationsInput | string
+    instructions?: StringFieldUpdateOperationsInput | string
     frequency?: StringFieldUpdateOperationsInput | string
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     startTime?: StringFieldUpdateOperationsInput | string
     times?: MedicationUpdatetimesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7537,11 +7607,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     dosage?: StringFieldUpdateOperationsInput | string
+    instructions?: StringFieldUpdateOperationsInput | string
     frequency?: StringFieldUpdateOperationsInput | string
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     startTime?: StringFieldUpdateOperationsInput | string
     times?: MedicationUpdatetimesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

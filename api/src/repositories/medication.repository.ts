@@ -9,11 +9,13 @@ export class MedicationRepository implements IMedicationRepository {
       data: {
         name: data.name,
         dosage: data.dosage,
+        instructions: data.instructions,
         frequency: data.frequency,
         startDate: new Date(data.startDate),
         startTime: data.startTime,
         times: data.times || [],
         active: data.active ?? true,
+        photoUrl: data.photoUrl || null,
         patientId: data.patientId,
       },
     });
