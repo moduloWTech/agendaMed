@@ -22,6 +22,7 @@ export function AppointmentsScreen() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
   const fetchAppointments = async () => {
     if (!activePatient) return;
@@ -84,7 +85,11 @@ export function AppointmentsScreen() {
               const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1);
               
               return (
-                <div key={apt.id} className="bg-white rounded-[32px] p-5 shadow-sm border border-gray-100 flex gap-4 hover:shadow-md transition-shadow">
+                <div 
+                  key={apt.id} 
+                  onClick={() => setSelectedAppointment(apt)}
+                  className="bg-white rounded-[32px] p-5 shadow-sm border border-gray-100 flex gap-4 hover:shadow-md transition-shadow cursor-pointer"
+                >
                   {/* Date Badge */}
                   <div className="w-16 h-20 rounded-2xl bg-[var(--color-primary)]/10 flex flex-col items-center justify-center shrink-0">
                     <span className="text-2xl font-black text-[var(--color-primary)] leading-none">{day}</span>
@@ -114,11 +119,16 @@ export function AppointmentsScreen() {
         )}
       </div>
 
-      {isAddModalOpen && (
+      {(isAddModalOpen || selectedAppointment) && (
         <AddAppointmentModal 
-          onClose={() => setIsAddModalOpen(false)} 
+          appointment={selectedAppointment}
+          onClose={() => {
+            setIsAddModalOpen(false);
+            setSelectedAppointment(null);
+          }} 
           onSaved={() => {
             setIsAddModalOpen(false);
+            setSelectedAppointment(null);
             fetchAppointments();
           }} 
         />
