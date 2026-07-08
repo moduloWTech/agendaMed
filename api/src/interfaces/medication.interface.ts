@@ -3,17 +3,20 @@ import type { Medication } from '../generated/prisma/client';
 export interface IMedicationCreate {
   name: string;
   dosage: string;
+  instructions: string;
   frequency: string;
   startDate: Date | string;
   startTime: string;
   times?: string[];
   active?: boolean;
+  photoUrl?: string;
   patientId: string;
 }
 
 export interface IMedicationUpdate {
   name?: string;
   dosage?: string;
+  instructions?: string;
   frequency?: string;
   startDate?: Date | string;
   startTime?: string;

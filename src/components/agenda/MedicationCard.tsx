@@ -4,13 +4,24 @@ interface MedicationCardProps {
   time: string;
   name: string;
   dosage: string;
+  instructions?: string;
+  frequency?: string;
   status: 'pending' | 'completed' | 'late';
   onCheck?: () => void;
 }
 
-export function MedicationCard({ time, name, dosage, status, onCheck }: MedicationCardProps) {
+export function MedicationCard({ time, name, dosage, instructions, frequency, status, onCheck }: MedicationCardProps) {
   const isCompleted = status === 'completed';
   const isLate = status === 'late';
+
+  const formatFrequency = (freq?: string) => {
+    if (!freq) return '';
+    if (freq === '8h') return 'De 8 em 8 horas';
+    if (freq === '12h') return 'De 12 em 12 horas';
+    if (freq === 'daily') return '1 vez ao dia';
+    if (freq === 'manual') return 'Horários manuais';
+    return 'Uso único';
+  };
 
   return (
     <div className="flex gap-4 items-start relative w-full mb-6">
@@ -34,10 +45,22 @@ export function MedicationCard({ time, name, dosage, status, onCheck }: Medicati
         ${isCompleted ? 'opacity-60' : isLate ? 'border border-red-100 shadow-[0_8px_30px_rgba(225,29,72,0.1)]' : 'border border-transparent'}
       `}>
         <div>
-          <h3 className={`text-xl font-bold ${isCompleted ? 'text-gray-400 line-through' : 'text-[var(--color-primary)]'}`}>
+          <h3 className={`text-xl font-bold flex items-center gap-2 ${isCompleted ? 'text-gray-400 line-through' : 'text-[var(--color-primary)]'}`}>
             {name}
+            {dosage && (
+              <span className="text-xs font-bold bg-[var(--color-secondary)]/20 text-[var(--color-primary)] px-2 py-1 rounded-full whitespace-nowrap line-through-none">
+                {dosage}
+              </span>
+            )}
           </h3>
-          <p className="text-gray-500 font-medium text-[15px] mt-1">{dosage}</p>
+          
+          {instructions && (
+            <p className="text-gray-600 font-medium text-[15px] mt-2 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]/50"></span>
+              {instructions}
+              {frequency && <span className="text-sm text-gray-400 ml-1">• {formatFrequency(frequency)}</span>}
+            </p>
+          )}
 
           {isLate && (
             <p className="text-[var(--color-alert)] text-sm font-bold flex items-center gap-1 mt-2">

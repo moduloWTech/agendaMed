@@ -11,25 +11,35 @@ export class MedicationUseCase {
 
   async createMedication(data: any): Promise<Medication> {
     const schema = z.object({
-      name: z.string().min(2, 'O nome do medicamento deve ter no mínimo 2 caracteres'),
+      name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
       dosage: z.string().min(1, 'A dosagem é obrigatória'),
-      frequency: z.string().min(1, 'A frequência é obrigatória'),
-      startDate: z.string().datetime().or(z.date()),
+      instructions: z.string().min(1, 'As instruções são obrigatórias'),
+      frequency: z.string(),
+      startDate: z.string(),
       startTime: z.string().min(4, 'O horário inicial é obrigatório'),
       times: z.array(z.string()).optional(),
       active: z.boolean().optional(),
-      patientId: z.string().uuid('ID do paciente (patientId) inválido'),
+      patientId: z.string().uuid('ID do paciente inválido'),
     });
 
-    const parsedData = schema.parse(data);
+    const parsed = schema.parse(data);
 
     // Regra de Negócio: O paciente precisa existir
-    const patientExists = await this.patientRepository.findById(parsedData.patientId);
+    const patientExists = await this.patientRepository.findById(parsed.patientId);
     if (!patientExists) {
       throw new Error('Paciente associado não encontrado na plataforma.');
     }
 
-    return await this.medicationRepository.create(parsedData);
+    return await this.medicationRepository.create({
+      name: parsed.name,
+      dosage: parsed.dosage,
+      instructions: parsed.instructions,
+      frequency: parsed.frequency,
+      startDate: new Date(parsed.startDate),
+      startTime: parsed.startTime,
+      times: parsed.times || [],
+      patientId: parsed.patientId
+    });
   }
 
   async getMedicationById(id: string): Promise<Medication> {
@@ -48,6 +58,7 @@ export class MedicationUseCase {
     const schema = z.object({
       name: z.string().min(2).optional(),
       dosage: z.string().min(1).optional(),
+      instructions: z.string().min(1).optional(),
       frequency: z.string().min(1).optional(),
       startDate: z.string().datetime().or(z.date()).optional(),
       startTime: z.string().min(4).optional(),

@@ -15,6 +15,7 @@ export function LoginForm({}: LoginFormProps) {
   const [phoneWhats, setPhoneWhats] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [patientName, setPatientName] = useState('');
 
   // Status visual para erros
   const [message, setMessage] = useState('');
@@ -95,7 +96,7 @@ export function LoginForm({}: LoginFormProps) {
       const response = await fetch('http://localhost:3333/api/auth/setup-admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneWhats, name, email }),
+        body: JSON.stringify({ phoneWhats, name, email, patientName }),
       });
 
       if (response.ok) {
@@ -161,6 +162,18 @@ export function LoginForm({}: LoginFormProps) {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <h4 className="text-sm font-bold text-gray-500 mb-4">Sobre quem vamos cuidar?</h4>
+          <Input
+            label="Nome do Paciente"
+            type="text"
+            placeholder="Ex: Dona Maria"
+            value={patientName}
+            onChange={(e) => setPatientName(e.target.value)}
+            required
+          />
+        </div>
 
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100">

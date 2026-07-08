@@ -2,23 +2,25 @@ export const api = {
   get: async (endpoint: string) => {
     return request(endpoint, 'GET');
   },
-  post: async (endpoint: string, body: any) => {
-    return request(endpoint, 'POST', body);
+  post: async (endpoint: string, body: any, options?: { isMultipart?: boolean }) => {
+    return request(endpoint, 'POST', body, options);
   },
-  put: async (endpoint: string, body: any) => {
-    return request(endpoint, 'PUT', body);
+  put: async (endpoint: string, body: any, options?: { isMultipart?: boolean }) => {
+    return request(endpoint, 'PUT', body, options);
   },
   delete: async (endpoint: string) => {
     return request(endpoint, 'DELETE');
   },
 };
 
-async function request(endpoint: string, method: string, body?: any) {
+async function request(endpoint: string, method: string, body?: any, options?: { isMultipart?: boolean }) {
   const token = localStorage.getItem('@agendaMed:token');
   
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
+  const headers: HeadersInit = {};
+  
+  if (!options?.isMultipart) {
+    headers['Content-Type'] = 'application/json';
+  }
   
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -27,7 +29,7 @@ async function request(endpoint: string, method: string, body?: any) {
   const response = await fetch(`http://localhost:3333${endpoint}`, {
     method,
     headers,
-    body: body ? JSON.stringify(body) : undefined,
+    body: options?.isMultipart ? body : (body ? JSON.stringify(body) : undefined),
   });
 
   if (!response.ok) {

@@ -4,13 +4,26 @@ import { MedicationCard } from './MedicationCard';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../services/api';
 
+export interface Medication {
+  id: string;
+  name: string;
+  dosage: string;
+  instructions: string;
+  frequency: string;
+  startDate: string;
+  startTime: string;
+  times: string[];
+  active: boolean;
+  photoUrl?: string;
+}
+
 interface MedicationListProps {
   selectedDate: Date;
 }
 
 export function MedicationList({ selectedDate }: MedicationListProps) {
   const { activePatient } = useAuth();
-  const [medications, setMedications] = useState<any[]>([]);
+  const [medications, setMedications] = useState<Medication[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -36,14 +49,37 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
     const schedule: any[] = [];
     
     medications.forEach(med => {
-      // Simplificação MVP: Mostra se ativo e se a data selecionada for >= startDate
-      const start = new Date(med.startDate);
+      // Extrair YYYY-MM-DD da string ISO para ignorar conversão de fuso horário que poderia voltar 1 dia
+      const [year, month, day] = med.startDate.split('T')[0].split('-').map(Number);
+      const start = new Date(year, month - 1, day);
       start.setHours(0,0,0,0);
+      
       const target = new Date(selectedDate);
       target.setHours(0,0,0,0);
 
       if (med.active && target.getTime() >= start.getTime()) {
-        const times = med.times || [med.startTime];
+        let times: string[] = [];
+
+        // Lógica de geração de horários baseada na frequência
+        if (med.frequency === 'manual' && med.times && med.times.length > 0) {
+          times = med.times;
+        } else if (med.frequency === 'daily' || med.frequency === 'single') {
+          times = [med.startTime];
+        } else if (med.frequency === '12h' || med.frequency === '8h' || med.frequency === '6h' || med.frequency === '4h') {
+          const interval = parseInt(med.frequency.replace('h', ''));
+          const [startHour, startMinute] = med.startTime.split(':').map(Number);
+          
+          let currentHour = startHour;
+          while (currentHour < 24) {
+            const timeStr = `${currentHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+            times.push(timeStr);
+            currentHour += interval;
+          }
+        } else {
+          // Fallback seguro
+          times = (med.times && med.times.length > 0) ? med.times : [med.startTime];
+        }
+
         times.forEach((time: string) => {
           const uniqueId = `${med.id}-${selectedDateStr}-${time}`;
           const isCompleted = completedIds.has(uniqueId);
@@ -53,13 +89,15 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
             time,
             name: med.name,
             dosage: med.dosage,
+            instructions: med.instructions,
+            frequency: med.frequency,
+            times: med.times,
             status: isCompleted ? 'completed' : 'pending'
           });
         });
       }
     });
 
-    // Ordena por horário
     return schedule.sort((a, b) => a.time.localeCompare(b.time));
   }, [medications, selectedDate, selectedDateStr, completedIds]);
 
@@ -72,7 +110,6 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
     });
   };
 
-  // Lógica de títulos
   const isToday = selectedDateStr === formatDateStr(today);
   const isPast = selectedDate.getTime() < new Date(today.setHours(0,0,0,0)).getTime();
   
@@ -113,6 +150,8 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
               time={med.time}
               name={med.name}
               dosage={med.dosage}
+              instructions={med.instructions}
+              frequency={med.frequency}
               status={med.status}
               onCheck={() => handleCheck(med.uniqueId)}
             />
