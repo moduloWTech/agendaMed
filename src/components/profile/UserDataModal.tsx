@@ -1,12 +1,21 @@
+import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface UserDataModalProps {
   onClose: () => void;
 }
 
 export function UserDataModal({ onClose }: UserDataModalProps) {
+  const { user } = useAuth();
+  
+  // Estados para edição (MVP, só visual)
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const phone = user?.phoneWhats || '';
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-in fade-in duration-300">
 
@@ -30,31 +39,38 @@ export function UserDataModal({ onClose }: UserDataModalProps) {
           </button>
         </div>
 
-        {/* Formulário Fictício */}
+        {/* Formulário com Dados Reais */}
         <div className="flex flex-col gap-4 overflow-y-auto max-h-[60vh] pb-2 custom-scrollbar">
           <Input
             label="Nome Completo"
-            defaultValue="João Silva"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Digite seu nome"
           />
           <Input
             label="E-mail"
             type="email"
-            defaultValue="joao.silva@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Digite seu e-mail"
           />
 
           <Input
-            label="Telefone"
+            label="Telefone do WhatsApp"
             type="tel"
-            defaultValue="(11) 98765-4321"
-            placeholder="(00) 00000-0000"
+            value={phone}
+            readOnly
+            className="opacity-70 cursor-not-allowed"
+            title="O telefone não pode ser alterado pois é a sua chave de login"
           />
         </div>
 
         {/* Botões de Ação */}
         <div className="flex flex-col gap-3 mt-4">
-          <Button fullWidth onClick={onClose}>
+          <Button fullWidth onClick={() => {
+             alert('Salvar dados de usuário ainda não está conectado à API.');
+             onClose();
+          }}>
             Salvar Alterações
           </Button>
           <Button variant="outline" fullWidth onClick={onClose}>

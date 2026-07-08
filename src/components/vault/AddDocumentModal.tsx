@@ -2,14 +2,45 @@ import { useState } from 'react';
 import { X, Camera, FileText, FlaskConical, Stethoscope, FilePlus2 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { api } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface AddDocumentModalProps {
   onClose: () => void;
 }
 
 export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
+  const { activePatient } = useAuth();
+  const [title, setTitle] = useState('');
   const [category, setCategory] = useState('recipe');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSave = async () => {
+    if (!activePatient) {
+      alert('Selecione um paciente ativo primeiro.');
+      return;
+    }
+    if (!title) {
+      alert('Preencha o título do documento.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await api.post('/api/documents', {
+        title,
+        category,
+        date: new Date(date).toISOString(),
+        fileUrl: 'https://example.com/mock-doc.pdf', // MVP: Mock URL
+        patientId: activePatient.id
+      });
+      window.location.reload();
+    } catch (error: any) {
+      alert('Erro ao salvar documento: ' + (error.message || 'Erro desconhecido'));
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-0 sm:px-4 animate-in fade-in duration-300">
@@ -50,6 +81,8 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
             <Input
               label="Título"
               placeholder="Ex: Receita Dr. Silva, Hemograma..."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
 
@@ -107,9 +140,10 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
         <div className="p-6 border-t border-gray-100 bg-white rounded-b-[40px]">
           <Button
             fullWidth
-            onClick={onClose}
+            onClick={handleSave}
+            disabled={isLoading}
           >
-            Salvar no Prontuário
+            {isLoading ? 'Salvando...' : 'Salvar no Prontuário'}
           </Button>
         </div>
 

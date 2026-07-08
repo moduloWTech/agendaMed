@@ -1,42 +1,76 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { CalendarX2 } from 'lucide-react';
 import { MedicationCard } from './MedicationCard';
+import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../services/api';
 
 interface MedicationListProps {
   selectedDate: Date;
 }
 
 export function MedicationList({ selectedDate }: MedicationListProps) {
-  // Dados simulados realistas espalhados em diferentes datas para demonstração.
-  const today = new Date();
-  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
-  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-  
+  const { activePatient } = useAuth();
+  const [medications, setMedications] = useState<any[]>([]);
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    async function fetchMedications() {
+      if (!activePatient) return;
+      try {
+        const data = await api.get(`/api/patients/${activePatient.id}/medications`);
+        setMedications(data || []);
+      } catch (error) {
+        console.error('Falha ao buscar medicamentos', error);
+      }
+    }
+    fetchMedications();
+  }, [activePatient]);
+
   const formatDateStr = (d: Date) => d.toISOString().split('T')[0];
-
-  const [medications, setMedications] = useState([
-    { id: 1, dateStr: formatDateStr(yesterday), time: '08:00', name: 'Losartana', dosage: '50mg - 1 comprimido', status: 'completed' as const },
-    { id: 2, dateStr: formatDateStr(yesterday), time: '20:00', name: 'Sinvastatina', dosage: '20mg - 1 comprimido', status: 'completed' as const },
-    { id: 3, dateStr: formatDateStr(today), time: '08:00', name: 'Losartana', dosage: '50mg - 1 comprimido', status: 'completed' as const },
-    { id: 4, dateStr: formatDateStr(today), time: '12:00', name: 'Metformina', dosage: '500mg - Após almoço', status: 'late' as const },
-    { id: 5, dateStr: formatDateStr(today), time: '20:00', name: 'Sinvastatina', dosage: '20mg - 1 comprimido', status: 'pending' as const },
-    { id: 6, dateStr: formatDateStr(tomorrow), time: '08:00', name: 'Losartana', dosage: '50mg - 1 comprimido', status: 'pending' as const },
-    { id: 7, dateStr: formatDateStr(tomorrow), time: '12:00', name: 'Metformina', dosage: '500mg - Após almoço', status: 'pending' as const },
-    { id: 8, dateStr: formatDateStr(tomorrow), time: '20:00', name: 'Sinvastatina', dosage: '20mg - 1 comprimido', status: 'pending' as const },
-  ]);
-
-  const handleCheck = (id: number) => {
-    setMedications(prev =>
-      prev.map(med =>
-        med.id === id ? { ...med, status: 'completed' } : med
-      )
-    );
-  };
-
   const selectedDateStr = formatDateStr(selectedDate);
-  const filteredMedications = useMemo(() => {
-    return medications.filter(med => med.dateStr === selectedDateStr);
-  }, [medications, selectedDateStr]);
+  const today = new Date();
+  
+  const generatedSchedule = useMemo(() => {
+    if (!medications || medications.length === 0) return [];
+    
+    const schedule: any[] = [];
+    
+    medications.forEach(med => {
+      // Simplificação MVP: Mostra se ativo e se a data selecionada for >= startDate
+      const start = new Date(med.startDate);
+      start.setHours(0,0,0,0);
+      const target = new Date(selectedDate);
+      target.setHours(0,0,0,0);
+
+      if (med.active && target.getTime() >= start.getTime()) {
+        const times = med.times || [med.startTime];
+        times.forEach((time: string) => {
+          const uniqueId = `${med.id}-${selectedDateStr}-${time}`;
+          const isCompleted = completedIds.has(uniqueId);
+          schedule.push({
+            uniqueId,
+            id: med.id,
+            time,
+            name: med.name,
+            dosage: med.dosage,
+            status: isCompleted ? 'completed' : 'pending'
+          });
+        });
+      }
+    });
+
+    // Ordena por horário
+    return schedule.sort((a, b) => a.time.localeCompare(b.time));
+  }, [medications, selectedDate, selectedDateStr, completedIds]);
+
+  const handleCheck = (uniqueId: string) => {
+    setCompletedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(uniqueId)) next.delete(uniqueId);
+      else next.add(uniqueId);
+      return next;
+    });
+  };
 
   // Lógica de títulos
   const isToday = selectedDateStr === formatDateStr(today);
@@ -55,6 +89,15 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
     }
   }
 
+  if (!activePatient) {
+    return (
+      <div className="w-full px-4 pt-12 pb-2 flex flex-col items-center justify-center text-center">
+        <CalendarX2 className="w-12 h-12 text-gray-300 mb-4" />
+        <p className="text-gray-500 font-medium">Selecione ou crie um paciente no Perfil para ver a agenda.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full px-4 pt-6 pb-2 relative z-0 min-h-[40vh]">
       <div className="mb-6 px-2">
@@ -63,15 +106,15 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
       </div>
 
       <div className="flex flex-col">
-        {filteredMedications.length > 0 ? (
-          filteredMedications.map((med) => (
+        {generatedSchedule.length > 0 ? (
+          generatedSchedule.map((med) => (
             <MedicationCard
-              key={med.id}
+              key={med.uniqueId}
               time={med.time}
               name={med.name}
               dosage={med.dosage}
               status={med.status}
-              onCheck={() => handleCheck(med.id)}
+              onCheck={() => handleCheck(med.uniqueId)}
             />
           ))
         ) : (
@@ -86,12 +129,6 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
           </div>
         )}
       </div>
-
-      {filteredMedications.length > 0 && (
-        <div className="flex items-center justify-center mt-4 mb-8">
-          <div className="w-2 h-2 rounded-full bg-gray-300"></div>
-        </div>
-      )}
     </div>
   );
 }

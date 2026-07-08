@@ -5,57 +5,48 @@ import { AgendaScreen } from './screens/AgendaScreen';
 import { VaultScreen } from './screens/VaultScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { AuthLayout } from './components/layout/AuthLayout';
+import { useAuth } from './contexts/AuthContext';
 
 export default function App() {
-  const [showSplash, setShowSplash] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const { isAuthenticated, isLoading, login, logout } = useAuth();
+  const [isVerifyingToken, setIsVerifyingToken] = useState(false);
   const [activeTab, setActiveTab] = useState<'agenda' | 'cofre' | 'perfil'>('agenda');
 
   useEffect(() => {
-    const validateTokenAndInit = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
 
-      if (token) {
-        try {
-          const response = await fetch('http://localhost:3333/api/auth/verify-link', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token }),
-          });
-
-          if (response.ok) {
-            // O token foi validado com sucesso!
-            setIsAuthenticated(true);
-            
-            // Limpa o token da barra de endereço por segurança
+    if (token) {
+      setIsVerifyingToken(true);
+      fetch('http://localhost:3333/api/auth/verify-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      })
+      .then(async (res) => {
+        if (res.ok) {
+          const data = await res.json();
+          if (data.accessToken && data.user) {
+            login(data.accessToken, data.user);
             window.history.replaceState({}, document.title, '/');
-          } else {
-            console.error('Token inválido ou expirado');
           }
-        } catch (error) {
-          console.error('Falha ao validar token:', error);
+        } else {
+          console.error('Token inválido ou expirado');
         }
-      }
-      
-      // Oculta a splash screen depois de verificar tudo
-      setTimeout(() => {
-        setShowSplash(false);
-      }, 1500);
-    };
+      })
+      .catch(err => console.error('Falha ao validar token:', err))
+      .finally(() => setIsVerifyingToken(false));
+    }
+  }, [login]);
 
-    validateTokenAndInit();
-  }, []);
-
-  if (showSplash) {
+  if (isLoading || isVerifyingToken) {
     return <SplashScreen />;
   }
 
   if (isAuthenticated) {
     let CurrentScreen = <AgendaScreen />;
     if (activeTab === 'cofre') CurrentScreen = <VaultScreen />;
-    if (activeTab === 'perfil') CurrentScreen = <ProfileScreen onLogout={() => setIsAuthenticated(false)} />;
+    if (activeTab === 'perfil') CurrentScreen = <ProfileScreen onLogout={logout} />;
 
     return (
       <AuthLayout currentTab={activeTab} onChangeTab={setActiveTab}>
@@ -64,5 +55,5 @@ export default function App() {
     );
   }
 
-  return <LoginScreen onLogin={() => setIsAuthenticated(true)} />;
+  return <LoginScreen onLogin={() => {}} />;
 }
