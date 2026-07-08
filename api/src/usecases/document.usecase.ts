@@ -13,7 +13,7 @@ export class DocumentUseCase {
     const schema = z.object({
       title: z.string().min(2, 'O título do documento é obrigatório'),
       category: z.enum(['recipe', 'exam', 'report', 'other'], {
-        errorMap: () => ({ message: 'Categoria inválida. Use: recipe, exam, report, other' })
+        message: 'Categoria inválida. Use: recipe, exam, report, other'
       }),
       date: z.string().datetime().or(z.date()),
       fileUrl: z.string().url('A URL do arquivo deve ser válida'),
