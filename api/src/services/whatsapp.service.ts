@@ -40,7 +40,14 @@ export class WhatsappService {
         if (shouldReconnect) {
           this.connect();
         } else {
-          console.log('[WhatsApp] ⚠️ Você foi desconectado (logged out).');
+          console.log('[WhatsApp] ⚠️ Você foi desconectado (logged out). Limpando sessão e reiniciando...');
+          // Deleta a pasta de autenticação corrompida/antiga e tenta de novo
+          const authPath = path.join(__dirname, '..', '..', 'auth_info_baileys');
+          const fs = require('fs');
+          if (fs.existsSync(authPath)) {
+            fs.rmSync(authPath, { recursive: true, force: true });
+          }
+          this.connect();
         }
       } else if (connection === 'open') {
         this.isConnected = true;
@@ -68,14 +75,29 @@ export class WhatsappService {
       return false;
     }
 
-    // O Baileys exige o formato JID: número@s.whatsapp.net
-    // Removemos qualquer caractere não numérico por segurança
-    const numericPhone = phoneWhats.replace(/\D/g, '');
-    const jid = `${numericPhone}@s.whatsapp.net`;
+    let numericPhone = phoneWhats.replace(/\D/g, '');
+    
+    // Se o número tiver 10 ou 11 dígitos, presumimos que é do Brasil sem o DDI (55)
+    if (numericPhone.length === 10 || numericPhone.length === 11) {
+      numericPhone = `55${numericPhone}`;
+    }
 
     try {
+      // O Baileys tem um método maravilhoso chamado "onWhatsApp" que consulta os servidores
+      // do WhatsApp para saber se o número existe. E o melhor: ele resolve o problema do 
+      // 9º dígito no Brasil automaticamente, retornando o JID (ID) exato daquele usuário!
+      const [result] = await this.sock.onWhatsApp(numericPhone);
+      
+      let jid = `${numericPhone}@s.whatsapp.net`; // Fallback
+      
+      if (result && result.exists) {
+        jid = result.jid;
+      } else {
+        console.warn(`[WhatsApp] ⚠️ Aviso: Não conseguimos validar ${numericPhone} no servidor. Tentando forçar o envio...`);
+      }
+
       await this.sock.sendMessage(jid, { text });
-      console.log(`[WhatsApp] 📩 Mensagem enviada para ${phoneWhats}`);
+      console.log(`[WhatsApp] 📩 Mensagem enviada para ${phoneWhats} (JID: ${jid})`);
       return true;
     } catch (error) {
       console.error(`[WhatsApp] ❌ Falha ao enviar para ${phoneWhats}:`, error);

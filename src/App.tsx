@@ -13,12 +13,39 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'agenda' | 'cofre' | 'perfil'>('agenda');
 
   useEffect(() => {
-    // Simula o tempo de carregamento da aplicação nativa (2.5 segundos)
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2500);
+    const validateTokenAndInit = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
 
-    return () => clearTimeout(timer);
+      if (token) {
+        try {
+          const response = await fetch('http://localhost:3333/api/auth/verify-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token }),
+          });
+
+          if (response.ok) {
+            // O token foi validado com sucesso!
+            setIsAuthenticated(true);
+            
+            // Limpa o token da barra de endereço por segurança
+            window.history.replaceState({}, document.title, '/');
+          } else {
+            console.error('Token inválido ou expirado');
+          }
+        } catch (error) {
+          console.error('Falha ao validar token:', error);
+        }
+      }
+      
+      // Oculta a splash screen depois de verificar tudo
+      setTimeout(() => {
+        setShowSplash(false);
+      }, 1500);
+    };
+
+    validateTokenAndInit();
   }, []);
 
   if (showSplash) {
