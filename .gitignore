@@ -23,3 +23,8 @@ api/src/generated/prisma/
 *.njsproj
 *.sln
 *.sw?
+
+# Env files
+.env
+.env.local
+.env.*.local

@@ -26,7 +26,8 @@ async function request(endpoint: string, method: string, body?: any, options?: {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`http://localhost:3333${endpoint}`, {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3333';
+  const response = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers,
     body: options?.isMultipart ? body : (body ? JSON.stringify(body) : undefined),
