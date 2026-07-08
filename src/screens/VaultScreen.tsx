@@ -1,16 +1,36 @@
-import { useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Search, FileText } from 'lucide-react';
 import { DocumentCard } from '../components/vault/DocumentCard';
 import { AddDocumentModal } from '../components/vault/AddDocumentModal';
-
-const mockDocuments = [
-  { id: 1, title: 'Receita - Cardiologista', date: 'Hoje, 14:30', type: 'pdf' as const },
-  { id: 2, title: 'Exame de Sangue', date: 'Ontem', type: 'image' as const },
-  { id: 3, title: 'Laudo Tomografia', date: '10 Nov 2023', type: 'pdf' as const },
-];
+import { useAuth } from '../contexts/AuthContext';
+import { api } from '../services/api';
 
 export function VaultScreen() {
+  const { activePatient } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [documents, setDocuments] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchDocuments() {
+      if (!activePatient) return;
+      try {
+        const data = await api.get(`/api/patients/${activePatient.id}/documents`);
+        setDocuments(data || []);
+      } catch (error) {
+        console.error('Falha ao buscar documentos', error);
+      }
+    }
+    fetchDocuments();
+  }, [activePatient]);
+
+  if (!activePatient) {
+    return (
+      <div className="flex flex-col w-full h-full min-h-screen bg-[#F4F7FA] px-4 pt-12 items-center justify-center text-center">
+        <FileText className="w-12 h-12 text-gray-300 mb-4" />
+        <p className="text-gray-500 font-medium">Selecione ou crie um paciente no Perfil para ver o Prontuário.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col w-full h-full min-h-screen bg-[#F4F7FA]">
@@ -35,9 +55,20 @@ export function VaultScreen() {
         </div>
 
         <div className="flex flex-col gap-1">
-          {mockDocuments.map((doc) => (
-            <DocumentCard key={doc.id} title={doc.title} date={doc.date} type={doc.type} />
-          ))}
+          {documents.length > 0 ? (
+            documents.map((doc) => (
+              <DocumentCard 
+                key={doc.id} 
+                title={doc.title} 
+                date={new Date(doc.date).toLocaleDateString('pt-BR')} 
+                type={doc.category === 'recipe' ? 'pdf' : 'image'} 
+              />
+            ))
+          ) : (
+             <div className="text-center text-gray-400 py-12">
+               <p>Nenhum documento encontrado.</p>
+             </div>
+          )}
         </div>
       </div>
 

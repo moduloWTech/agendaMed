@@ -2,13 +2,21 @@ import { useState } from 'react';
 import { X, Camera, Plus, Trash2, ArrowRight, Check } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { api } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface AddMedicationWizardProps {
   onClose: () => void;
 }
 
 export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
+  const { activePatient } = useAuth();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // States
+  const [name, setName] = useState('');
+  const [dosage, setDosage] = useState('');
 
   // Novos estados para a Lógica de Frequência
   const [frequency, setFrequency] = useState('8h');
@@ -34,6 +42,36 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
     if(frequency === 'monthly') return `O alarme soará todo mês no mesmo dia que a data escolhida (${new Date(startDate).toLocaleDateString('pt-BR')}) às ${startTime}.`;
     
     return `Calcularemos os próximos horários baseados na data ${new Date(startDate).toLocaleDateString('pt-BR')} às ${startTime}. Alarmes antigos não soarão.`;
+  };
+
+  const handleFinish = async () => {
+    if (!activePatient) {
+      alert('Selecione um paciente ativo primeiro.');
+      return;
+    }
+    if (!name || !dosage) {
+      alert('Preencha o nome e a dosagem do medicamento.');
+      setStep(1);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await api.post('/api/medications', {
+        name,
+        dosage,
+        frequency,
+        startDate: frequency === 'manual' ? new Date().toISOString() : new Date(startDate).toISOString(),
+        startTime: frequency === 'manual' ? times[0] : startTime,
+        times: frequency === 'manual' ? times : [],
+        patientId: activePatient.id,
+        active: true
+      });
+      window.location.reload(); // Recarrega a tela para buscar novos dados
+    } catch (error: any) {
+      alert('Erro ao salvar medicamento: ' + (error.message || 'Erro desconhecido'));
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -77,12 +115,16 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
                 <Input
                   label="Nome do Remédio"
                   placeholder="Ex: Losartana Potássica"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div>
                 <Input
                   label="Dosagem / Instruções"
                   placeholder="Ex: 50mg - 1 comprimido"
+                  value={dosage}
+                  onChange={(e) => setDosage(e.target.value)}
                 />
               </div>
             </div>
@@ -205,6 +247,7 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
               variant="outline"
               className="flex-1"
               onClick={() => setStep(step - 1)}
+              disabled={isLoading}
             >
               Voltar
             </Button>
@@ -221,9 +264,10 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
             <Button
               variant="success"
               className="flex-[2] flex items-center justify-center gap-2"
-              onClick={onClose}
+              onClick={handleFinish}
+              disabled={isLoading}
             >
-              Concluir <Check className="w-5 h-5" />
+              {isLoading ? 'Salvando...' : 'Concluir'} <Check className="w-5 h-5" />
             </Button>
           )}
         </div>

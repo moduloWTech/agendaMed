@@ -1,13 +1,17 @@
 import { FastifyInstance } from 'fastify';
 import { PatientUseCase } from '../usecases/patient.usecase';
+import { authMiddleware } from '../middlewares/auth.middleware';
 
 export class PatientRouter {
   constructor(private patientUseCase: PatientUseCase) {}
 
   register(app: FastifyInstance) {
-    
-    // ROTA: Criar Paciente
-    app.post('/api/patients', async (request, reply) => {
+    app.register(async (scopedApp) => {
+      // Aplica o middleware apenas nestas rotas de pacientes
+      scopedApp.addHook('preHandler', authMiddleware);
+      
+      // ROTA: Criar Paciente
+      scopedApp.post('/api/patients', async (request, reply) => {
       try {
         const patient = await this.patientUseCase.createPatient(request.body);
         return reply.status(201).send(patient);
@@ -19,7 +23,7 @@ export class PatientRouter {
     });
 
     // ROTA: Listar Pacientes de um Cuidador (User)
-    app.get('/api/users/:userId/patients', async (request, reply) => {
+    scopedApp.get('/api/users/:userId/patients', async (request, reply) => {
       try {
         const { userId } = request.params as { userId: string };
         const patients = await this.patientUseCase.getPatientsByUserId(userId);
@@ -31,7 +35,7 @@ export class PatientRouter {
     });
 
     // ROTA: Obter Paciente Específico
-    app.get('/api/patients/:id', async (request, reply) => {
+    scopedApp.get('/api/patients/:id', async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
         const patient = await this.patientUseCase.getPatientById(id);
@@ -43,7 +47,7 @@ export class PatientRouter {
     });
 
     // ROTA: Atualizar Paciente
-    app.put('/api/patients/:id', async (request, reply) => {
+    scopedApp.put('/api/patients/:id', async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
         const patient = await this.patientUseCase.updatePatient(id, request.body);
@@ -56,7 +60,7 @@ export class PatientRouter {
     });
 
     // ROTA: Deletar Paciente
-    app.delete('/api/patients/:id', async (request, reply) => {
+    scopedApp.delete('/api/patients/:id', async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
         await this.patientUseCase.deletePatient(id);
@@ -67,5 +71,6 @@ export class PatientRouter {
       }
     });
 
+    });
   }
 }
