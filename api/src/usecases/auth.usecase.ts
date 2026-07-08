@@ -11,36 +11,31 @@ export class AuthUseCase {
   constructor(private userRepository: IUserRepository) {}
 
   /**
-   * Verifica se é o Primeiro Acesso da plataforma.
-   * Se não existir NENHUM usuário no banco, o primeiro WhatsApp cadastrado vira ADMIN.
+   * Verifica se o usuário existe para enviar o link.
+   * Se o banco estiver vazio, sinaliza para o frontend iniciar o Setup.
    */
-  async requestLogin(phoneWhats: string): Promise<{ message: string }> {
+  async requestLogin(phoneWhats: string): Promise<any> {
     const schema = z.string().min(10, 'Telefone inválido');
     const phone = schema.parse(phoneWhats);
 
-    let user = await this.userRepository.findByPhoneWhats(phone);
+    const userCount = await prisma.user.count();
+    
+    // Se o banco estiver vazio, precisamos que o admin se cadastre
+    if (userCount === 0) {
+      return { action: 'REQUIRE_SETUP' };
+    }
 
-    // Bootstrap (Primeiro Acesso Geral)
+    const user = await this.userRepository.findByPhoneWhats(phone);
+
     if (!user) {
-      const userCount = await prisma.user.count();
-      if (userCount === 0) {
-        console.log(`[Auth] Bootstrap acionado! Cadastrando o dono da família (ADMIN): ${phone}`);
-        user = await this.userRepository.create({
-          phoneWhats: phone,
-          role: 'ADMIN',
-        });
-      } else {
-        // Se o banco não está vazio, é um cuidador tentando logar sem convite
-        // Retornamos falso positivo pra não vazar informações, ou erro claro se preferir
-        throw new Error('Número não cadastrado. Fale com o administrador da família.');
-      }
+      throw new Error('Número não cadastrado. Fale com o administrador da família.');
     }
 
     // Gera um Magic Link Token válido por 15 minutos
     const magicToken = jwt.sign({ id: user.id, phoneWhats: user.phoneWhats }, JWT_SECRET, { expiresIn: '15m' });
     
     // Constrói o link
-    const magicLink = `http://localhost:5173/auth/callback?token=${magicToken}`; // Mudar para o domínio oficial em prod
+    const magicLink = `http://localhost:5173/auth/callback?token=${magicToken}`;
 
     // Mensagem
     let text = '';
@@ -54,10 +49,39 @@ export class AuthUseCase {
     const sent = await whatsappService.sendMessage(phone, text);
     
     if (!sent) {
-      throw new Error('Falha ao enviar mensagem de WhatsApp. O serviço está conectado?');
+      // Se não enviou, o robô está desconectado. 
+      // Avisa o frontend para mostrar o QR Code de reconexão!
+      return { action: 'REQUIRE_QR_SETUP', error: 'O WhatsApp do sistema está desconectado.' };
     }
 
     return { message: 'Link mágico enviado para o WhatsApp.' };
+  }
+
+  /**
+   * Salva os dados do Admin quando o banco está vazio.
+   */
+  async setupAdmin(data: any): Promise<{ message: string }> {
+    const userCount = await prisma.user.count();
+    if (userCount > 0) {
+      throw new Error('O sistema já possui usuários. Setup indisponível.');
+    }
+
+    const schema = z.object({
+      phoneWhats: z.string().min(10, 'O telefone deve ter pelo menos 10 dígitos'),
+      name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
+      email: z.string().email('E-mail inválido'),
+    });
+
+    const parsed = schema.parse(data);
+
+    await this.userRepository.create({
+      phoneWhats: parsed.phoneWhats,
+      name: parsed.name,
+      email: parsed.email,
+      role: 'ADMIN',
+    });
+
+    return { message: 'Administrador cadastrado com sucesso.' };
   }
 
   /**
