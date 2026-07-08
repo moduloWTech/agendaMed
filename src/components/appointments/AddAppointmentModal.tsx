@@ -7,25 +7,26 @@ import { Toggle } from '../ui/Toggle';
 interface AddAppointmentModalProps {
   onClose: () => void;
   onSaved: () => void;
+  appointment?: any;
 }
 
-export function AddAppointmentModal({ onClose, onSaved }: AddAppointmentModalProps) {
+export function AddAppointmentModal({ onClose, onSaved, appointment }: AddAppointmentModalProps) {
   const { activePatient } = useAuth();
   
-  const [specialty, setSpecialty] = useState('');
-  const [doctorName, setDoctorName] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [location, setLocation] = useState('');
-  const [notes, setNotes] = useState('');
-  const [intensiveAlerts, setIntensiveAlerts] = useState(false);
+  const [specialty, setSpecialty] = useState(appointment?.specialty || '');
+  const [doctorName, setDoctorName] = useState(appointment?.doctorName || '');
+  const [date, setDate] = useState(appointment?.date ? new Date(appointment.date).toISOString().split('T')[0] : '');
+  const [time, setTime] = useState(appointment?.time || '');
+  const [location, setLocation] = useState(appointment?.location || '');
+  const [notes, setNotes] = useState(appointment?.notes || '');
+  const [intensiveAlerts, setIntensiveAlerts] = useState(appointment ? appointment.intensiveAlerts : false);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
     if (!activePatient || !specialty || !date || !time) return;
     setIsSaving(true);
     try {
-      await api.post('/api/appointments', {
+      const payload = {
         patientId: activePatient.id,
         specialty,
         doctorName,
@@ -34,12 +35,32 @@ export function AddAppointmentModal({ onClose, onSaved }: AddAppointmentModalPro
         location,
         notes,
         intensiveAlerts
-      });
+      };
+
+      if (appointment) {
+        await api.put(`/api/appointments/${appointment.id}`, payload);
+      } else {
+        await api.post('/api/appointments', payload);
+      }
       onSaved();
     } catch (error) {
       console.error('Erro ao salvar consulta', error);
       alert('Não foi possível salvar a consulta. Verifique os dados.');
     } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!appointment) return;
+    if (!window.confirm('Deseja realmente excluir esta consulta?')) return;
+    setIsSaving(true);
+    try {
+      await api.delete(`/api/appointments/${appointment.id}`);
+      onSaved();
+    } catch (error) {
+      console.error('Erro ao excluir consulta', error);
+      alert('Não foi possível excluir a consulta.');
       setIsSaving(false);
     }
   };
@@ -54,7 +75,7 @@ export function AddAppointmentModal({ onClose, onSaved }: AddAppointmentModalPro
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 bg-white z-10">
-          <h2 className="text-xl font-bold text-gray-800">Nova Consulta</h2>
+          <h2 className="text-xl font-bold text-gray-800">{appointment ? 'Detalhes da Consulta' : 'Nova Consulta'}</h2>
           <button onClick={onClose} className="p-2 bg-gray-50 text-gray-400 hover:text-gray-600 rounded-full transition-colors">
             <X className="w-5 h-5" />
           </button>
@@ -189,14 +210,23 @@ export function AddAppointmentModal({ onClose, onSaved }: AddAppointmentModalPro
           <div className="h-10" />
         </div>
 
-        {/* Footer com Botão */}
-        <div className="p-6 bg-white border-t border-gray-100 z-10">
+        {/* Footer com Botões */}
+        <div className="p-6 bg-white border-t border-gray-100 z-10 flex gap-3">
+          {appointment && (
+            <button 
+              onClick={handleDelete}
+              disabled={isSaving}
+              className="py-4 px-6 bg-red-50 text-red-500 font-bold text-lg rounded-2xl hover:bg-red-100 transition-all disabled:opacity-50"
+            >
+              Excluir
+            </button>
+          )}
           <button 
             onClick={handleSave}
             disabled={!isFormValid || isSaving}
-            className="w-full py-4 bg-[var(--color-primary)] text-white font-bold text-lg rounded-2xl shadow-lg shadow-[var(--color-primary)]/30 hover:bg-[var(--color-accent)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-4 bg-[var(--color-primary)] text-white font-bold text-lg rounded-2xl shadow-lg shadow-[var(--color-primary)]/30 hover:bg-[var(--color-accent)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSaving ? 'Salvando...' : 'Agendar Consulta'}
+            {isSaving ? 'Salvando...' : (appointment ? 'Salvar Alterações' : 'Agendar Consulta')}
           </button>
         </div>
 
