@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface WeeklyCarouselProps {
@@ -7,6 +7,19 @@ interface WeeklyCarouselProps {
 }
 
 export function WeeklyCarousel({ selectedDate, onDateSelect }: WeeklyCarouselProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll para o dia selecionado ao carregar ou mudar o mês
+  useEffect(() => {
+    if (scrollRef.current) {
+      const selectedEl = scrollRef.current.querySelector('[data-selected="true"]');
+      if (selectedEl) {
+        // Rola o container para centralizar o elemento selecionado
+        selectedEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [selectedDate]);
+
   // Gera os dias do mês baseado no selectedDate
   const days = useMemo(() => {
     const year = selectedDate.getFullYear();
@@ -78,10 +91,11 @@ export function WeeklyCarousel({ selectedDate, onDateSelect }: WeeklyCarouselPro
         </div>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+      <div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
         {days.map((day, idx) => (
           <button
             key={idx}
+            data-selected={day.isSelected}
             onClick={() => onDateSelect(day.date)}
             className={`
               flex flex-col items-center justify-center min-w-[72px] h-[96px] rounded-full transition-all duration-300 snap-center shrink-0

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { User, Settings, Lock, LogOut } from 'lucide-react';
+import HeaderImg from '../assets/login-header.png';
 import { ProfileMenuItem } from '../components/profile/ProfileMenuItem';
 import { UserDataModal } from '../components/profile/UserDataModal';
 import { SettingsModal } from '../components/profile/SettingsModal';
@@ -41,25 +42,33 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   return (
     <div className="flex flex-col w-full min-h-screen bg-gray-50 pb-24 relative animate-in fade-in slide-in-from-bottom-2 duration-500">
       
-      {/* Fundo Decorativo */}
-      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] opacity-10 rounded-b-[48px] pointer-events-none" />
+      {/* Fundo Decorativo com Imagem e Máscara Escura */}
+      <div className="absolute top-0 left-0 right-0 h-72 rounded-b-[48px] overflow-hidden pointer-events-none z-0 shadow-lg">
+        <img 
+          src={HeaderImg} 
+          alt="Profile Background" 
+          className="w-full h-full object-cover"
+        />
+        {/* Máscara escura com transparência para dar o efeito solicitado */}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+      </div>
 
-      <div className="w-full max-w-md mx-auto px-6 pt-12 z-10">
+      <div className="w-full max-w-md mx-auto px-6 pt-10 z-10">
         
         {/* Header do Usuário */}
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-8 relative">
           <div className="relative mb-4">
-            <div className="w-28 h-28 rounded-[32px] bg-white/80 backdrop-blur-xl shadow-lg border border-white/60 flex items-center justify-center text-[var(--color-primary)] rotate-3 transition-transform hover:rotate-0">
+            <div className="w-28 h-28 rounded-[32px] bg-white/20 backdrop-blur-md shadow-xl border border-white/30 flex items-center justify-center text-white rotate-3 transition-transform hover:rotate-0">
               <User className="w-14 h-14" />
             </div>
             {/* Status Indicator */}
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-white shadow-sm" />
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-400 rounded-full border-4 border-black/20 shadow-sm" />
           </div>
           
-          <h1 className="text-2xl font-extrabold text-gray-800 tracking-tight">{user?.name || 'Administrador'}</h1>
-          <p className="text-gray-500 font-medium">{displayPhone}</p>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight drop-shadow-md">{user?.name || 'Administrador'}</h1>
+          <p className="text-gray-200 font-medium drop-shadow-md">{displayPhone}</p>
           {activePatient && (
-             <span className="mt-2 px-3 py-1 bg-[var(--color-primary)]/10 text-[var(--color-primary)] rounded-full text-xs font-bold">
+             <span className="mt-3 px-4 py-1.5 bg-white/20 text-white rounded-full text-xs font-bold border border-white/30 backdrop-blur-md shadow-sm">
                Paciente Ativo: {activePatient.name}
              </span>
           )}
