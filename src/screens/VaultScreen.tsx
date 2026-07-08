@@ -62,6 +62,7 @@ export function VaultScreen() {
                 title={doc.title} 
                 date={new Date(doc.date).toLocaleDateString('pt-BR')} 
                 type={doc.category === 'recipe' ? 'pdf' : 'image'} 
+                url={doc.fileUrl}
               />
             ))
           ) : (
