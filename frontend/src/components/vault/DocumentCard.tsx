@@ -12,7 +12,8 @@ export function DocumentCard({ title, date, type, url }: DocumentCardProps) {
   
   const handleDownload = async () => {
     if (!url) return;
-    const finalUrl = url.startsWith('http') ? url : `http://localhost:3333${url}`;
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3333';
+    const finalUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
     try {
       // Tenta baixar o arquivo para forçar o download (evita abrir direto no navegador)
       const response = await fetch(finalUrl);
