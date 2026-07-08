@@ -39,25 +39,27 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
 
           {/* Seção: Lembretes Essenciais */}
           <section className="flex flex-col gap-4">
-            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider px-1">Lembretes</h3>
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider px-1">Consultas e Exames</h3>
 
             <div className="flex items-center justify-between bg-white p-4 rounded-[20px] shadow-sm border border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 text-blue-500 rounded-xl">
+                <div className="p-2 bg-red-50 text-red-500 rounded-xl">
                   <CalendarHeart className="w-5 h-5" />
                 </div>
-                <span className="font-semibold text-gray-800">Alertar Consultas</span>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-gray-800">Alerta Intensivo Padrão</span>
+                  <span className="text-[11px] text-gray-400 leading-tight">Sugere avisos progressivos em todas novas consultas</span>
+                </div>
               </div>
               <Toggle checked={remindersConsultations} onChange={setRemindersConsultations} />
             </div>
 
             <div className="flex flex-col gap-2 px-1">
-              <label className="text-gray-700 font-medium text-[15px]">Antecedência Padrão</label>
+              <label className="text-gray-700 font-medium text-[15px]">Antecedência Base</label>
               <select className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[20px] px-4 py-3 text-gray-800 text-base outline-none transition-all cursor-pointer">
                 <option value="1h">1 hora antes</option>
-                <option value="2h">2 horas antes</option>
-                <option value="1d">1 dia antes</option>
-                <option value="2d">2 dias antes</option>
+                <option value="24h">24 horas antes</option>
+                <option value="48h">48 horas antes</option>
               </select>
             </div>
           </section>

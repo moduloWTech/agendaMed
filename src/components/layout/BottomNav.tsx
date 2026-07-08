@@ -1,8 +1,8 @@
-import { CalendarHeart, FolderHeart, User } from 'lucide-react';
+import { CalendarHeart, FolderHeart, User, Stethoscope } from 'lucide-react';
 
 interface BottomNavProps {
-  currentTab?: 'agenda' | 'cofre' | 'perfil';
-  onChangeTab?: (tab: 'agenda' | 'cofre' | 'perfil') => void;
+  currentTab?: 'agenda' | 'consultas' | 'cofre' | 'perfil';
+  onChangeTab?: (tab: 'agenda' | 'consultas' | 'cofre' | 'perfil') => void;
 }
 
 export function BottomNav({ currentTab = 'agenda', onChangeTab }: BottomNavProps) {
@@ -20,6 +20,19 @@ export function BottomNav({ currentTab = 'agenda', onChangeTab }: BottomNavProps
           />
           <span className={`text-[11px] font-semibold mt-1 transition-colors ${currentTab === 'agenda' ? 'text-[var(--color-primary)]' : 'text-gray-400'}`}>
             Agenda
+          </span>
+        </button>
+
+        <button 
+          onClick={() => onChangeTab?.('consultas')}
+          className="flex flex-col items-center justify-center min-h-[48px] min-w-[48px] gap-1 group w-20"
+        >
+          <Stethoscope
+            className={`w-7 h-7 transition-colors ${currentTab === 'consultas' ? 'text-[var(--color-primary)]' : 'text-gray-400 group-hover:text-gray-600'}`}
+            strokeWidth={currentTab === 'consultas' ? 2.5 : 2}
+          />
+          <span className={`text-[11px] font-semibold mt-1 transition-colors ${currentTab === 'consultas' ? 'text-[var(--color-primary)]' : 'text-gray-400'}`}>
+            Consultas
           </span>
         </button>
 
