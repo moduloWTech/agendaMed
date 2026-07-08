@@ -21,12 +21,14 @@ export function AgendaScreen() {
         </div>
 
         {/* Floating Action Button (FAB) */}
-        <button 
-          onClick={() => setIsWizardOpen(true)}
-          className="fixed bottom-24 right-6 z-40 w-16 h-16 bg-[var(--color-primary)] text-white rounded-[24px] shadow-lg shadow-[var(--color-primary)]/40 flex items-center justify-center hover:bg-[var(--color-accent)] hover:scale-105 active:scale-95 transition-all duration-300"
-        >
-          <Plus className="w-8 h-8" />
-        </button>
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-md flex justify-end px-6 z-40 pointer-events-none">
+          <button 
+            onClick={() => setIsWizardOpen(true)}
+            className="w-16 h-16 bg-[var(--color-primary)] text-white rounded-[24px] shadow-lg shadow-[var(--color-primary)]/40 flex items-center justify-center hover:bg-[var(--color-accent)] hover:scale-105 active:scale-95 transition-all duration-300 pointer-events-auto"
+          >
+            <Plus className="w-8 h-8" />
+          </button>
+        </div>
 
         {/* Wizard Modal */}
         {isWizardOpen && (
