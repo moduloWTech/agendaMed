@@ -73,7 +73,7 @@ export function VaultScreen() {
       </div>
 
       {/* FAB (Floating Action Button) */}
-      <div className="fixed bottom-[100px] left-0 w-full max-w-md mx-auto flex justify-center z-40 pointer-events-none">
+      <div className="fixed bottom-[100px] left-1/2 -translate-x-1/2 w-full max-w-md mx-auto flex justify-center z-40 pointer-events-none">
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-[var(--color-primary)] text-white h-16 px-8 rounded-[32px] flex items-center justify-center gap-2 shadow-xl shadow-[var(--color-primary)]/20 hover:bg-[var(--color-accent)] active:scale-95 transition-all duration-300 pointer-events-auto border border-[var(--color-primary)]/50"

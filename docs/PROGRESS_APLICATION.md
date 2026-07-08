@@ -22,8 +22,8 @@ Este documento registra o histórico de desenvolvimento, a situação atual da a
 - **AuthContext (Coração do App):** Estado global que armazena os dados do Cuidador logado e do Paciente Ativo de forma segura usando `localStorage`.
 - **Lógica de Paciente Único:** O sistema auto-cria um paciente nos bastidores quando o Administrador se loga pela primeira vez, mantendo a regra de que o app serve para "Um paciente / Vários cuidadores".
 - **Tela de Perfil:** Exibe os dados reais do usuário logado e permite renomear amigavelmente o familiar que está sendo cuidado através de um Modal nativo.
-- **Tela de Agenda:** Busca de medicamentos de forma real da API. O *Wizard* (Passo a Passo) agora envia novos medicamentos diretamente para o banco de dados.
-- **Tela do Cofre:** Busca de documentos (laudos, receitas) da API e integração parcial da modal de Adicionar Documento para salvar registros no backend.
+- **Tela de Agenda:** Busca de medicamentos de forma real da API. O *Wizard* (Passo a Passo) agora envia novos medicamentos diretamente para o banco de dados. Ajustes de UI garantem alinhamento correto do botão flutuante em telas largas.
+- **Tela do Cofre:** Busca de documentos (laudos, receitas) da API e integração parcial da modal de Adicionar Documento. Ajustes de UI no botão flutuante para telas largas.
 
 ---
 
