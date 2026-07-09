@@ -57,5 +57,5 @@ export default function App() {
     );
   }
 
-  return <LoginScreen onLogin={() => {}} />;
+  return <LoginScreen />;
 }

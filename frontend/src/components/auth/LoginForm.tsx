@@ -3,11 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 
-interface LoginFormProps {
-  onLogin?: () => void;
-}
-
-export function LoginForm({ onLogin }: LoginFormProps) {
+export function LoginForm() {
   // Estados da máquina
   const [mode, setMode] = useState<'idle' | 'admin_register' | 'setup_qr' | 'ready_to_send' | 'success'>('idle');
   const [qrCode, setQrCode] = useState<string | null>(null);
