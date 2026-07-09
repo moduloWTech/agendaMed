@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Settings, Lock, LogOut, Users, UserPlus } from 'lucide-react';
+import { User, Settings, Lock, LogOut, UserPlus } from 'lucide-react';
 import HeaderImg from '../assets/login-header.png';
 import { ProfileMenuItem } from '../components/profile/ProfileMenuItem';
 import { UserDataModal } from '../components/profile/UserDataModal';
