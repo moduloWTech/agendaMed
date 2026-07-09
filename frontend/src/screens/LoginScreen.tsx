@@ -1,11 +1,7 @@
 import { LoginForm } from '../components/auth/LoginForm';
 import LoginHeaderImg from '../assets/login-header.png';
 
-interface LoginScreenProps {
-  onLogin?: () => void;
-}
-
-export function LoginScreen({ onLogin }: LoginScreenProps) {
+export function LoginScreen() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center relative overflow-hidden animate-in fade-in duration-500">
       
@@ -31,7 +27,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         {/* Card do Formulário */}
         <div className="bg-white/90 backdrop-blur-md w-full p-6 sm:p-8 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-white flex flex-col items-center">
           <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-8 self-start px-2">Acesse sua conta</h2>
-          <LoginForm onLogin={onLogin} />
+          <LoginForm />
         </div>
         
       </div>
