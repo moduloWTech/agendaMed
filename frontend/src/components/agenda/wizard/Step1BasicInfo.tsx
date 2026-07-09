@@ -19,7 +19,7 @@ const MED_TYPES = [
   { id: 'outro', label: 'Outro', icon: Box },
 ];
 
-export function Step1BasicInfo({ name, setName, dosage, setDosage, instructions, setInstructions }: Step1BasicInfoProps) {
+export function Step1BasicInfo({ name, setName, dosage, setDosage, setInstructions }: Step1BasicInfoProps) {
   // Estados locais para montar a instrução de forma visual
   const [medType, setMedType] = useState('comprimido');
   const [quantity, setQuantity] = useState(1);

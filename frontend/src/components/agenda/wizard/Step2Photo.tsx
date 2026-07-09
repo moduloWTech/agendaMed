@@ -3,7 +3,7 @@ import React from 'react';
 
 interface Step2PhotoProps {
   selectedFile: File | null;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null> | any;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
