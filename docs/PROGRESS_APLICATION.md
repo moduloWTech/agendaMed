@@ -13,6 +13,11 @@ Este documento registra o histórico de desenvolvimento, a situação atual da a
 - **Segurança de APIs:** Zod para validação de dados de entrada e Middlewares de JWT para bloqueio de rotas protegidas.
 - **CRUDS Completos:** Rotas de Criação, Leitura, Atualização e Deleção (CRUD) prontas para todas as entidades.
 
+### 🚀 Deploy e Infraestrutura (Novo)
+- **Servidor Backend:** API e Bot do WhatsApp implantados em uma Máquina Virtual (VM) no **Google Cloud Platform (GCP)** usando Docker.
+- **CI/CD Automático:** Pipeline construída com **GitHub Actions**. Qualquer push na `main` gera uma nova imagem Docker no GitHub Container Registry e reinicia a API na VM automaticamente.
+- **Domínio e Segurança:** API conectada ao subdomínio `api-agendamed.moduloweb.com.br` com tráfego 100% criptografado e certificado SSL gerado pelo **Cloudflare** (Regra de Proxy Ativa na porta 80).
+- **Frontend Vercel:** Interface Single Page Application (React Router) hospedada na **Vercel** (`agenda-med-nu.vercel.app`), com configuração inteligente de `vercel.json` para evitar erros 404 em rotas diretas (como no Magic Link).
 ### 🔐 Autenticação (A "Mágica")
 - **Integração WhatsApp:** Bot construído com a biblioteca `@whiskeysockets/baileys`.
 - **Fluxo "Magic Link":** O usuário envia mensagem no WhatsApp, o sistema detecta/cadastra, gera um Token JWT seguro e envia um link clicável (Magic Link) que autentica o usuário diretamente no celular sem necessidade de senhas.
@@ -45,4 +50,3 @@ Para o MVP atingir a sua plenitude, as seguintes funcionalidades críticas estã
 - [ ] **Foto do Medicamento:** Permitir anexar foto/imagem da caixa do remédio no fluxo de cadastro da Agenda.
 - [ ] **Gestão de Cuidadores (Convites):** Criar a funcionalidade para o Administrador adicionar outros números de WhatsApp na família para que eles também possam pedir o "Magic Link".
 - [ ] **Desconexão por Inatividade/Segurança:** Tratar com mais robustez a queda do bot do WhatsApp ou quando o número admin for removido.
-- [ ] **Testes em Dispositivo Real:** Fazer deploy do Frontend e Backend em uma infraestrutura (ex: Render, Vercel) para testes pesados simulando o dia a dia.
