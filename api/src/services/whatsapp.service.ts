@@ -45,7 +45,19 @@ export class WhatsappService {
           const authPath = path.join(__dirname, '..', '..', 'auth_info_baileys');
           const fs = require('fs');
           if (fs.existsSync(authPath)) {
-            fs.rmSync(authPath, { recursive: true, force: true });
+            try {
+              const files = fs.readdirSync(authPath);
+              for (const file of files) {
+                const filePath = path.join(authPath, file);
+                if (fs.statSync(filePath).isFile()) {
+                  fs.unlinkSync(filePath);
+                } else {
+                  fs.rmSync(filePath, { recursive: true, force: true });
+                }
+              }
+            } catch (e) {
+              console.error('[WhatsApp] Erro ao limpar auth:', e);
+            }
           }
           this.connect();
         }
