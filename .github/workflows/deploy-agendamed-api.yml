@@ -64,7 +64,7 @@ jobs:
               --name agendamed-api-container \
               --network agilizai-network \
               --restart unless-stopped \
-              -p 3333:3333 \
+              -p 80:3333 \
               --env-file /home/${{ secrets.GCP_VM_USERNAME }}/agendaMed-api/.env \
               -v /home/${{ secrets.GCP_VM_USERNAME }}/agendaMed-api/auth_info_baileys:/app/auth_info_baileys \
               ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
