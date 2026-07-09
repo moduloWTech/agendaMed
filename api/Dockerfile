@@ -35,7 +35,7 @@ RUN apk add --no-cache openssl
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/build ./build
-COPY --from=builder /app/src/generated/prisma ./src/generated/prisma
+COPY --from=builder /app/src/generated/prisma ./build/generated/prisma
 COPY --from=builder /app/prisma ./prisma
 
 # Criar a pasta do baileys com as permissões corretas
