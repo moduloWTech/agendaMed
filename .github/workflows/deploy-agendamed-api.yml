@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/agendamed-api
+  IMAGE_NAME: modulowtech/agendamed-api
 
 jobs:
   build-and-deploy:
