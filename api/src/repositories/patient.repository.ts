@@ -9,7 +9,9 @@ export class PatientRepository implements IPatientRepository {
       data: {
         name: data.name,
         birthDate: data.birthDate ? new Date(data.birthDate) : null,
-        userId: data.userId,
+        users: {
+          connect: { id: data.userId }
+        }
       },
     });
   }
@@ -22,7 +24,11 @@ export class PatientRepository implements IPatientRepository {
 
   async findByUserId(userId: string): Promise<Patient[]> {
     return await prisma.patient.findMany({
-      where: { userId },
+      where: {
+        users: {
+          some: { id: userId }
+        }
+      },
       orderBy: { createdAt: 'desc' }
     });
   }

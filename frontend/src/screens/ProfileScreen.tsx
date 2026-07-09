@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { User, Settings, Lock, LogOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User, Settings, Lock, LogOut, Users, UserPlus } from 'lucide-react';
 import HeaderImg from '../assets/login-header.png';
 import { ProfileMenuItem } from '../components/profile/ProfileMenuItem';
 import { UserDataModal } from '../components/profile/UserDataModal';
 import { SettingsModal } from '../components/profile/SettingsModal';
 import { PrivacyModal } from '../components/profile/PrivacyModal';
+import { InviteCaregiverModal } from '../components/profile/InviteCaregiverModal';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 
@@ -26,6 +27,22 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   // Formata telefone se disponível
   const displayPhone = user?.phoneWhats || 'Sem telefone';
 
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [caregivers, setCaregivers] = useState<any[]>([]);
+
+  const loadCaregivers = async () => {
+    if (!activePatient) return;
+    try {
+      const response = await api.get(`/api/users/family/${activePatient.id}`);
+      setCaregivers(response || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    loadCaregivers();
+  }, [activePatient]);
   const handleRenamePatient = async () => {
     if (!activePatient || !newPatientName.trim()) return;
     setIsSavingPatient(true);
@@ -101,6 +118,38 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             )}
           </div>
 
+          {/* Nova Seção: Equipe de Cuidados */}
+          <div className="flex items-center justify-between mb-2 mt-6 px-2">
+            <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Equipe de Cuidados</h2>
+            {user?.role === 'ADMIN' && (
+              <button 
+                onClick={() => setIsInviteModalOpen(true)}
+                className="flex items-center gap-1 text-sm font-bold text-[var(--color-primary)] hover:text-[var(--color-accent)] transition-colors"
+              >
+                <UserPlus className="w-4 h-4" /> Adicionar
+              </button>
+            )}
+          </div>
+          
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-2">
+            {(caregivers || []).map((cg, idx) => (
+              <div key={cg.id} className={`flex items-center justify-between px-4 py-3 ${idx !== (caregivers || []).length - 1 ? 'border-b border-gray-50' : ''}`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-gray-800 text-sm">{cg.name || 'Sem nome'} {cg.id === user?.id ? '(Você)' : ''}</span>
+                    <span className="text-xs text-gray-400">{cg.phoneWhats?.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')} • {cg.role === 'ADMIN' ? 'Administrador' : 'Cuidador'}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {(!caregivers || caregivers.length === 0) && (
+              <div className="px-4 py-3 text-sm text-gray-400 text-center">Nenhum cuidador encontrado.</div>
+            )}
+          </div>
+
           <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-2">Conta</h2>
           
           <ProfileMenuItem 
@@ -149,6 +198,16 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
       )}
       {isPrivacyModalOpen && (
         <PrivacyModal onClose={() => setIsPrivacyModalOpen(false)} />
+      )}
+
+      {isInviteModalOpen && (
+        <InviteCaregiverModal 
+          onClose={() => setIsInviteModalOpen(false)} 
+          onSuccess={() => {
+            setIsInviteModalOpen(false);
+            loadCaregivers();
+          }}
+        />
       )}
 
       {/* Modal de Edição de Paciente */}

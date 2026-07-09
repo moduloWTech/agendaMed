@@ -1,6 +1,7 @@
 import { IUserRepository, IUserCreate } from '../interfaces/user.interface';
 import { z } from 'zod';
 import type { User } from '../generated/prisma/client';
+import { whatsappService } from '../services/whatsapp.service';
 
 export class UserUseCase {
   constructor(private userRepository: IUserRepository) {}
@@ -64,5 +65,52 @@ export class UserUseCase {
     }
 
     await this.userRepository.delete(id);
+  }
+
+  async inviteCaregiver(adminId: string, data: any): Promise<User> {
+    const schema = z.object({
+      phoneWhats: z.string().min(10, 'O telefone deve ter pelo menos 10 dígitos'),
+      name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
+      patientId: z.string().uuid('ID do paciente inválido'),
+      patientName: z.string() // para enviar na mensagem
+    });
+
+    const parsedData = schema.parse(data);
+
+    // Valida admin
+    const admin = await this.userRepository.findById(adminId);
+    if (!admin || admin.role !== 'ADMIN') {
+      throw new Error('Apenas administradores podem convidar cuidadores.');
+    }
+
+    // Verifica se já existe
+    let user = await this.userRepository.findByPhoneWhats(parsedData.phoneWhats);
+    if (user) {
+      // Se existir, apenas atualiza para vincular ao paciente (se precisar)
+      throw new Error('Este número já está cadastrado no sistema.');
+    }
+
+    // Cria o usuário Cuidador
+    user = await this.userRepository.create({
+      phoneWhats: parsedData.phoneWhats,
+      name: parsedData.name,
+      role: 'CARE_GIVER',
+      patientId: parsedData.patientId
+    });
+
+    // Envia WhatsApp
+    const message = `Olá, ${parsedData.name}! 👋\n\nVocê foi convidado(a) por *${admin.name || 'um administrador'}* para fazer parte da equipe de cuidados de *${parsedData.patientName}* no aplicativo *AgendaMed*.\n\nAcesse o link abaixo para entrar no sistema:\n${process.env.FRONTEND_URL || 'http://localhost:5173'}\n\nLá, basta digitar o seu número de telefone para acessar a conta.`;
+    
+    try {
+      await whatsappService.sendMessage(parsedData.phoneWhats, message);
+    } catch (e) {
+      console.error('Erro ao enviar mensagem de convite no WhatsApp', e);
+    }
+
+    return user;
+  }
+
+  async getCaregivers(patientId: string): Promise<User[]> {
+    return await this.userRepository.findByPatientId(patientId);
   }
 }

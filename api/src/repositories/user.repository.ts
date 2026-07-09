@@ -5,13 +5,19 @@ import { prisma } from '../DB/prisma.config';
 
 export class UserRepository implements IUserRepository {
   async create(data: IUserCreate): Promise<User> {
+    const payload: any = {
+      phoneWhats: data.phoneWhats,
+      name: data.name || null,
+      email: data.email || null,
+      role: data.role || 'CARE_GIVER',
+    };
+    if (data.patientId) {
+      payload.patients = {
+        connect: { id: data.patientId }
+      };
+    }
     return await prisma.user.create({
-      data: {
-        phoneWhats: data.phoneWhats,
-        name: data.name || null,
-        email: data.email || null,
-        role: data.role || 'CARE_GIVER',
-      },
+      data: payload,
     });
   }
 
@@ -30,6 +36,16 @@ export class UserRepository implements IUserRepository {
   async findById(id: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: { id },
+    });
+  }
+
+  async findByPatientId(patientId: string): Promise<User[]> {
+    return await prisma.user.findMany({
+      where: {
+        patients: {
+          some: { id: patientId }
+        }
+      }
     });
   }
 
