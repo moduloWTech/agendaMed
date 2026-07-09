@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Stethoscope, Clock, MapPin, Search } from 'lucide-react';
+import { Plus, Stethoscope, Clock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { AddAppointmentModal } from '../components/appointments/AddAppointmentModal';
