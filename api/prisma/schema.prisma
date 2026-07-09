@@ -16,7 +16,7 @@ model User {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  patients Patient[]
+  patients Patient[] @relation("PatientCaregivers")
 }
 
 model Patient {
@@ -26,8 +26,7 @@ model Patient {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  users User[] @relation("PatientCaregivers")
 
   medications Medication[]
   documents   Document[]

@@ -5,6 +5,7 @@ export interface IUserCreate {
   name?: string;
   email?: string;
   role?: string;
+  patientId?: string;
 }
 
 export interface IUserUpdate {
@@ -19,6 +20,7 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
   findByPhoneWhats(phoneWhats: string): Promise<User | null>;
   findById(id: string): Promise<User | null>;
+  findByPatientId(patientId: string): Promise<User[]>;
   update(id: string, data: IUserUpdate): Promise<User>;
   delete(id: string): Promise<void>;
 }
