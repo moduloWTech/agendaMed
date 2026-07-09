@@ -19,7 +19,7 @@ export default function App() {
 
     if (token) {
       setIsVerifyingToken(true);
-      fetch('http://localhost:3333/api/auth/verify-link', {
+      fetch(`${import.meta.env.VITE_API_URL}/api/auth/verify-link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
