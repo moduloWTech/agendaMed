@@ -27,7 +27,7 @@ export function LoginForm() {
 
     const interval = setInterval(async () => {
       try {
-        const response = await fetch('http://localhost:3333/api/whatsapp/status');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/whatsapp/status`);
         const data = await response.json();
         
         if (data.connected) {
@@ -51,7 +51,7 @@ export function LoginForm() {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:3333/api/auth/request-link', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/request-link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phoneWhats }),
@@ -91,7 +91,7 @@ export function LoginForm() {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:3333/api/auth/setup-admin', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/setup-admin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phoneWhats, name, email, patientName }),
