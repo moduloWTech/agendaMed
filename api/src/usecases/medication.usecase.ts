@@ -2,6 +2,8 @@ import { IMedicationRepository } from '../interfaces/medication.interface';
 import { IPatientRepository } from '../interfaces/patient.interface';
 import { z } from 'zod';
 import type { Medication } from '../generated/prisma/client';
+import { prisma } from '../lib/prisma';
+import { pushService } from '../services/push.service';
 
 export class MedicationUseCase {
   constructor(
@@ -98,6 +100,33 @@ export class MedicationUseCase {
     });
     
     const parsed = schema.parse(data);
-    await this.medicationRepository.toggleHistory(userId, parsed);
+    const wasCreated = await this.medicationRepository.toggleHistory(userId, parsed);
+
+    if (wasCreated) {
+      try {
+        const medication = await this.medicationRepository.findById(parsed.medicationId);
+        const patient: any = await this.patientRepository.findById(parsed.patientId);
+        const userWhoDidIt = await prisma.user.findUnique({ where: { id: userId } });
+        
+        const userName = userWhoDidIt?.name || 'Um cuidador';
+        
+        if (patient && medication) {
+          // Filtrar os usuários do paciente para enviar a notificação (exceto para o que acabou de dar o remédio)
+          const otherUserIds = (patient.users || [])
+            .map((u: any) => u.id)
+            .filter((id: string) => id !== userId);
+            
+          if (otherUserIds.length > 0) {
+            pushService.sendNotificationToUsers(otherUserIds, {
+              title: '✅ Remédio Administrado!',
+              body: `${userName} registrou que ${patient.name} tomou ${medication.name}.`,
+              url: '/'
+            }).catch(console.error);
+          }
+        }
+      } catch (err) {
+        console.error('[WebPush] Falha ao enviar notificação de check-in:', err);
+      }
+    }
   }
 }
