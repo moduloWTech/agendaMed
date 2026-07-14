@@ -58,7 +58,7 @@ export class MedicationRepository implements IMedicationRepository {
     });
   }
 
-  async toggleHistory(userId: string, data: { medicationId: string, patientId: string, date: string, time: string }): Promise<void> {
+  async toggleHistory(userId: string, data: { medicationId: string, patientId: string, date: string, time: string }): Promise<boolean> {
     const existing = await prisma.medicationHistory.findUnique({
       where: {
         medicationId_date_time: {
@@ -74,6 +74,7 @@ export class MedicationRepository implements IMedicationRepository {
       await prisma.medicationHistory.delete({
         where: { id: existing.id }
       });
+      return false;
     } else {
       // Se não existe, faz o checkin
       await prisma.medicationHistory.create({
@@ -85,6 +86,7 @@ export class MedicationRepository implements IMedicationRepository {
           time: data.time
         }
       });
+      return true;
     }
   }
 }
