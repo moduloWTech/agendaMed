@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Save, Trash2, Clock, CheckCircle2, RotateCcw } from 'lucide-react';
+import { X, Save, Trash2, Clock, CheckCircle2, RotateCcw, Plus } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { api } from '../../services/api';
@@ -24,10 +24,22 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
     isOpen: false, title: '', message: '', type: 'info'
   });
 
-  // State
   const [name, setName] = useState(medication.name || '');
   const [dosage, setDosage] = useState(medication.dosage || '');
   const [instructions, setInstructions] = useState(medication.instructions || '');
+
+  const [frequency, setFrequency] = useState(medication.frequency || 'daily');
+  const [startDate, setStartDate] = useState(medication.startDate ? new Date(medication.startDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+  const [startTime, setStartTime] = useState(medication.startTime || '08:00');
+  const [times, setTimes] = useState<string[]>(medication.times && medication.times.length > 0 ? medication.times : ['08:00']);
+
+  const handleAddTime = () => setTimes([...times, '12:00']);
+  const handleRemoveTime = (index: number) => setTimes(times.filter((_, i) => i !== index));
+  const updateTime = (index: number, value: string) => {
+    const newTimes = [...times];
+    newTimes[index] = value;
+    setTimes(newTimes);
+  };
 
   const handleDelete = async () => {
     if (!window.confirm('Tem certeza que deseja excluir este medicamento? Esta ação não pode ser desfeita.')) return;
@@ -49,7 +61,15 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
     }
     setIsLoading(true);
     try {
-      await api.put(`/api/medications/${medication.id}`, { name, dosage, instructions });
+      await api.put(`/api/medications/${medication.id}`, { 
+        name, 
+        dosage, 
+        instructions,
+        frequency,
+        startDate: frequency === 'manual' ? new Date().toISOString() : new Date(startDate).toISOString(),
+        startTime: frequency === 'manual' ? times[0] : startTime,
+        times: frequency === 'manual' ? times : []
+      });
       onRefresh();
       onClose();
     } catch (error: any) {
@@ -136,10 +156,84 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
             disabled={!isAdmin}
           />
 
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mt-2">
-            <p className="text-sm text-gray-600 font-medium">Frequência: <span className="text-gray-800 font-bold">{formatFrequency(medication.frequency)}</span></p>
-            <p className="text-xs text-gray-400 mt-1">A frequência só pode ser alterada recadastrando o medicamento.</p>
-          </div>
+          {isAdmin ? (
+            <div className="flex flex-col gap-4 mt-2">
+              <div className="flex flex-col gap-2">
+                <label className="text-gray-700 font-medium text-[15px] ml-1">Frequência</label>
+                <select
+                  value={frequency}
+                  onChange={(e) => setFrequency(e.target.value)}
+                  className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-lg outline-none transition-all cursor-pointer"
+                >
+                  <option value="4h">A cada 4 horas</option>
+                  <option value="6h">A cada 6 horas</option>
+                  <option value="8h">A cada 8 horas</option>
+                  <option value="12h">A cada 12 horas</option>
+                  <option value="daily">Diário</option>
+                  <option value="weekly">Semanal</option>
+                  <option value="monthly">Mensal</option>
+                  <option value="single">Dose Única</option>
+                  <option value="manual">Adicionar horários manualmente</option>
+                </select>
+              </div>
+
+              {frequency === 'manual' ? (
+                <div className="flex flex-col gap-3">
+                  <label className="text-gray-700 font-medium text-[15px] ml-1">Quais horários?</label>
+                  {times.map((time, index) => (
+                    <div key={index} className="flex items-center gap-3 bg-[#F8FAFC] p-2 pr-4 rounded-[24px] border border-gray-100">
+                      <input
+                        type="time"
+                        value={time}
+                        onChange={(e) => updateTime(index, e.target.value)}
+                        className="flex-1 bg-transparent text-xl font-bold text-gray-800 outline-none px-4 py-2"
+                      />
+                      {times.length > 1 && (
+                        <button
+                          onClick={() => handleRemoveTime(index)}
+                          className="p-2 text-red-400 hover:text-red-600 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    onClick={handleAddTime}
+                    className="flex items-center justify-center gap-2 py-4 border-2 border-dashed border-gray-300 rounded-[24px] text-gray-500 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all"
+                  >
+                    <Plus className="w-5 h-5" /> Adicionar outro horário
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-gray-700 font-medium text-[15px] ml-1">Data de Início</label>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-base outline-none transition-all cursor-pointer"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-gray-700 font-medium text-[15px] ml-1">Horário Base</label>
+                    <input
+                      type="time"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-base outline-none transition-all cursor-pointer text-center"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mt-2">
+              <p className="text-sm text-gray-600 font-medium">Frequência: <span className="text-gray-800 font-bold">{formatFrequency(medication.frequency)}</span></p>
+              <p className="text-xs text-gray-400 mt-1">Apenas administradores podem editar os horários e frequências do medicamento.</p>
+            </div>
+          )}
 
         </div>
 
