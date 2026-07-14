@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { api } from '../services/api';
+import { subscribeToPushNotifications } from '../services/push';
 
 interface User {
   id: string;
@@ -60,6 +61,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem('@agendaMed:user');
           setUser(null);
         }
+
+        // Tenta registrar no push se o usuário estiver válido
+        if (localStorage.getItem('@agendaMed:token')) {
+          subscribeToPushNotifications();
+        }
       }
       setIsLoading(false);
     }
@@ -83,6 +89,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Erro ao buscar pacientes no login:', err);
     }
+
+    // Após o login, inscreve o dispositivo para Push Notifications
+    subscribeToPushNotifications();
   };
 
   const logout = () => {
