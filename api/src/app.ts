@@ -94,7 +94,7 @@ export class App {
 
     // Injeção de Dependências Manual (OOP) - MEDICATION
     const medicationRepository = new MedicationRepository();
-    const medicationUseCase = new MedicationUseCase(medicationRepository, patientRepository);
+    const medicationUseCase = new MedicationUseCase(medicationRepository, patientRepository, userRepository);
     const medicationRouter = new MedicationRouter(medicationUseCase);
 
     // Injeção de Dependências Manual (OOP) - DOCUMENT
