@@ -45,7 +45,7 @@ Neste exato momento, o esqueleto central do projeto (Frontend ↔ Backend ↔ Ba
 
 Para o MVP atingir a sua plenitude, as seguintes funcionalidades críticas estão na fila:
 
-- [ ] **Baixa de Medicamentos (Histórico):** Criar a lógica para quando a pessoa clicar na bolinha do remédio na Agenda, o sistema gravar que a dose daquele horário específico foi "Tomada" por fulano.
+- [x] **Baixa de Medicamentos (Histórico):** Criar a lógica para quando a pessoa clicar na bolinha do remédio na Agenda, o sistema gravar que a dose daquele horário específico foi "Tomada" por fulano. (Concluído com controle de Edição por Admins)
 - [ ] **Avisos pelo WhatsApp (Cron Jobs):** Implementar um motor no backend que roda a cada minuto (ou usa agenda) para ler os horários e disparar mensagens automáticas de alerta ("Hora do remédio X!") no WhatsApp.
 - [ ] **Foto do Medicamento:** Permitir anexar foto/imagem da caixa do remédio no fluxo de cadastro da Agenda.
 - [x] **Gestão de Cuidadores (Convites):** Criar a funcionalidade para o Administrador adicionar outros números de WhatsApp na família para que eles também possam pedir o "Magic Link".

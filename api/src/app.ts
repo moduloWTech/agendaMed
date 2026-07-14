@@ -28,6 +28,8 @@ import { AuthRouter } from './routes/auth.router';
 import { AuthUseCase } from './usecases/auth.usecase';
 
 import { WhatsappRouter } from './routes/whatsapp.router';
+import { PushRouter } from './routes/push.router';
+import { cronService } from './services/cron.service';
 
 export class App {
   private app: FastifyInstance;
@@ -112,6 +114,9 @@ export class App {
     // Injeção de Dependências Manual (OOP) - WHATSAPP
     const whatsappRouter = new WhatsappRouter();
 
+    // Injeção de Dependências Manual (OOP) - PUSH
+    const pushRouter = new PushRouter();
+
     // Registrando rotas
     userRouter.register(this.app);
     patientRouter.register(this.app);
@@ -120,6 +125,7 @@ export class App {
     appointmentRouter.register(this.app);
     authRouter.register(this.app);
     whatsappRouter.register(this.app);
+    pushRouter.register(this.app);
 
     this.app.register(uploadRoutes, { prefix: '/api/upload' });
   }
@@ -127,6 +133,10 @@ export class App {
   public async start() {
     this.registerMiddlewares();
     this.registerRoutes();
+    
+    // Inicia o serviço de Agendamento (Cron Jobs)
+    cronService.start();
+
     await this.listen();
   }
 }
