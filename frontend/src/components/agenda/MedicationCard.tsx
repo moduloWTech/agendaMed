@@ -8,9 +8,10 @@ interface MedicationCardProps {
   frequency?: string;
   status: 'pending' | 'completed' | 'late';
   onCheck?: () => void;
+  onCardClick?: () => void;
 }
 
-export function MedicationCard({ time, name, dosage, instructions, frequency, status, onCheck }: MedicationCardProps) {
+export function MedicationCard({ time, name, dosage, instructions, frequency, status, onCheck, onCardClick }: MedicationCardProps) {
   const isCompleted = status === 'completed';
   const isLate = status === 'late';
 
@@ -40,8 +41,11 @@ export function MedicationCard({ time, name, dosage, instructions, frequency, st
       </div>
 
       {/* Card do Medicamento */}
-      <div className={`
+      <div 
+        onClick={onCardClick}
+        className={`
         flex-1 bg-white p-6 rounded-[32px] flex items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300
+        ${onCardClick ? 'cursor-pointer hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]' : ''}
         ${isCompleted ? 'opacity-60' : isLate ? 'border border-red-100 shadow-[0_8px_30px_rgba(225,29,72,0.1)]' : 'border border-transparent'}
       `}>
         <div>
@@ -72,7 +76,7 @@ export function MedicationCard({ time, name, dosage, instructions, frequency, st
         {/* Botão de Check Grande (Estilo Premium) */}
         {!isCompleted && (
           <button
-            onClick={onCheck}
+            onClick={(e) => { e.stopPropagation(); onCheck?.(); }}
             className="w-16 h-16 rounded-[24px] flex items-center justify-center bg-[var(--color-primary)] text-white hover:bg-[var(--color-accent)] active:scale-95 transition-all duration-300 shadow-xl shadow-[var(--color-primary)]/20 flex-shrink-0"
             aria-label="Confirmar medicação"
           >
@@ -81,9 +85,13 @@ export function MedicationCard({ time, name, dosage, instructions, frequency, st
         )}
 
         {isCompleted && (
-          <div className="w-16 h-16 rounded-[24px] flex items-center justify-center bg-[var(--color-secondary)]/50 text-[var(--color-primary)] flex-shrink-0">
+          <button
+            onClick={(e) => { e.stopPropagation(); onCheck?.(); }}
+            className="w-16 h-16 rounded-[24px] flex items-center justify-center bg-[var(--color-secondary)]/50 text-[var(--color-primary)] hover:bg-[var(--color-secondary)] active:scale-95 transition-all duration-300 flex-shrink-0"
+            aria-label="Desfazer medicação"
+          >
             <CheckCircle2 className="w-8 h-8" strokeWidth={2.5} />
-          </div>
+          </button>
         )}
       </div>
     </div>

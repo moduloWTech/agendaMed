@@ -17,6 +17,7 @@ model User {
   updatedAt  DateTime @updatedAt
 
   patients Patient[] @relation("PatientCaregivers")
+  medicationHistory MedicationHistory[]
 }
 
 model Patient {
@@ -31,6 +32,7 @@ model Patient {
   medications Medication[]
   documents   Document[]
   appointments Appointment[]
+  medicationHistory MedicationHistory[]
 }
 
 model Medication {
@@ -50,6 +52,24 @@ model Medication {
 
   patientId String
   patient   Patient @relation(fields: [patientId], references: [id])
+  history   MedicationHistory[]
+}
+
+model MedicationHistory {
+  id           String     @id @default(uuid())
+  medicationId String
+  patientId    String
+  userId       String
+  date         String     // YYYY-MM-DD
+  time         String     // HH:MM
+  takenAt      DateTime   @default(now())
+
+  medication   Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  patient      Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id])
+
+  // Um medicamento só pode ser marcado uma vez para um mesmo dia e horário
+  @@unique([medicationId, date, time])
 }
 
 model Document {

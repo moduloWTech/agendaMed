@@ -51,4 +51,40 @@ export class MedicationRepository implements IMedicationRepository {
       where: { id },
     });
   }
+
+  async getHistory(patientId: string, date: string): Promise<any[]> {
+    return await prisma.medicationHistory.findMany({
+      where: { patientId, date }
+    });
+  }
+
+  async toggleHistory(userId: string, data: { medicationId: string, patientId: string, date: string, time: string }): Promise<void> {
+    const existing = await prisma.medicationHistory.findUnique({
+      where: {
+        medicationId_date_time: {
+          medicationId: data.medicationId,
+          date: data.date,
+          time: data.time
+        }
+      }
+    });
+
+    if (existing) {
+      // Se já existe, o usuário quer desfazer o checkin
+      await prisma.medicationHistory.delete({
+        where: { id: existing.id }
+      });
+    } else {
+      // Se não existe, faz o checkin
+      await prisma.medicationHistory.create({
+        data: {
+          medicationId: data.medicationId,
+          patientId: data.patientId,
+          userId,
+          date: data.date,
+          time: data.time
+        }
+      });
+    }
+  }
 }

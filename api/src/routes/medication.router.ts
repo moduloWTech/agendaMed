@@ -45,9 +45,12 @@ export class MedicationRouter {
         }
       });
 
-      // ROTA: Atualizar Medicamento
-      scopedApp.put('/api/medications/:id', async (request, reply) => {
+      // ROTA: Atualizar Medicamento (Apenas Admin)
+      scopedApp.put('/api/medications/:id', async (request: any, reply) => {
         try {
+          if (request.user.role !== 'ADMIN') {
+            return reply.status(403).send({ error: 'Apenas administradores podem editar medicamentos.' });
+          }
           const { id } = request.params as { id: string };
           const medication = await this.medicationUseCase.updateMedication(id, request.body);
           return reply.status(200).send(medication);
@@ -58,15 +61,45 @@ export class MedicationRouter {
         }
       });
 
-      // ROTA: Deletar Medicamento
-      scopedApp.delete('/api/medications/:id', async (request, reply) => {
+      // ROTA: Deletar Medicamento (Apenas Admin)
+      scopedApp.delete('/api/medications/:id', async (request: any, reply) => {
         try {
+          if (request.user.role !== 'ADMIN') {
+            return reply.status(403).send({ error: 'Apenas administradores podem excluir medicamentos.' });
+          }
           const { id } = request.params as { id: string };
           await this.medicationUseCase.deleteMedication(id);
           return reply.status(204).send();
         } catch (error: any) {
           app.log.error(error);
           return reply.status(404).send({ error: error.message });
+        }
+      });
+
+      // ROTA: Obter Histórico de Medicamentos
+      scopedApp.get('/api/patients/:patientId/medications/history', async (request: any, reply) => {
+        try {
+          const { patientId } = request.params as { patientId: string };
+          const { date } = request.query as { date: string };
+          if (!date) return reply.status(400).send({ error: 'Data é obrigatória (date=YYYY-MM-DD)' });
+
+          const history = await this.medicationUseCase.getHistory(patientId, date);
+          return reply.status(200).send(history);
+        } catch (error: any) {
+          app.log.error(error);
+          return reply.status(400).send({ error: error.message });
+        }
+      });
+
+      // ROTA: Alternar Check-in (Fazer/Desfazer)
+      scopedApp.post('/api/medications/history/toggle', async (request: any, reply) => {
+        try {
+          const userId = request.user.id;
+          await this.medicationUseCase.toggleCheckin(userId, request.body);
+          return reply.status(200).send({ success: true });
+        } catch (error: any) {
+          app.log.error(error);
+          return reply.status(400).send({ error: error.message });
         }
       });
     });

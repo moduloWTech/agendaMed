@@ -84,4 +84,20 @@ export class MedicationUseCase {
 
     await this.medicationRepository.delete(id);
   }
+
+  async getHistory(patientId: string, date: string): Promise<any[]> {
+    return await this.medicationRepository.getHistory(patientId, date);
+  }
+
+  async toggleCheckin(userId: string, data: any): Promise<void> {
+    const schema = z.object({
+      medicationId: z.string().uuid(),
+      patientId: z.string().uuid(),
+      date: z.string(),
+      time: z.string()
+    });
+    
+    const parsed = schema.parse(data);
+    await this.medicationRepository.toggleHistory(userId, parsed);
+  }
 }

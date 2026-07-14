@@ -48,5 +48,5 @@ Para o MVP atingir a sua plenitude, as seguintes funcionalidades críticas estã
 - [ ] **Baixa de Medicamentos (Histórico):** Criar a lógica para quando a pessoa clicar na bolinha do remédio na Agenda, o sistema gravar que a dose daquele horário específico foi "Tomada" por fulano.
 - [ ] **Avisos pelo WhatsApp (Cron Jobs):** Implementar um motor no backend que roda a cada minuto (ou usa agenda) para ler os horários e disparar mensagens automáticas de alerta ("Hora do remédio X!") no WhatsApp.
 - [ ] **Foto do Medicamento:** Permitir anexar foto/imagem da caixa do remédio no fluxo de cadastro da Agenda.
-- [ ] **Gestão de Cuidadores (Convites):** Criar a funcionalidade para o Administrador adicionar outros números de WhatsApp na família para que eles também possam pedir o "Magic Link".
+- [x] **Gestão de Cuidadores (Convites):** Criar a funcionalidade para o Administrador adicionar outros números de WhatsApp na família para que eles também possam pedir o "Magic Link".
 - [ ] **Desconexão por Inatividade/Segurança:** Tratar com mais robustez a queda do bot do WhatsApp ou quando o número admin for removido.

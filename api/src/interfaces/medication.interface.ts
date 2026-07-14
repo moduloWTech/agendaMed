@@ -30,4 +30,6 @@ export interface IMedicationRepository {
   findByPatientId(patientId: string): Promise<Medication[]>;
   update(id: string, data: IMedicationUpdate): Promise<Medication>;
   delete(id: string): Promise<void>;
+  getHistory(patientId: string, date: string): Promise<any[]>;
+  toggleHistory(userId: string, data: { medicationId: string, patientId: string, date: string, time: string }): Promise<void>;
 }

@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { CalendarX2 } from 'lucide-react';
 import { MedicationCard } from './MedicationCard';
+import { EditMedicationModal } from './EditMedicationModal';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../services/api';
 
@@ -25,6 +26,17 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
   const { activePatient } = useAuth();
   const [medications, setMedications] = useState<Medication[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [editingMedInfo, setEditingMedInfo] = useState<{med: any, uniqueId: string, isCompleted: boolean} | null>(null);
+
+  const formatDateStr = (d: Date) => {
+    // Evita problemas de fuso horário
+    const offset = d.getTimezoneOffset()
+    d = new Date(d.getTime() - (offset*60*1000))
+    return d.toISOString().split('T')[0]
+  };
+
+  const selectedDateStr = formatDateStr(selectedDate);
+  const today = new Date();
 
   useEffect(() => {
     async function fetchMedications() {
@@ -32,16 +44,19 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
       try {
         const data = await api.get(`/api/patients/${activePatient.id}/medications`);
         setMedications(data || []);
+
+        const historyData = await api.get(`/api/patients/${activePatient.id}/medications/history?date=${selectedDateStr}`);
+        const completed = new Set<string>();
+        historyData.forEach((h: any) => {
+          completed.add(`${h.medicationId}-${h.date}-${h.time}`);
+        });
+        setCompletedIds(completed);
       } catch (error) {
         console.error('Falha ao buscar medicamentos', error);
       }
     }
     fetchMedications();
-  }, [activePatient]);
-
-  const formatDateStr = (d: Date) => d.toISOString().split('T')[0];
-  const selectedDateStr = formatDateStr(selectedDate);
-  const today = new Date();
+  }, [activePatient, selectedDateStr]);
   
   const generatedSchedule = useMemo(() => {
     if (!medications || medications.length === 0) return [];
@@ -101,13 +116,34 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
     return schedule.sort((a, b) => a.time.localeCompare(b.time));
   }, [medications, selectedDate, selectedDateStr, completedIds]);
 
-  const handleCheck = (uniqueId: string) => {
+  const handleCheck = async (medicationId: string, time: string, uniqueId: string) => {
+    if (!activePatient) return;
+
+    // Optimistic UI update
     setCompletedIds(prev => {
       const next = new Set(prev);
       if (next.has(uniqueId)) next.delete(uniqueId);
       else next.add(uniqueId);
       return next;
     });
+
+    try {
+      await api.post('/api/medications/history/toggle', {
+        medicationId,
+        patientId: activePatient.id,
+        date: selectedDateStr,
+        time
+      });
+    } catch (error) {
+      console.error('Erro ao alternar check-in', error);
+      // Rollback optimistic update
+      setCompletedIds(prev => {
+        const next = new Set(prev);
+        if (next.has(uniqueId)) next.delete(uniqueId);
+        else next.add(uniqueId);
+        return next;
+      });
+    }
   };
 
   const isToday = selectedDateStr === formatDateStr(today);
@@ -145,7 +181,7 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
       <div className="flex flex-col">
         {generatedSchedule.length > 0 ? (
           generatedSchedule.map((med) => (
-            <MedicationCard
+              <MedicationCard
               key={med.uniqueId}
               time={med.time}
               name={med.name}
@@ -153,7 +189,8 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
               instructions={med.instructions}
               frequency={med.frequency}
               status={med.status}
-              onCheck={() => handleCheck(med.uniqueId)}
+              onCheck={() => handleCheck(med.id, med.time, med.uniqueId)}
+              onCardClick={() => setEditingMedInfo({ med, uniqueId: med.uniqueId, isCompleted: med.status === 'completed' })}
             />
           ))
         ) : (
@@ -168,6 +205,17 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
           </div>
         )}
       </div>
+
+      {editingMedInfo && (
+        <EditMedicationModal
+          medication={editingMedInfo.med}
+          uniqueId={editingMedInfo.uniqueId}
+          isCompleted={editingMedInfo.isCompleted}
+          onClose={() => setEditingMedInfo(null)}
+          onRefresh={() => window.location.reload()}
+          onToggleCheckin={handleCheck}
+        />
+      )}
     </div>
   );
 }
