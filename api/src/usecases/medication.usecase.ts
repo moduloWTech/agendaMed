@@ -1,14 +1,15 @@
 import { IMedicationRepository } from '../interfaces/medication.interface';
 import { IPatientRepository } from '../interfaces/patient.interface';
+import { IUserRepository } from '../interfaces/user.interface';
 import { z } from 'zod';
 import type { Medication } from '../generated/prisma/client';
-import { prisma } from '../lib/prisma';
 import { pushService } from '../services/push.service';
 
 export class MedicationUseCase {
   constructor(
     private medicationRepository: IMedicationRepository,
-    private patientRepository: IPatientRepository
+    private patientRepository: IPatientRepository,
+    private userRepository: IUserRepository
   ) {}
 
   async createMedication(data: any): Promise<Medication> {
@@ -106,7 +107,7 @@ export class MedicationUseCase {
       try {
         const medication = await this.medicationRepository.findById(parsed.medicationId);
         const patient: any = await this.patientRepository.findById(parsed.patientId);
-        const userWhoDidIt = await prisma.user.findUnique({ where: { id: userId } });
+        const userWhoDidIt = await this.userRepository.findById(userId);
         
         const userName = userWhoDidIt?.name || 'Um cuidador';
         
