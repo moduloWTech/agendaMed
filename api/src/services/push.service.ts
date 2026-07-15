@@ -3,15 +3,23 @@ import { prisma } from '../DB/prisma.config';
 
 export class PushService {
   constructor() {
-    const publicKey = process.env.VAPID_PUBLIC_KEY || '';
-    const privateKey = process.env.VAPID_PRIVATE_KEY || '';
+    const publicKey = process.env.VAPID_PUBLIC_KEY?.replace(/"/g, '') || '';
+    const privateKey = process.env.VAPID_PRIVATE_KEY?.replace(/"/g, '') || '';
     
-    // Sujeito é tipicamente um URL ou "mailto:admin@dominio.com"
-    webpush.setVapidDetails(
-      'mailto:suporte@agendamed.com',
-      publicKey,
-      privateKey
-    );
+    if (publicKey && privateKey) {
+      try {
+        // Sujeito é tipicamente um URL ou "mailto:admin@dominio.com"
+        webpush.setVapidDetails(
+          'mailto:suporte@agendamed.com',
+          publicKey,
+          privateKey
+        );
+      } catch (err) {
+        console.error('[WebPush] Erro ao configurar VAPID details. Chaves inválidas?', err);
+      }
+    } else {
+      console.warn('[WebPush] ATENÇÃO: Chaves VAPID ausentes no .env. O sistema de Notificações Push está inoperante.');
+    }
   }
 
   async saveSubscription(userId: string, subscription: any) {
