@@ -2,12 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MedicationUseCase = void 0;
 const zod_1 = require("zod");
+const push_service_1 = require("../services/push.service");
 class MedicationUseCase {
     medicationRepository;
     patientRepository;
-    constructor(medicationRepository, patientRepository) {
+    userRepository;
+    constructor(medicationRepository, patientRepository, userRepository) {
         this.medicationRepository = medicationRepository;
         this.patientRepository = patientRepository;
+        this.userRepository = userRepository;
     }
     async createMedication(data) {
         const schema = zod_1.z.object({
@@ -72,6 +75,41 @@ class MedicationUseCase {
             throw new Error('Medicamento não encontrado.');
         }
         await this.medicationRepository.delete(id);
+    }
+    async getHistory(patientId, date) {
+        return await this.medicationRepository.getHistory(patientId, date);
+    }
+    async toggleCheckin(userId, data) {
+        const schema = zod_1.z.object({
+            medicationId: zod_1.z.string().uuid(),
+            patientId: zod_1.z.string().uuid(),
+            date: zod_1.z.string(),
+            time: zod_1.z.string()
+        });
+        const parsed = schema.parse(data);
+        const wasCreated = await this.medicationRepository.toggleHistory(userId, parsed);
+        if (wasCreated) {
+            try {
+                const medication = await this.medicationRepository.findById(parsed.medicationId);
+                const patient = await this.patientRepository.findById(parsed.patientId);
+                const userWhoDidIt = await this.userRepository.findById(userId);
+                const userName = userWhoDidIt?.name || 'Um cuidador';
+                if (patient && medication) {
+                    // Extrair a lista de todos os usuários atrelados ao paciente
+                    const allUserIds = (patient.users || []).map((u) => u.id);
+                    if (allUserIds.length > 0) {
+                        push_service_1.pushService.sendNotificationToUsers(allUserIds, {
+                            title: '✅ Remédio Administrado!',
+                            body: `${userName} registrou que ${patient.name} tomou ${medication.name}.`,
+                            url: '/'
+                        }).catch(console.error);
+                    }
+                }
+            }
+            catch (err) {
+                console.error('[WebPush] Falha ao enviar notificação de check-in:', err);
+            }
+        }
     }
 }
 exports.MedicationUseCase = MedicationUseCase;
