@@ -112,13 +112,11 @@ export class MedicationUseCase {
         const userName = userWhoDidIt?.name || 'Um cuidador';
         
         if (patient && medication) {
-          // Filtrar os usuários do paciente para enviar a notificação (exceto para o que acabou de dar o remédio)
-          const otherUserIds = (patient.users || [])
-            .map((u: any) => u.id)
-            .filter((id: string) => id !== userId);
+          // Extrair a lista de todos os usuários atrelados ao paciente
+          const allUserIds = (patient.users || []).map((u: any) => u.id);
             
-          if (otherUserIds.length > 0) {
-            pushService.sendNotificationToUsers(otherUserIds, {
+          if (allUserIds.length > 0) {
+            pushService.sendNotificationToUsers(allUserIds, {
               title: '✅ Remédio Administrado!',
               body: `${userName} registrou que ${patient.name} tomou ${medication.name}.`,
               url: '/'
