@@ -27,6 +27,8 @@ const appointment_repository_1 = require("./repositories/appointment.repository"
 const auth_router_1 = require("./routes/auth.router");
 const auth_usecase_1 = require("./usecases/auth.usecase");
 const whatsapp_router_1 = require("./routes/whatsapp.router");
+const push_router_1 = require("./routes/push.router");
+const cron_service_1 = require("./services/cron.service");
 class App {
     app;
     PORT;
@@ -81,7 +83,7 @@ class App {
         const patientRouter = new patient_router_1.PatientRouter(patientUseCase);
         // Injeção de Dependências Manual (OOP) - MEDICATION
         const medicationRepository = new medication_repository_1.MedicationRepository();
-        const medicationUseCase = new medication_usecase_1.MedicationUseCase(medicationRepository, patientRepository);
+        const medicationUseCase = new medication_usecase_1.MedicationUseCase(medicationRepository, patientRepository, userRepository);
         const medicationRouter = new medication_router_1.MedicationRouter(medicationUseCase);
         // Injeção de Dependências Manual (OOP) - DOCUMENT
         const documentRepository = new document_repository_1.DocumentRepository();
@@ -96,6 +98,8 @@ class App {
         const authRouter = new auth_router_1.AuthRouter(authUseCase);
         // Injeção de Dependências Manual (OOP) - WHATSAPP
         const whatsappRouter = new whatsapp_router_1.WhatsappRouter();
+        // Injeção de Dependências Manual (OOP) - PUSH
+        const pushRouter = new push_router_1.PushRouter();
         // Registrando rotas
         userRouter.register(this.app);
         patientRouter.register(this.app);
@@ -104,11 +108,14 @@ class App {
         appointmentRouter.register(this.app);
         authRouter.register(this.app);
         whatsappRouter.register(this.app);
+        pushRouter.register(this.app);
         this.app.register(upload_router_1.uploadRoutes, { prefix: '/api/upload' });
     }
     async start() {
         this.registerMiddlewares();
         this.registerRoutes();
+        // Inicia o serviço de Agendamento (Cron Jobs)
+        cron_service_1.cronService.start();
         await this.listen();
     }
 }

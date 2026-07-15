@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../DB/prisma.config';
 import { pushService } from './push.service';
 
 export class CronService {
@@ -57,7 +57,7 @@ export class CronService {
 
           if (!alreadyTaken) {
             // 5. Enviar Notificações para todos os usuários do paciente
-            const userIds = med.patient.users.map(u => u.id);
+            const userIds = med.patient.users.map((u: any) => u.id);
             if (userIds.length > 0) {
               console.log(`[Cron] Disparando Push para ${med.name} (${currentTimeStr}) - Paciente: ${med.patient.name}`);
               await pushService.sendNotificationToUsers(userIds, {

@@ -1,5 +1,5 @@
 import webpush from 'web-push';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../DB/prisma.config';
 
 export class PushService {
   constructor() {
@@ -55,7 +55,7 @@ export class PushService {
       where: { userId: { in: userIds } }
     });
 
-    const notifications = subscriptions.map(async (sub) => {
+    const notifications = subscriptions.map(async (sub: any) => {
       const pushSubscription = {
         endpoint: sub.endpoint,
         keys: {

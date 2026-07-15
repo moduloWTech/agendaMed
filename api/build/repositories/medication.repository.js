@@ -45,5 +45,41 @@ class MedicationRepository {
             where: { id },
         });
     }
+    async getHistory(patientId, date) {
+        return await prisma_config_1.prisma.medicationHistory.findMany({
+            where: { patientId, date }
+        });
+    }
+    async toggleHistory(userId, data) {
+        const existing = await prisma_config_1.prisma.medicationHistory.findUnique({
+            where: {
+                medicationId_date_time: {
+                    medicationId: data.medicationId,
+                    date: data.date,
+                    time: data.time
+                }
+            }
+        });
+        if (existing) {
+            // Se já existe, o usuário quer desfazer o checkin
+            await prisma_config_1.prisma.medicationHistory.delete({
+                where: { id: existing.id }
+            });
+            return false;
+        }
+        else {
+            // Se não existe, faz o checkin
+            await prisma_config_1.prisma.medicationHistory.create({
+                data: {
+                    medicationId: data.medicationId,
+                    patientId: data.patientId,
+                    userId,
+                    date: data.date,
+                    time: data.time
+                }
+            });
+            return true;
+        }
+    }
 }
 exports.MedicationRepository = MedicationRepository;

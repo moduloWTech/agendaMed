@@ -8,18 +8,27 @@ class PatientRepository {
             data: {
                 name: data.name,
                 birthDate: data.birthDate ? new Date(data.birthDate) : null,
-                userId: data.userId,
+                users: {
+                    connect: { id: data.userId }
+                }
             },
         });
     }
     async findById(id) {
         return await prisma_config_1.prisma.patient.findUnique({
             where: { id },
+            include: {
+                users: true
+            }
         });
     }
     async findByUserId(userId) {
         return await prisma_config_1.prisma.patient.findMany({
-            where: { userId },
+            where: {
+                users: {
+                    some: { id: userId }
+                }
+            },
             orderBy: { createdAt: 'desc' }
         });
     }

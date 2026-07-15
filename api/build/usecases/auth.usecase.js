@@ -33,7 +33,8 @@ class AuthUseCase {
         // Gera um Magic Link Token válido por 15 minutos
         const magicToken = jsonwebtoken_1.default.sign({ id: user.id, phoneWhats: user.phoneWhats }, JWT_SECRET, { expiresIn: '15m' });
         // Constrói o link
-        const magicLink = `http://localhost:5173/auth/callback?token=${magicToken}`;
+        const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const magicLink = `${baseUrl}/auth/callback?token=${magicToken}`;
         // Mensagem
         let text = '';
         if (!user.name) {
