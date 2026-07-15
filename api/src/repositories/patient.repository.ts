@@ -19,6 +19,9 @@ export class PatientRepository implements IPatientRepository {
   async findById(id: string): Promise<Patient | null> {
     return await prisma.patient.findUnique({
       where: { id },
+      include: {
+        users: true
+      }
     });
   }
 
