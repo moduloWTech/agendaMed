@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { User, Settings, Lock, LogOut, UserPlus } from 'lucide-react';
+import { User, Settings, Lock, LogOut, UserPlus, Download } from 'lucide-react';
 import HeaderImg from '../assets/login-header.png';
 import { ProfileMenuItem } from '../components/profile/ProfileMenuItem';
 import { UserDataModal } from '../components/profile/UserDataModal';
 import { SettingsModal } from '../components/profile/SettingsModal';
 import { PrivacyModal } from '../components/profile/PrivacyModal';
 import { InviteCaregiverModal } from '../components/profile/InviteCaregiverModal';
+import { InstallPwaModal } from '../components/profile/InstallPwaModal';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { usePwaInstall } from '../hooks/usePwaInstall';
 
 interface ProfileScreenProps {
   onLogout?: () => void;
@@ -15,9 +17,11 @@ interface ProfileScreenProps {
 
 export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   const { user, activePatient } = useAuth();
+  const { isInstallable, isIOS, isInstalled, promptInstall } = usePwaInstall();
   const [isUserDataModalOpen, setIsUserDataModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
   
   // Estados para o Modal de Edição de Paciente
   const [isEditPatientModalOpen, setIsEditPatientModalOpen] = useState(false);
@@ -158,6 +162,23 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             subtitle="Informações pessoais e contato"
             onClick={() => setIsUserDataModalOpen(true)}
           />
+
+          {!isInstalled && (isInstallable || isIOS) && (
+            <div className="mt-4">
+              <ProfileMenuItem 
+                icon={<Download />}
+                title="Instalar Aplicativo"
+                subtitle="Tenha acesso rápido na tela inicial"
+                onClick={() => {
+                  if (isIOS) {
+                    setIsInstallModalOpen(true);
+                  } else {
+                    promptInstall();
+                  }
+                }}
+              />
+            </div>
+          )}
           
           <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Preferências</h2>
           
@@ -208,6 +229,10 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             loadCaregivers();
           }}
         />
+      )}
+
+      {isInstallModalOpen && (
+        <InstallPwaModal onClose={() => setIsInstallModalOpen(false)} />
       )}
 
       {/* Modal de Edição de Paciente */}
