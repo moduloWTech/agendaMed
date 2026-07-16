@@ -163,7 +163,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             onClick={() => setIsUserDataModalOpen(true)}
           />
 
-          {!isInstalled && (isInstallable || isIOS) && (
+          {!isInstalled && (
             <div className="mt-4">
               <ProfileMenuItem 
                 icon={<Download />}
@@ -173,7 +173,11 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
                   if (isIOS) {
                     setIsInstallModalOpen(true);
                   } else {
-                    promptInstall();
+                    if (isInstallable) {
+                      promptInstall();
+                    } else {
+                      alert('Para instalar, toque nos 3 pontinhos do menu do navegador e selecione "Instalar Aplicativo" ou "Adicionar à Tela Inicial".');
+                    }
                   }
                 }}
               />
