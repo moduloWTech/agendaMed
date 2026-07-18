@@ -9,7 +9,7 @@ export interface IMedicationCreate {
   startTime: string;
   times?: string[];
   active?: boolean;
-  photoUrl?: string;
+  photoUrl?: string | null;
   patientId: string;
 }
 
@@ -22,6 +22,7 @@ export interface IMedicationUpdate {
   startTime?: string;
   times?: string[];
   active?: boolean;
+  photoUrl?: string | null;
 }
 
 export interface IMedicationRepository {

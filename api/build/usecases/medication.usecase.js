@@ -23,6 +23,7 @@ class MedicationUseCase {
             times: zod_1.z.array(zod_1.z.string()).optional(),
             active: zod_1.z.boolean().optional(),
             patientId: zod_1.z.string().uuid('ID do paciente inválido'),
+            photoUrl: zod_1.z.string().nullable().optional()
         });
         const parsed = schema.parse(data);
         // Regra de Negócio: O paciente precisa existir
@@ -38,7 +39,8 @@ class MedicationUseCase {
             startDate: new Date(parsed.startDate),
             startTime: parsed.startTime,
             times: parsed.times || [],
-            patientId: parsed.patientId
+            patientId: parsed.patientId,
+            photoUrl: parsed.photoUrl
         });
     }
     async getMedicationById(id) {
@@ -61,6 +63,7 @@ class MedicationUseCase {
             startTime: zod_1.z.string().min(4).optional(),
             times: zod_1.z.array(zod_1.z.string()).optional(),
             active: zod_1.z.boolean().optional(),
+            photoUrl: zod_1.z.string().nullable().optional()
         });
         const parsedData = schema.parse(data);
         const medication = await this.medicationRepository.findById(id);
