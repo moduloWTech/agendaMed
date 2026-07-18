@@ -43,6 +43,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Tenta carregar o primeiro paciente automaticamente
         try {
           const parsedUser = JSON.parse(storedUser);
+          
+          // Silently refresh user profile to catch Role (Admin) promotions
+          api.get(`/api/users/${parsedUser.id}`).then((updatedUser: any) => {
+            if (updatedUser && updatedUser.id) {
+              const u: User = { 
+                id: updatedUser.id, 
+                name: updatedUser.name, 
+                phoneWhats: updatedUser.phoneWhats, 
+                email: updatedUser.email, 
+                role: updatedUser.role 
+              };
+              setUser(u);
+              localStorage.setItem('@agendaMed:user', JSON.stringify(u));
+            }
+          }).catch(console.error);
+
           const patients = await api.get(`/api/users/${parsedUser.id}/patients`);
           if (patients && patients.length > 0) {
             setActivePatient(patients[0]);
