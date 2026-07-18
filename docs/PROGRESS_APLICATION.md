@@ -47,4 +47,3 @@ Temos um PWA funcional que envia Notificações Push na tela de bloqueio com sin
 
 - [ ] **Foto do Medicamento (Agenda):** Permitir anexar foto/imagem da caixa do remédio no fluxo de cadastro da Agenda, da mesma forma que fizemos com os Documentos no cofre.
 - [ ] **Edição de Perfil de Usuário Adicional:** Garantir que convidados (outros cuidadores) tenham fluxos claros de permissão (Admin vs Leitor).
-- [ ] **Empacotamento Loja (Opcional Futuro):** Uso do Bubblewrap/TWA para gerar o arquivo `.aab` e subir o app oficialmente na Google Play Store.
