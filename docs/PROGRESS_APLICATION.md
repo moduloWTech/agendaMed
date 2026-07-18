@@ -21,6 +21,10 @@ Este documento registra o histórico de desenvolvimento, a situação atual da a
 - **Frontend Vercel:** Hospedado no domínio `agendamed.moduloweb.com.br` com suporte de proxy seguro e cache agressivo (PWA).
 
 ### 📱 Experiência de App (PWA & Notificações Push)
+- [x] **4. Notificações e Atualizações PWA**
+  - Integração com Service Worker e detecção de updates via contexto (`PwaUpdateContext`).
+  - Badge visual (bolinha vermelha) alertando novas versões de forma silenciosa e elegante.
+  - Separação explícita entre "Câmera" e "Galeria" no fluxo de fotos.
 - **Transformação para App Nativo:** Implementação do `vite-plugin-pwa`. Geração de manifest e ícones nativos.
 - **Fluxo de Instalação (Install App):** Lógica inteligente de detecção do iOS (Safari) guiando o usuário a instalar manualmente, enquanto exibe o prompt nativo no Android.
 - **Notificações Push (Substituindo o WhatsApp):** Estratégia modernizada. O usuário se loga e o Service Worker gera uma inscrição (Subscription) no servidor. O servidor envia o Push via internet direto para a tela de bloqueio do celular, tornando o app autossuficiente e economizando custos com APIs do WhatsApp.
@@ -45,5 +49,9 @@ Temos um PWA funcional que envia Notificações Push na tela de bloqueio com sin
 
 ## 3. O que ainda precisamos fazer (Próximos Passos) 🚀
 
-- [ ] **Foto do Medicamento (Agenda):** Permitir anexar foto/imagem da caixa do remédio no fluxo de cadastro da Agenda, da mesma forma que fizemos com os Documentos no cofre.
+- [x] **2. Agenda Central (Visualização Diária)**
+  - Lista de remédios filtrada pela data e paciente selecionado.
+  - Cartão de medicamento com miniatura da foto, horário, status, cor de status (Tomado, Atrasado, Pendente).
+  - Modal de Foto Expandida.
+  - Edição de medicamentos pelo modal, incluindo capacidade de **Adicionar/Alterar Foto** do medicamento cadastrado.
 - [ ] **Edição de Perfil de Usuário Adicional:** Garantir que convidados (outros cuidadores) tenham fluxos claros de permissão (Admin vs Leitor).
