@@ -107,6 +107,7 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
             instructions: med.instructions,
             frequency: med.frequency,
             times: med.times,
+            photoUrl: med.photoUrl,
             status: isCompleted ? 'completed' : 'pending'
           });
         });
@@ -188,6 +189,7 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
               dosage={med.dosage}
               instructions={med.instructions}
               frequency={med.frequency}
+              photoUrl={med.photoUrl}
               status={med.status}
               onCheck={() => handleCheck(med.id, med.time, med.uniqueId)}
               onCardClick={() => setEditingMedInfo({ med, uniqueId: med.uniqueId, isCompleted: med.status === 'completed' })}
