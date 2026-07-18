@@ -113,4 +113,28 @@ export class UserUseCase {
   async getCaregivers(patientId: string): Promise<User[]> {
     return await this.userRepository.findByPatientId(patientId);
   }
+
+  async changeUserRole(adminId: string, targetUserId: string, newRole: string): Promise<User> {
+    const schema = z.object({
+      newRole: z.enum(['ADMIN', 'CARE_GIVER'])
+    });
+
+    const parsedData = schema.parse({ newRole });
+
+    if (adminId === targetUserId) {
+      throw new Error('Você não pode alterar o seu próprio cargo.');
+    }
+
+    const admin = await this.userRepository.findById(adminId);
+    if (!admin || admin.role !== 'ADMIN') {
+      throw new Error('Apenas administradores podem alterar cargos.');
+    }
+
+    const targetUser = await this.userRepository.findById(targetUserId);
+    if (!targetUser) {
+      throw new Error('Usuário alvo não encontrado.');
+    }
+
+    return await this.userRepository.update(targetUserId, { role: parsedData.newRole });
+  }
 }

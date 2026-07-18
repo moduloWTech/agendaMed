@@ -46,6 +46,18 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
     }
   };
 
+  const handleToggleRole = async (targetId: string, currentRole: string) => {
+    try {
+      const newRole = currentRole === 'ADMIN' ? 'CARE_GIVER' : 'ADMIN';
+      if (confirm(`Tem certeza que deseja alterar o cargo para ${newRole === 'ADMIN' ? 'Administrador' : 'Cuidador'}?`)) {
+        await api.patch(`/api/users/${targetId}/role`, { role: newRole });
+        loadCaregivers();
+      }
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Erro ao alterar cargo');
+    }
+  };
+
   useEffect(() => {
     loadCaregivers();
   }, [activePatient]);
@@ -149,6 +161,18 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
                     <span className="text-xs text-gray-400">{cg.phoneWhats?.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')} • {cg.role === 'ADMIN' ? 'Administrador' : 'Cuidador'}</span>
                   </div>
                 </div>
+                {user?.role === 'ADMIN' && cg.id !== user?.id && (
+                  <button
+                    onClick={() => handleToggleRole(cg.id, cg.role)}
+                    className={`text-xs font-bold px-3 py-1 rounded-full transition-colors ${
+                      cg.role === 'ADMIN' 
+                        ? 'bg-red-50 text-red-600 hover:bg-red-100' 
+                        : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20'
+                    }`}
+                  >
+                    {cg.role === 'ADMIN' ? 'Remover Admin' : 'Tornar Admin'}
+                  </button>
+                )}
               </div>
             ))}
             {(!caregivers || caregivers.length === 0) && (
