@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../services/api';
 
 interface UserDataModalProps {
   onClose: () => void;
@@ -15,6 +16,19 @@ export function UserDataModal({ onClose }: UserDataModalProps) {
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const phone = user?.phoneWhats || '';
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleSave = async () => {
+    if (!user) return;
+    setIsLoading(true);
+    try {
+      await api.put(`/api/users/${user.id}`, { name, email });
+      window.location.reload();
+    } catch (err: any) {
+      alert(err.message || 'Erro ao salvar os dados.');
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-in fade-in duration-300">
@@ -67,11 +81,8 @@ export function UserDataModal({ onClose }: UserDataModalProps) {
 
         {/* Botões de Ação */}
         <div className="flex flex-col gap-3 mt-4">
-          <Button fullWidth onClick={() => {
-             alert('Salvar dados de usuário ainda não está conectado à API.');
-             onClose();
-          }}>
-            Salvar Alterações
+          <Button fullWidth onClick={handleSave} disabled={isLoading}>
+            {isLoading ? 'Salvando...' : 'Salvar Alterações'}
           </Button>
           <Button variant="outline" fullWidth onClick={onClose}>
             Cancelar
