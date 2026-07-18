@@ -8,45 +8,43 @@ Este documento registra o histórico de desenvolvimento, a situação atual da a
 
 ### 🏗️ Infraestrutura e Backend
 - **Configuração Inicial:** Configuração do ecossistema Monorepo (Frontend em Vite/React e Backend em Node.js/Fastify).
-- **Banco de Dados Real:** Modelagem e implantação do banco de dados relacional (PostgreSQL) usando Prisma ORM (Tabelas: `User`, `Patient`, `Medication`, `Document`).
+- **Banco de Dados Real:** Modelagem e implantação do banco de dados relacional (PostgreSQL) usando Prisma ORM (Tabelas: `User`, `Patient`, `Medication`, `Document`, `PushSubscription`).
 - **Arquitetura Escalável:** Padrão rigoroso `Layered R-U-R` implementado (Router > UseCase > Repository), garantindo um código limpo e fácil de testar.
 - **Segurança de APIs:** Zod para validação de dados de entrada e Middlewares de JWT para bloqueio de rotas protegidas.
 - **CRUDS Completos:** Rotas de Criação, Leitura, Atualização e Deleção (CRUD) prontas para todas as entidades.
+- **Cron Job & Timezone:** Motor interno agendado (`cron.service.ts`) operando a cada minuto. Cálculo de fuso horário blindado para `America/Fortaleza` (Brasília) garantindo precisão nos alertas, independentemente do local físico do servidor em nuvem.
 
-### 🚀 Deploy e Infraestrutura (Novo)
-- **Servidor Backend:** API e Bot do WhatsApp implantados em uma Máquina Virtual (VM) no **Google Cloud Platform (GCP)** usando Docker.
-- **CI/CD Automático:** Pipeline construída com **GitHub Actions**. Qualquer push na `main` gera uma nova imagem Docker no GitHub Container Registry e reinicia a API na VM automaticamente.
-- **Domínio e Segurança:** API conectada ao subdomínio `api-agendamed.moduloweb.com.br` com tráfego 100% criptografado e certificado SSL gerado pelo **Cloudflare** (Regra de Proxy Ativa na porta 80).
-- **Frontend Vercel:** Interface Single Page Application (React Router) hospedada na **Vercel** (`agenda-med-nu.vercel.app`), com configuração inteligente de `vercel.json` para evitar erros 404 em rotas diretas (como no Magic Link).
+### 🚀 Deploy e Infraestrutura
+- **Servidor Backend (VM GCP):** API implantada em uma Máquina Virtual (VM) no Google Cloud Platform usando Docker.
+- **CI/CD Automático:** Pipeline no GitHub Actions. Push na `main` gera imagem Docker e reinicia a VM (Watchtower).
+- **Domínio e Segurança (Cloudflare):** API rodando no subdomínio `api-agendamed.moduloweb.com.br` criptografada.
+- **Frontend Vercel:** Hospedado no domínio `agendamed.moduloweb.com.br` com suporte de proxy seguro e cache agressivo (PWA).
+
+### 📱 Experiência de App (PWA & Notificações Push)
+- **Transformação para App Nativo:** Implementação do `vite-plugin-pwa`. Geração de manifest e ícones nativos.
+- **Fluxo de Instalação (Install App):** Lógica inteligente de detecção do iOS (Safari) guiando o usuário a instalar manualmente, enquanto exibe o prompt nativo no Android.
+- **Notificações Push (Substituindo o WhatsApp):** Estratégia modernizada. O usuário se loga e o Service Worker gera uma inscrição (Subscription) no servidor. O servidor envia o Push via internet direto para a tela de bloqueio do celular, tornando o app autossuficiente e economizando custos com APIs do WhatsApp.
+- **Feedback UI (Zero Alerts):** Criação de um `FeedbackContext` global. Todos os `alert()` nativos do navegador foram extirpados e substituídos por modais elegantes que seguem o Design System.
+
 ### 🔐 Autenticação (A "Mágica")
-- **Integração WhatsApp:** Bot construído com a biblioteca `@whiskeysockets/baileys`.
-- **Fluxo "Magic Link":** O usuário envia mensagem no WhatsApp, o sistema detecta/cadastra, gera um Token JWT seguro e envia um link clicável (Magic Link) que autentica o usuário diretamente no celular sem necessidade de senhas.
+- **Fluxo "Magic Link":** Geração de Token JWT que envia um link seguro (Magic Link), autenticando o usuário no celular sem necessidade de senhas. 
+- **Gestão de Sessão (LocalStorage):** Frontend mantém de forma segura as credenciais e força redirecionamentos quando o token expira.
 
-### 📱 Frontend (Interface e Integração)
-- **Design System:** Telas construídas com TailwindCSS seguindo o conceito focado em usabilidade para idosos/cuidadores.
-- **AuthContext (Coração do App):** Estado global que armazena os dados do Cuidador logado e do Paciente Ativo de forma segura usando `localStorage`.
-- **Lógica de Paciente Único:** O sistema auto-cria um paciente nos bastidores quando o Administrador se loga pela primeira vez, mantendo a regra de que o app serve para "Um paciente / Vários cuidadores".
-- **Tela de Perfil:** Exibe os dados reais do usuário logado e permite renomear amigavelmente o familiar que está sendo cuidado através de um Modal nativo.
-- **Tela de Agenda:** Busca de medicamentos de forma real da API. O *Wizard* (Passo a Passo) agora envia novos medicamentos diretamente para o banco de dados. Ajustes de UI garantem alinhamento correto do botão flutuante em telas largas.
-- **Tela do Cofre:** Busca de documentos (laudos, receitas) da API e integração parcial da modal de Adicionar Documento. Ajustes de UI no botão flutuante para telas largas.
+### 🖼️ Frontend (Interface)
+- **Tela de Perfil:** Atualização de dados, deleção de conta e botão principal de "Instalar Aplicativo".
+- **Tela de Agenda:** Wizard avançado de medicação enviando dados diretamente para o Supabase. 
+- **Tela do Cofre:** Upload real de imagens (`Multipart`) para o Storage do Supabase (bucket `agendamed`). Frontend recebe URL final segura.
 
 ---
 
 ## 2. Em que "pé" estamos (Situação Atual) 📍
-Neste exato momento, o esqueleto central do projeto (Frontend ↔ Backend ↔ Banco de Dados) está **100% conectado**. O fluxo crítico (entrar pelo WhatsApp, ver a tela, cadastrar um remédio e ver ele na tela) funciona com dados reais. Saímos da fase de "Mocks" (dados de mentira) e agora temos um sistema *Full-Stack* operante.
-
----
-
-- [x] **Upload Real de Arquivos:** Rota construída e enviando as fotos diretamente para o Supabase Storage. O Frontend já recebe a URL final gerada e a salva na criação do Documento.
+Estamos em fase de **Homologação/Testes**. O MVP principal está de pé. 
+Temos um PWA funcional que envia Notificações Push na tela de bloqueio com sincronia de Fuso Horário, e com uma jornada de usuário que já flui sem engasgos de interface (sem *alerts* intrusivos). A estrutura está pronta para uso diário.
 
 ---
 
 ## 3. O que ainda precisamos fazer (Próximos Passos) 🚀
 
-Para o MVP atingir a sua plenitude, as seguintes funcionalidades críticas estão na fila:
-
-- [x] **Baixa de Medicamentos (Histórico):** Criar a lógica para quando a pessoa clicar na bolinha do remédio na Agenda, o sistema gravar que a dose daquele horário específico foi "Tomada" por fulano. (Concluído com controle de Edição por Admins)
-- [ ] **Avisos pelo WhatsApp (Cron Jobs):** Implementar um motor no backend que roda a cada minuto (ou usa agenda) para ler os horários e disparar mensagens automáticas de alerta ("Hora do remédio X!") no WhatsApp.
-- [ ] **Foto do Medicamento:** Permitir anexar foto/imagem da caixa do remédio no fluxo de cadastro da Agenda.
-- [x] **Gestão de Cuidadores (Convites):** Criar a funcionalidade para o Administrador adicionar outros números de WhatsApp na família para que eles também possam pedir o "Magic Link".
-- [ ] **Desconexão por Inatividade/Segurança:** Tratar com mais robustez a queda do bot do WhatsApp ou quando o número admin for removido.
+- [ ] **Foto do Medicamento (Agenda):** Permitir anexar foto/imagem da caixa do remédio no fluxo de cadastro da Agenda, da mesma forma que fizemos com os Documentos no cofre.
+- [ ] **Edição de Perfil de Usuário Adicional:** Garantir que convidados (outros cuidadores) tenham fluxos claros de permissão (Admin vs Leitor).
+- [ ] **Empacotamento Loja (Opcional Futuro):** Uso do Bubblewrap/TWA para gerar o arquivo `.aab` e subir o app oficialmente na Google Play Store.
