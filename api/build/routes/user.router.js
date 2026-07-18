@@ -82,6 +82,21 @@ class UserRouter {
                 return reply.status(404).send({ error: error.message });
             }
         });
+        // ROTA: Alterar cargo do usuário (Protegida, apenas ADMIN)
+        app.patch('/api/users/:id/role', { preHandler: [auth_middleware_1.authMiddleware] }, async (request, reply) => {
+            try {
+                const adminId = request.user.id;
+                const targetUserId = request.params.id;
+                const { role } = request.body;
+                const updatedUser = await this.userUseCase.changeUserRole(adminId, targetUserId, role);
+                return reply.status(200).send(updatedUser);
+            }
+            catch (error) {
+                app.log.error(error);
+                const statusCode = error.name === 'ZodError' ? 400 : (error.message.includes('Apenas admin') ? 403 : 400);
+                return reply.status(statusCode).send({ error: error.message });
+            }
+        });
     }
 }
 exports.UserRouter = UserRouter;

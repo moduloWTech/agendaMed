@@ -54,4 +54,5 @@ Temos um PWA funcional que envia Notificações Push na tela de bloqueio com sin
   - Cartão de medicamento com miniatura da foto, horário, status, cor de status (Tomado, Atrasado, Pendente).
   - Modal de Foto Expandida.
   - Edição de medicamentos pelo modal, incluindo capacidade de **Adicionar/Alterar Foto** do medicamento cadastrado.
-- [ ] **Edição de Perfil de Usuário Adicional:** Garantir que convidados (outros cuidadores) tenham fluxos claros de permissão (Admin vs Leitor).
+- [x] **Gestão de Cargos e Permissões:** 
+  - Funcionalidade implementada permitindo que Administradores promovam cuidadores a moderadores/administradores ou os rebaixem, estabelecendo um controle de acesso seguro entre os perfis familiares.

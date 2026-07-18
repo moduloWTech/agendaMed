@@ -8,6 +8,9 @@ export const api = {
   put: async (endpoint: string, body: any, options?: { isMultipart?: boolean }) => {
     return request(endpoint, 'PUT', body, options);
   },
+  patch: async (endpoint: string, body: any, options?: { isMultipart?: boolean }) => {
+    return request(endpoint, 'PATCH', body, options);
+  },
   delete: async (endpoint: string) => {
     return request(endpoint, 'DELETE');
   },
