@@ -23,6 +23,7 @@ export class MedicationUseCase {
       times: z.array(z.string()).optional(),
       active: z.boolean().optional(),
       patientId: z.string().uuid('ID do paciente inválido'),
+      photoUrl: z.string().nullable().optional()
     });
 
     const parsed = schema.parse(data);
@@ -41,7 +42,8 @@ export class MedicationUseCase {
       startDate: new Date(parsed.startDate),
       startTime: parsed.startTime,
       times: parsed.times || [],
-      patientId: parsed.patientId
+      patientId: parsed.patientId,
+      photoUrl: parsed.photoUrl
     });
   }
 
@@ -67,6 +69,7 @@ export class MedicationUseCase {
       startTime: z.string().min(4).optional(),
       times: z.array(z.string()).optional(),
       active: z.boolean().optional(),
+      photoUrl: z.string().nullable().optional()
     });
 
     const parsedData = schema.parse(data);
