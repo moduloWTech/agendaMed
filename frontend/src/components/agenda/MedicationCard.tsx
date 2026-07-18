@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Clock, CheckCircle2, X } from 'lucide-react';
 
 interface MedicationCardProps {
@@ -116,7 +117,7 @@ export function MedicationCard({ time, name, dosage, instructions, frequency, ph
       </div>
 
       {/* Modal Fullscreen da Imagem */}
-      {isPhotoOpen && photoUrl && (
+      {isPhotoOpen && photoUrl && createPortal(
         <div 
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-in fade-in duration-300"
           onClick={() => setIsPhotoOpen(false)}
@@ -133,7 +134,8 @@ export function MedicationCard({ time, name, dosage, instructions, frequency, ph
             className="w-full max-w-lg max-h-[85vh] object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300"
             onClick={(e) => e.stopPropagation()} 
           />
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
