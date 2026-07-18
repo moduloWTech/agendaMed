@@ -10,7 +10,7 @@ export function BottomNav({ currentTab = 'agenda', onChangeTab }: BottomNavProps
   const { needRefresh } = usePwaUpdate();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.02)] z-50 pb-safe">
+    <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.02)] z-40 pb-safe">
       <nav className="flex justify-between items-center max-w-md mx-auto px-6 h-20">
 
         <button 
