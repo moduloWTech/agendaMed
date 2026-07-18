@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, Save, Trash2, Clock, CheckCircle2, RotateCcw, Plus } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { X, Save, Trash2, Clock, CheckCircle2, RotateCcw, Plus, Camera, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { api } from '../../services/api';
@@ -33,6 +33,19 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
   const [startTime, setStartTime] = useState(medication.startTime || '08:00');
   const [times, setTimes] = useState<string[]>(medication.times && medication.times.length > 0 ? medication.times : ['08:00']);
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(medication.photoUrl || null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
   const handleAddTime = () => setTimes([...times, '12:00']);
   const handleRemoveTime = (index: number) => setTimes(times.filter((_, i) => i !== index));
   const updateTime = (index: number, value: string) => {
@@ -61,6 +74,18 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
     }
     setIsLoading(true);
     try {
+      let uploadedPhotoUrl = photoUrl;
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        const uploadRes = await api.post('/api/upload', formData, {
+          isMultipart: true
+        });
+        if (uploadRes.fileUrl) {
+          uploadedPhotoUrl = uploadRes.fileUrl;
+        }
+      }
+
       await api.put(`/api/medications/${medication.id}`, { 
         name, 
         dosage, 
@@ -68,7 +93,8 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
         frequency,
         startDate: frequency === 'manual' ? new Date().toISOString() : new Date(startDate).toISOString(),
         startTime: frequency === 'manual' ? times[0] : startTime,
-        times: frequency === 'manual' ? times : []
+        times: frequency === 'manual' ? times : [],
+        photoUrl: uploadedPhotoUrl
       });
       onRefresh();
       onClose();
@@ -141,6 +167,85 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
             onChange={(e) => setName(e.target.value)}
             disabled={!isAdmin}
           />
+
+          {/* Seção da Foto */}
+          <div className="flex flex-col gap-2">
+            <label className="text-gray-700 font-medium text-[15px] ml-1">Foto da Caixa</label>
+            <div className="flex-1 min-h-[150px] border-2 border-dashed border-[var(--color-primary)]/40 bg-[var(--color-primary)]/5 rounded-[24px] overflow-hidden relative group">
+              {(selectedFile || photoUrl) ? (
+                <div 
+                  className="w-full h-[150px] relative cursor-pointer"
+                  onClick={() => {
+                    if (isAdmin) {
+                      setSelectedFile(null);
+                      setPhotoUrl(null);
+                    }
+                  }}
+                >
+                  <img 
+                    src={selectedFile ? URL.createObjectURL(selectedFile) : photoUrl!} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover"
+                  />
+                  {isAdmin && selectedFile && (
+                    <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X className="w-10 h-10 text-white mb-2" />
+                      <span className="text-white font-semibold text-center px-4">Tocar para remover</span>
+                    </div>
+                  )}
+                  {isAdmin && !selectedFile && (
+                    <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Camera className="w-8 h-8 text-white mb-2" />
+                      <span className="text-white font-semibold text-center px-4">Nova foto substituirá a atual</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex w-full h-[150px] items-center justify-center gap-2">
+                  {isAdmin ? (
+                    <>
+                      <button 
+                        onClick={() => cameraInputRef.current?.click()} 
+                        className="flex flex-col items-center justify-center flex-1 h-full gap-2 hover:bg-[var(--color-primary)]/10 transition-colors"
+                      >
+                        <Camera className="w-6 h-6 text-[var(--color-primary)]" />
+                        <span className="text-xs font-semibold text-[var(--color-primary)]">Câmera</span>
+                      </button>
+                      <div className="w-px h-16 bg-[var(--color-primary)]/20" />
+                      <button 
+                        onClick={() => fileInputRef.current?.click()} 
+                        className="flex flex-col items-center justify-center flex-1 h-full gap-2 hover:bg-[var(--color-primary)]/10 transition-colors"
+                      >
+                        <ImageIcon className="w-6 h-6 text-[var(--color-primary)]" />
+                        <span className="text-xs font-semibold text-[var(--color-primary)]">Galeria</span>
+                      </button>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-gray-400 gap-2 h-full">
+                      <ImageIcon className="w-8 h-8" />
+                      <span className="text-sm">Sem foto</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*" 
+              className="hidden" 
+            />
+            <input 
+              type="file" 
+              ref={cameraInputRef}
+              onChange={handleFileChange}
+              accept="image/*" 
+              capture="environment"
+              className="hidden" 
+            />
+          </div>
           <Input
             label="Dosagem (Ex: 50mg)"
             placeholder="Ex: 50mg"
