@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Save, Trash2, Clock, CheckCircle2, RotateCcw, Plus, Camera, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -119,7 +120,7 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
     return 'Uso único';
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center animate-in fade-in duration-300">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
@@ -370,6 +371,7 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
         message={feedback.message}
         type={feedback.type}
       />
-    </div>
+    </div>,
+    document.body
   );
 }
