@@ -48,4 +48,4 @@ Todo microsserviço Node.js/TypeScript deve ser estruturado em 3 camadas (Router
 - **Verificação de Regressão Obrigatória:** Sempre que for fazer uma alteração, o agente deve se perguntar ativamente: *"Essa alteração vai modificar o que já está funcionando na aplicação?"* e mitigar riscos.
 - **Prevenção e Permissão:** Sempre explique a alteração que vai fazer *antes* e pergunte se deve fazer essa alteração.
 - **Modo Somente Leitura Inicial:** Sempre responda as perguntas que o usuário fizer *sem* mudar o código. Modifique o código *somente* se o usuário autorizar explicitamente.
-- **Registro de Progresso Obrigatório:** Sempre antes de fazer um commit, atualize o arquivo `docs/PROGRESS_APLICATION.md` detalhando as alterações.
+- **Registro de Progresso Obrigatório:** Sempre antes de subir uma nova versão para o GitHub (git push), atualize o arquivo `docs/PROGRESS_APLICATION.md` detalhando as alterações.
