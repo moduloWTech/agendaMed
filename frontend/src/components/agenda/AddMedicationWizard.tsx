@@ -119,9 +119,11 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
+    } else {
+      setSelectedFile(null);
     }
   };
 
