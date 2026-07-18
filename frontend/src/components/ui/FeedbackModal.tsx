@@ -7,9 +7,11 @@ export interface FeedbackModalProps {
   title: string;
   message: string;
   type?: 'success' | 'error' | 'warning' | 'info';
+  onConfirm?: () => void;
+  confirmText?: string;
 }
 
-export function FeedbackModal({ isOpen, onClose, title, message, type = 'info' }: FeedbackModalProps) {
+export function FeedbackModal({ isOpen, onClose, title, message, type = 'info', onConfirm, confirmText = 'Confirmar' }: FeedbackModalProps) {
   if (!isOpen) return null;
 
   const icons = {
@@ -50,9 +52,16 @@ export function FeedbackModal({ isOpen, onClose, title, message, type = 'info' }
         <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
         <p className="text-gray-500 mb-6 leading-relaxed">{message}</p>
         
-        <Button onClick={onClose} className="w-full">
-          Entendi
-        </Button>
+        <div className="w-full flex gap-3">
+          <Button onClick={onClose} variant={onConfirm ? 'outline' : 'primary'} className="flex-1">
+            {onConfirm ? 'Cancelar' : 'Entendi'}
+          </Button>
+          {onConfirm && (
+            <Button onClick={onConfirm} className="flex-1">
+              {confirmText}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

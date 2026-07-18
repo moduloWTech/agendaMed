@@ -10,6 +10,7 @@ import { InstallPwaModal } from '../components/profile/InstallPwaModal';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { usePwaInstall } from '../hooks/usePwaInstall';
+import { usePwaUpdate } from '../contexts/PwaUpdateContext';
 
 interface ProfileScreenProps {
   onLogout?: () => void;
@@ -18,6 +19,7 @@ interface ProfileScreenProps {
 export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   const { user, activePatient } = useAuth();
   const { isInstallable, isIOS, isInstalled, promptInstall } = usePwaInstall();
+  const { needRefresh } = usePwaUpdate();
   const [isUserDataModalOpen, setIsUserDataModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
@@ -190,6 +192,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             icon={<Settings />}
             title="Configurações"
             subtitle="Notificações e aparência"
+            showBadge={needRefresh}
             onClick={() => setIsSettingsModalOpen(true)}
           />
           <ProfileMenuItem 

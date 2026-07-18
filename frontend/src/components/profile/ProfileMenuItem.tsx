@@ -7,6 +7,7 @@ interface ProfileMenuItemProps {
   subtitle?: string;
   onClick?: () => void;
   danger?: boolean;
+  showBadge?: boolean;
 }
 
 export function ProfileMenuItem({
@@ -14,7 +15,8 @@ export function ProfileMenuItem({
   title,
   subtitle,
   onClick,
-  danger = false
+  danger = false,
+  showBadge = false
 }: ProfileMenuItemProps) {
   return (
     <button
@@ -27,8 +29,13 @@ export function ProfileMenuItem({
         <div className={`p-2 rounded-xl ${danger ? 'bg-red-50 text-red-500' : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]'}`}>
           {icon}
         </div>
-        <div className="flex flex-col items-start text-left">
-          <span className={`font-semibold ${danger ? 'text-red-600' : 'text-gray-800'}`}>{title}</span>
+        <div className="flex flex-col items-start text-left relative">
+          <span className={`font-semibold flex items-center gap-2 ${danger ? 'text-red-600' : 'text-gray-800'}`}>
+            {title}
+            {showBadge && (
+              <span className="flex w-2 h-2 rounded-full bg-red-500"></span>
+            )}
+          </span>
           {subtitle && <span className="text-xs text-gray-500 mt-0.5">{subtitle}</span>}
         </div>
       </div>
