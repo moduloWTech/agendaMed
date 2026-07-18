@@ -6,22 +6,34 @@ export class CronService {
   public start() {
     // Roda a cada 1 minuto
     cron.schedule('* * * * *', async () => {
-      console.log('[Cron] Verificando medicamentos agendados...');
+      console.log('[Cron] Verificando medicamentos agendados (Fuso: America/Fortaleza)...');
       await this.checkMedications();
     });
-    console.log('[Cron] Serviço de agendamento iniciado.');
+    console.log('[Cron] Serviço de agendamento iniciado (Fuso: America/Fortaleza).');
+  }
+
+  // Converte qualquer data para a string local de Fortaleza
+  private getFortalezaTime(date: Date) {
+    const formatter = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Fortaleza',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+    const parts = formatter.formatToParts(date);
+    const getPart = (type: string) => parts.find(p => p.type === type)?.value;
+    return {
+      dateStr: `${getPart('year')}-${getPart('month')}-${getPart('day')}`,
+      timeStr: `${getPart('hour')}:${getPart('minute')}`
+    };
   }
 
   private async checkMedications() {
     const now = new Date();
-    // Ajusta para o fuso local do servidor para pegar a data correta
-    const offset = now.getTimezoneOffset();
-    const localNow = new Date(now.getTime() - (offset * 60 * 1000));
-    
-    const todayStr = localNow.toISOString().split('T')[0];
-    const currentHour = String(now.getHours()).padStart(2, '0');
-    const currentMinute = String(now.getMinutes()).padStart(2, '0');
-    const currentTimeStr = `${currentHour}:${currentMinute}`;
+    const { dateStr: todayStr, timeStr: currentTimeStr } = this.getFortalezaTime(now);
 
     try {
       // 1. Busca medicamentos ativos e com patient.users
@@ -37,8 +49,8 @@ export class CronService {
       });
 
       for (const med of medications) {
-        // Verifica se é hoje ou depois de hoje
-        const medStartDateStr = med.startDate.toISOString().split('T')[0];
+        // Pega a data de inicio exata baseada no fuso de Fortaleza
+        const { dateStr: medStartDateStr } = this.getFortalezaTime(med.startDate);
 
         // 2. Calcula os horários do medicamento para HOJE
         const todayTimes = this.getTimesForToday(med, todayStr, medStartDateStr);
@@ -97,13 +109,13 @@ export class CronService {
       if (isNaN(intervalHours) || intervalHours <= 0) return [];
 
       const timesForToday: string[] = [];
-      const [startH, startM] = med.startTime.split(':').map(Number);
       
-      const startDateTime = new Date(`${medStartDateStr}T${med.startTime}:00`);
-      const currentDayStart = new Date(`${todayStr}T00:00:00`);
-      const currentDayEnd = new Date(`${todayStr}T23:59:59`);
+      // Cria a data no fuso do Brasil forçando o offset (-03:00)
+      const startDateTime = new Date(`${medStartDateStr}T${med.startTime}:00-03:00`);
+      const currentDayStart = new Date(`${todayStr}T00:00:00-03:00`);
+      const currentDayEnd = new Date(`${todayStr}T23:59:59-03:00`);
 
-      // Se a data de início é depois de hoje, nem gera
+      // Se a data de início é depois de hoje (impossível se a checagem acima passou, mas por segurança)
       if (startDateTime > currentDayEnd) return [];
 
       // Acha a próxima dose a partir do começo do dia de hoje (ou da data de inicio se for hoje mesmo)
@@ -113,9 +125,8 @@ export class CronService {
       }
 
       while (currentDose <= currentDayEnd) {
-        const h = String(currentDose.getHours()).padStart(2, '0');
-        const m = String(currentDose.getMinutes()).padStart(2, '0');
-        timesForToday.push(`${h}:${m}`);
+        const { timeStr } = this.getFortalezaTime(currentDose);
+        timesForToday.push(timeStr);
         currentDose.setHours(currentDose.getHours() + intervalHours);
       }
 
