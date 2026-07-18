@@ -1,4 +1,5 @@
 import { CalendarHeart, FolderHeart, User, Stethoscope } from 'lucide-react';
+import { usePwaUpdate } from '../../contexts/PwaUpdateContext';
 
 interface BottomNavProps {
   currentTab?: 'agenda' | 'consultas' | 'cofre' | 'perfil';
@@ -6,6 +7,8 @@ interface BottomNavProps {
 }
 
 export function BottomNav({ currentTab = 'agenda', onChangeTab }: BottomNavProps) {
+  const { needRefresh } = usePwaUpdate();
+
   return (
     <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.02)] z-50 pb-safe">
       <nav className="flex justify-between items-center max-w-md mx-auto px-6 h-20">
@@ -51,12 +54,17 @@ export function BottomNav({ currentTab = 'agenda', onChangeTab }: BottomNavProps
 
         <button 
           onClick={() => onChangeTab?.('perfil')}
-          className="flex flex-col items-center justify-center min-h-[48px] min-w-[48px] gap-1 group w-20"
+          className="flex flex-col items-center justify-center min-h-[48px] min-w-[48px] gap-1 group w-20 relative"
         >
-          <User
-            className={`w-7 h-7 transition-colors ${currentTab === 'perfil' ? 'text-[var(--color-primary)]' : 'text-gray-400 group-hover:text-gray-600'}`}
-            strokeWidth={currentTab === 'perfil' ? 2.5 : 2}
-          />
+          <div className="relative">
+            <User
+              className={`w-7 h-7 transition-colors ${currentTab === 'perfil' ? 'text-[var(--color-primary)]' : 'text-gray-400 group-hover:text-gray-600'}`}
+              strokeWidth={currentTab === 'perfil' ? 2.5 : 2}
+            />
+            {needRefresh && (
+              <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white shadow-sm" />
+            )}
+          </div>
           <span className={`text-[11px] font-semibold mt-1 transition-colors ${currentTab === 'perfil' ? 'text-[var(--color-primary)]' : 'text-gray-400'}`}>
             Perfil
           </span>

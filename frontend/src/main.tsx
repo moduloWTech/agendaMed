@@ -3,11 +3,14 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './contexts/AuthContext'
+import { PwaUpdateProvider } from './contexts/PwaUpdateContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
+    <PwaUpdateProvider>
+      <AuthProvider>
       <App />
-    </AuthProvider>
+      </AuthProvider>
+    </PwaUpdateProvider>
   </StrictMode>,
 )

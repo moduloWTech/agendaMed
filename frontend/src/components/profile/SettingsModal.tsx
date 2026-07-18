@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { X, CalendarHeart, Moon, Calendar, HelpCircle, Users, CheckCircle2 } from 'lucide-react';
+import { X, CalendarHeart, Moon, Calendar, HelpCircle, Users, CheckCircle2, RefreshCw } from 'lucide-react';
+import { usePwaUpdate } from '../../contexts/PwaUpdateContext';
+import { FeedbackModal } from '../ui/FeedbackModal';
 import { Toggle } from '../ui/Toggle';
 import { Button } from '../ui/Button';
 
@@ -11,6 +13,9 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
   const [remindersConsultations, setRemindersConsultations] = useState(true);
   const [syncGoogle, setSyncGoogle] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  
+  const { needRefresh, updateApp } = usePwaUpdate();
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-in fade-in duration-300">
@@ -111,6 +116,29 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             </div>
           </section>
 
+          {/* Seção: Atualização do App */}
+          {needRefresh && (
+            <section className="flex flex-col gap-4 mt-2">
+              <div 
+                className="flex items-center justify-between bg-red-50 p-4 rounded-[20px] shadow-sm border border-red-100 cursor-pointer hover:bg-red-100 transition-colors"
+                onClick={() => setShowUpdateModal(true)}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-500 text-white rounded-xl shadow-sm">
+                    <RefreshCw className="w-5 h-5 animate-spin-slow" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-red-700">Atualizar Aplicativo</span>
+                    <span className="text-[11px] text-red-600">Nova versão disponível!</span>
+                  </div>
+                </div>
+                <button className="text-xs font-bold bg-white text-red-600 px-3 py-1.5 rounded-full shadow-sm">
+                  Baixar
+                </button>
+              </div>
+            </section>
+          )}
+
           {/* Botão Central de Ajuda */}
           <button className="flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-700 py-4 rounded-[24px] transition-colors border border-gray-200 mt-2 font-semibold">
             <HelpCircle className="w-5 h-5" />
@@ -126,6 +154,16 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         </div>
 
       </div>
+
+      <FeedbackModal
+        isOpen={showUpdateModal}
+        title="Nova Versão!"
+        message="Deseja aplicar a nova atualização agora? O aplicativo será reiniciado para baixar as novidades."
+        type="info"
+        onClose={() => setShowUpdateModal(false)}
+        onConfirm={updateApp}
+        confirmText="Sim, atualizar"
+      />
     </div>
   );
 }
