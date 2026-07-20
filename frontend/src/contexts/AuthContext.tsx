@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(response.user);
 
       // Busca o paciente assim que loga
-      const patients = await api.get(`/api/users/${response.user.id}/patients`);
+      const patients = await api.get(`/api/patients`);
       if (patients && patients.length > 0) {
         setActivePatient(patients[0]);
       } else {
