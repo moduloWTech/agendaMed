@@ -7,14 +7,33 @@ datasource db {
   provider = "postgresql"
 }
 
+model Tenant {
+  id                 String   @id @default(uuid())
+  name               String
+  ownerId            String
+  stripeCustomerId   String?
+  subscriptionStatus String   @default("FREE")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  owner    User      @relation("TenantOwner", fields: [ownerId], references: [id])
+  users    User[]    @relation("TenantUsers")
+  patients Patient[]
+}
+
 model User {
   id         String   @id @default(uuid())
   phoneWhats String   @unique
   email      String?  @unique // Deixamos email opcional para o Onboarding
   name       String? // Opcional para preencher no Onboarding
+  passwordHash String? // Hash da senha para login (abandonando Magic Link)
   role       String   @default("CARE_GIVER") // CARE_GIVER, ADMIN
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  tenantId   String?
+  tenant     Tenant?  @relation("TenantUsers", fields: [tenantId], references: [id])
+  ownedTenants Tenant[] @relation("TenantOwner")
 
   patients Patient[] @relation("PatientCaregivers")
   medicationHistory MedicationHistory[]
@@ -27,6 +46,9 @@ model Patient {
   birthDate DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  tenantId  String?
+  tenant    Tenant?   @relation(fields: [tenantId], references: [id])
 
   users User[] @relation("PatientCaregivers")
 

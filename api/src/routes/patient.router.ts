@@ -13,7 +13,8 @@ export class PatientRouter {
       // ROTA: Criar Paciente
       scopedApp.post('/api/patients', async (request, reply) => {
       try {
-        const patient = await this.patientUseCase.createPatient(request.body);
+        const payload = { ...request.body as object, tenantId: (request as any).user.tenantId };
+        const patient = await this.patientUseCase.createPatient(payload);
         return reply.status(201).send(patient);
       } catch (error: any) {
         app.log.error(error);
@@ -22,11 +23,11 @@ export class PatientRouter {
       }
     });
 
-    // ROTA: Listar Pacientes de um Cuidador (User)
-    scopedApp.get('/api/users/:userId/patients', async (request, reply) => {
+    // ROTA: Listar Pacientes do Tenant Atual
+    scopedApp.get('/api/patients', async (request, reply) => {
       try {
-        const { userId } = request.params as { userId: string };
-        const patients = await this.patientUseCase.getPatientsByUserId(userId);
+        const tenantId = (request as any).user.tenantId;
+        const patients = await this.patientUseCase.getPatientsByTenantId(tenantId);
         return reply.status(200).send(patients);
       } catch (error: any) {
         app.log.error(error);
@@ -38,7 +39,8 @@ export class PatientRouter {
     scopedApp.get('/api/patients/:id', async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const patient = await this.patientUseCase.getPatientById(id);
+        const tenantId = (request as any).user.tenantId;
+        const patient = await this.patientUseCase.getPatientById(id, tenantId);
         return reply.status(200).send(patient);
       } catch (error: any) {
         app.log.error(error);
@@ -50,7 +52,8 @@ export class PatientRouter {
     scopedApp.put('/api/patients/:id', async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const patient = await this.patientUseCase.updatePatient(id, request.body);
+        const tenantId = (request as any).user.tenantId;
+        const patient = await this.patientUseCase.updatePatient(id, tenantId, request.body);
         return reply.status(200).send(patient);
       } catch (error: any) {
         app.log.error(error);
@@ -63,7 +66,8 @@ export class PatientRouter {
     scopedApp.delete('/api/patients/:id', async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        await this.patientUseCase.deletePatient(id);
+        const tenantId = (request as any).user.tenantId;
+        await this.patientUseCase.deletePatient(id, tenantId);
         return reply.status(204).send(); // 204 No Content
       } catch (error: any) {
         app.log.error(error);
