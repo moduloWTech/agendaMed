@@ -44,6 +44,9 @@ export function InviteCaregiverModal({ onClose, onSuccess }: InviteCaregiverModa
     setIsLoading(true);
     setError('');
 
+    // Cria a janela antes da requisição assíncrona para não ser barrada pelo bloqueador de popups
+    const newWindow = window.open('about:blank', '_blank');
+
     try {
       const response = await api.post('/api/users/invite', {
         phoneWhats: unformattedPhone,
@@ -53,11 +56,19 @@ export function InviteCaregiverModal({ onClose, onSuccess }: InviteCaregiverModa
       });
       
       if (response.data && response.data.inviteLink) {
-        window.open(response.data.inviteLink, '_blank');
+        if (newWindow) {
+           newWindow.location.href = response.data.inviteLink;
+        } else {
+           // Fallback se o navegador ainda assim bloqueou
+           window.location.href = response.data.inviteLink;
+        }
+      } else {
+        if (newWindow) newWindow.close();
       }
       
       onSuccess();
     } catch (err: any) {
+      if (newWindow) newWindow.close();
       setError(err.response?.data?.error || 'Erro ao enviar convite');
     } finally {
       setIsLoading(false);

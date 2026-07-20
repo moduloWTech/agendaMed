@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 
 export function InviteAcceptScreen() {
-  const { setUser } = useAuth();
-  
+  // const { setUser } = useAuth();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneWhats, setPhoneWhats] = useState('');
   const [password, setPassword] = useState('');
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [token, setToken] = useState<string | null>(null);
@@ -43,10 +43,10 @@ export function InviteAcceptScreen() {
         password
       });
 
-      if (response && response.accessToken) {
+      if (response.data && response.data.accessToken) {
         // Save token and reload page to trigger normal auth flow
-        localStorage.setItem('@AgendaMed:token', response.accessToken);
-        window.location.href = '/'; 
+        localStorage.setItem('@AgendaMed:token', response.data.accessToken);
+        window.location.href = '/';
       }
     } catch (err: any) {
       setError(err.response?.data?.error || err.message || 'Erro ao aceitar convite.');
@@ -58,7 +58,7 @@ export function InviteAcceptScreen() {
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 py-12 overflow-x-hidden overflow-y-auto">
       {/* Premium Background for Login/Invite */}
-      <div 
+      <div
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{ backgroundImage: "url('/premium_medical_bg.jpg')" }}
       >
@@ -77,9 +77,9 @@ export function InviteAcceptScreen() {
         </div>
 
         {error && !token ? (
-           <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm font-medium border border-red-100 text-center">
-             {error}
-           </div>
+          <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm font-medium border border-red-100 text-center">
+            {error}
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
