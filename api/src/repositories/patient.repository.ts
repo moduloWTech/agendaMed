@@ -1,5 +1,5 @@
 import { IPatientRepository, IPatientCreate, IPatientUpdate } from '../interfaces/patient.interface';
-import type { Patient } from '../generated/prisma/client';
+import type { Patient, User } from '../generated/prisma/client';
 
 import { prisma } from '../DB/prisma.config';
 
@@ -17,7 +17,7 @@ export class PatientRepository implements IPatientRepository {
     });
   }
 
-  async findById(id: string, tenantId: string): Promise<Patient | null> {
+  async findById(id: string, tenantId: string): Promise<(Patient & { users?: User[] }) | null> {
     return await prisma.patient.findUnique({
       where: { id, tenantId },
       include: {

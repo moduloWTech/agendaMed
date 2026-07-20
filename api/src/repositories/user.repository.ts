@@ -61,4 +61,32 @@ export class UserRepository implements IUserRepository {
       where: { id },
     });
   }
+
+  async createAdminWithTenant(userData: any, tenantName: string): Promise<{ user: User, tenant: any }> {
+    return await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          name: userData.name,
+          email: userData.email,
+          phoneWhats: userData.phoneWhats,
+          passwordHash: userData.passwordHash,
+          role: 'ADMIN',
+        }
+      });
+
+      const tenant = await tx.tenant.create({
+        data: {
+          name: tenantName,
+          ownerId: user.id,
+        }
+      });
+
+      const updatedUser = await tx.user.update({
+        where: { id: user.id },
+        data: { tenantId: tenant.id }
+      });
+
+      return { user: updatedUser, tenant };
+    });
+  }
 }

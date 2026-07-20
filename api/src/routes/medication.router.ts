@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { MedicationUseCase } from '../usecases/medication.usecase';
 import { authMiddleware } from '../middlewares/auth.middleware';
+import { IMedicationCreateData, IMedicationUpdateData, ICheckinData } from '../types/medication.types';
 
 export class MedicationRouter {
   constructor(private medicationUseCase: MedicationUseCase) {}
@@ -13,7 +14,7 @@ export class MedicationRouter {
       scopedApp.post('/api/medications', async (request, reply) => {
         try {
           const tenantId = (request as any).user.tenantId;
-          const medication = await this.medicationUseCase.createMedication(tenantId, request.body);
+          const medication = await this.medicationUseCase.createMedication(tenantId, request.body as IMedicationCreateData);
           return reply.status(201).send(medication);
         } catch (error: any) {
           app.log.error(error);
@@ -56,7 +57,7 @@ export class MedicationRouter {
           }
           const { id } = request.params as { id: string };
           const tenantId = (request as any).user.tenantId;
-          const medication = await this.medicationUseCase.updateMedication(id, tenantId, request.body);
+          const medication = await this.medicationUseCase.updateMedication(id, tenantId, request.body as IMedicationUpdateData);
           return reply.status(200).send(medication);
         } catch (error: any) {
           app.log.error(error);
@@ -102,7 +103,7 @@ export class MedicationRouter {
         try {
           const userId = request.user.id;
           const tenantId = request.user.tenantId;
-          await this.medicationUseCase.toggleCheckin(userId, tenantId, request.body);
+          await this.medicationUseCase.toggleCheckin(userId, tenantId, request.body as ICheckinData);
           return reply.status(200).send({ success: true });
         } catch (error: any) {
           app.log.error(error);

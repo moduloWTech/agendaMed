@@ -1,10 +1,10 @@
-import { IUserRepository, IUserCreate } from '../interfaces/user.interface';
+import { IUserRepository } from '../interfaces/user.interface';
 import { z } from 'zod';
 import type { User } from '../generated/prisma/client';
 import { whatsappService } from '../services/whatsapp.service';
 
 export class UserUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private userRepository: IUserRepository) { }
 
   async createUser(data: any): Promise<User> {
     // Regra de Negócio: Validação estrita via Zod
@@ -22,7 +22,7 @@ export class UserUseCase {
     if (existingUser) {
       throw new Error('Telefone já cadastrado na plataforma.');
     }
-    
+
     if (parsedData.email) {
       const existingEmail = await this.userRepository.findByEmail(parsedData.email);
       if (existingEmail) throw new Error('E-mail já cadastrado na plataforma.');
@@ -100,7 +100,7 @@ export class UserUseCase {
 
     // Envia WhatsApp
     const message = `Olá, ${parsedData.name}! 👋\n\nVocê foi convidado(a) por *${admin.name || 'um administrador'}* para fazer parte da equipe de cuidados de *${parsedData.patientName}* no aplicativo *AgendaMed*.\n\nAcesse o link abaixo para entrar no sistema:\n${process.env.FRONTEND_URL || 'http://localhost:5173'}\n\nLá, basta digitar o seu número de telefone para acessar a conta.`;
-    
+
     try {
       await whatsappService.sendMessage(parsedData.phoneWhats, message);
     } catch (e) {

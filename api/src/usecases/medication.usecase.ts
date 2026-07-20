@@ -4,15 +4,16 @@ import { IUserRepository } from '../interfaces/user.interface';
 import { z } from 'zod';
 import type { Medication } from '../generated/prisma/client';
 import { pushService } from '../services/push.service';
+import { IMedicationCreateData, IMedicationUpdateData, ICheckinData } from '../types/medication.types';
 
 export class MedicationUseCase {
   constructor(
     private medicationRepository: IMedicationRepository,
     private patientRepository: IPatientRepository,
     private userRepository: IUserRepository
-  ) {}
+  ) { }
 
-  async createMedication(tenantId: string, data: any): Promise<Medication> {
+  async createMedication(tenantId: string, data: IMedicationCreateData): Promise<Medication> {
     const schema = z.object({
       name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
       dosage: z.string().min(1, 'A dosagem é obrigatória'),
@@ -69,7 +70,7 @@ export class MedicationUseCase {
     return await this.medicationRepository.findByPatientId(patientId);
   }
 
-  async updateMedication(id: string, tenantId: string, data: any): Promise<Medication> {
+  async updateMedication(id: string, tenantId: string, data: IMedicationUpdateData): Promise<Medication> {
     const schema = z.object({
       name: z.string().min(2).optional(),
       dosage: z.string().min(1).optional(),
@@ -119,14 +120,14 @@ export class MedicationUseCase {
     return await this.medicationRepository.getHistory(patientId, date);
   }
 
-  async toggleCheckin(userId: string, tenantId: string, data: any): Promise<void> {
+  async toggleCheckin(userId: string, tenantId: string, data: ICheckinData): Promise<void> {
     const schema = z.object({
       medicationId: z.string().uuid(),
       patientId: z.string().uuid(),
       date: z.string(),
       time: z.string()
     });
-    
+
     const parsed = schema.parse(data);
 
     const patientExists = await this.patientRepository.findById(parsed.patientId, tenantId);
@@ -139,15 +140,15 @@ export class MedicationUseCase {
     if (wasCreated) {
       try {
         const medication = await this.medicationRepository.findById(parsed.medicationId);
-        const patient: any = await this.patientRepository.findById(parsed.patientId);
+        const patient = await this.patientRepository.findById(parsed.patientId, tenantId);
         const userWhoDidIt = await this.userRepository.findById(userId);
-        
+
         const userName = userWhoDidIt?.name || 'Um cuidador';
-        
+
         if (patient && medication) {
           // Extrair a lista de todos os usuários atrelados ao paciente
-          const allUserIds = (patient.users || []).map((u: any) => u.id);
-            
+          const allUserIds = (patient.users || []).map((u: { id: string }) => u.id);
+
           if (allUserIds.length > 0) {
             pushService.sendNotificationToUsers(allUserIds, {
               title: '✅ Remédio Administrado!',
