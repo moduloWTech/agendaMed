@@ -56,7 +56,7 @@ export function InviteAcceptScreen() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+    <div className="relative min-h-screen flex items-center justify-center p-4 py-12 overflow-x-hidden overflow-y-auto">
       {/* Premium Background for Login/Invite */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center"
