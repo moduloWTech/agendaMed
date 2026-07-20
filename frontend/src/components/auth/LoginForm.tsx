@@ -1,270 +1,160 @@
-import { useState, useEffect } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+import { useState } from 'react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
+import { useAuth } from '../../contexts/AuthContext';
+import bgImage from '../../assets/login-bg.png';
 
 export function LoginForm() {
-  // Estados da máquina
-  const [mode, setMode] = useState<'idle' | 'admin_register' | 'setup_qr' | 'ready_to_send' | 'success'>('idle');
-  const [qrCode, setQrCode] = useState<string | null>(null);
+  const { login, register } = useAuth();
+  
+  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Form Fields
-  const [isLoading, setIsLoading] = useState(false);
-  const [phoneWhats, setPhoneWhats] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [patientName, setPatientName] = useState('');
+  const [phoneWhats, setPhoneWhats] = useState('');
+  const [password, setPassword] = useState('');
 
   // Status visual para erros
   const [message, setMessage] = useState('');
   const [error, setError] = useState(false);
 
-  // Remove a checagem que ia direto pro setup. O fluxo agora começa no 'idle'.
-
-  // Polling para checar o status do WhatsApp apenas no 'setup_qr'
-  useEffect(() => {
-    if (mode !== 'setup_qr') return;
-
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/whatsapp/status`);
-        const data = await response.json();
-        
-        if (data.connected) {
-          setMode('ready_to_send');
-        } else if (data.qrCode) {
-          setQrCode(data.qrCode);
-        }
-      } catch (err) {
-        console.error('Erro ao checar status do WhatsApp', err);
-      }
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [mode]);
-
-  // Passo 1: Dispara requestLogin
-  const handleRequestLink = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setIsLoading(true);
-    setError(false);
-    setMessage('');
-
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/request-link`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneWhats }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        if (data.action === 'REQUIRE_SETUP') {
-          // Banco vazio! Ir para o form de registro
-          setMode('admin_register');
-        } else if (data.action === 'REQUIRE_QR_SETUP') {
-          // Robô caiu e precisa ser reconectado!
-          setMode('setup_qr');
-        } else {
-          // Deu tudo certo, link enviado
-          setMode('success');
-          setMessage('Link seguro enviado para o seu WhatsApp! Verifique suas mensagens.');
-        }
-      } else {
-        setError(true);
-        setMessage(data.error || 'Número não cadastrado. Fale com o administrador da família.');
-      }
-    } catch (error) {
-      setError(true);
-      setMessage('Falha ao conectar com o servidor.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Passo 2: Registra o Administrador
-  const handleRegisterAdmin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(false);
     setMessage('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/setup-admin`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneWhats, name, email, patientName }),
-      });
-
-      if (response.ok) {
-        setMode('setup_qr');
+      if (mode === 'login') {
+        await login(email, password);
       } else {
-        const data = await response.json();
-        setError(true);
-        setMessage(data.error || 'Falha ao cadastrar administrador.');
+        await register({ name, email, phoneWhats, password });
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(true);
-      setMessage('Erro na comunicação com o servidor.');
+      setMessage(err.message || 'Falha na comunicação com o servidor.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (mode === 'success') {
-    return (
-      <div className="flex flex-col items-center gap-4 text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-2 text-3xl">
-          📱
-        </div>
-        <h3 className="text-xl font-bold text-gray-800">Verifique seu WhatsApp</h3>
-        <p className="text-gray-600 mb-4">{message}</p>
-        <Button variant="outline" onClick={() => { setMode('idle'); setPhoneWhats(''); }} fullWidth>
-          Tentar outro número
-        </Button>
-      </div>
-    );
-  }
-
-  if (mode === 'admin_register') {
-    return (
-      <form onSubmit={handleRegisterAdmin} className="flex flex-col gap-6 w-full animate-in fade-in zoom-in-95">
-        <div className="text-center mb-2">
-          <h3 className="text-xl font-bold text-[var(--color-primary)]">Bem-vindo(a)! 🎉</h3>
-          <p className="text-sm text-gray-600">Este é o primeiro acesso ao sistema. Cadastre-se como <b>Administrador</b> da família.</p>
-        </div>
-
-        <Input
-          label="WhatsApp (com DDD)"
-          type="tel"
-          value={phoneWhats}
-          onChange={() => {}} // travado
-          disabled
-        />
+  return (
+    <div 
+      className="fixed inset-0 w-full h-full bg-cover bg-center flex items-center justify-center p-4 sm:p-8"
+      style={{ backgroundImage: `url(${bgImage})` }}
+      aria-label="Fundo desfocado com tema de saúde e bem-estar"
+    >
+      <div className="absolute inset-0 bg-[var(--color-primary)]/20 backdrop-blur-sm" aria-hidden="true" />
+      
+      <div className="relative w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/50 animate-in fade-in zoom-in-95 duration-500">
         
-        <Input
-          label="Seu Nome"
-          type="text"
-          placeholder="Ex: Carlos Silva"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        
-        <Input
-          label="Seu E-mail"
-          type="email"
-          placeholder="Ex: carlos@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <h4 className="text-sm font-bold text-gray-500 mb-4">Sobre quem vamos cuidar?</h4>
-          <Input
-            label="Nome do Paciente"
-            type="text"
-            placeholder="Ex: Dona Maria"
-            value={patientName}
-            onChange={(e) => setPatientName(e.target.value)}
-            required
-          />
-        </div>
-
-        {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100">
-            {message}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
           </div>
-        )}
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">AgendaMed</h2>
+          <p className="text-gray-500 mt-2 text-lg">Cuidado e carinho em família</p>
+        </div>
 
-        <Button type="submit" variant="primary" fullWidth disabled={isLoading}>
-          {isLoading ? 'Salvando...' : 'Cadastrar'}
-        </Button>
-      </form>
-    );
-  }
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-full">
+          {/* Opções de Abas */}
+          <div className="flex bg-gray-100 p-1 rounded-xl mb-2" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'login'}
+              onClick={() => { setMode('login'); setError(false); setMessage(''); }}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
+                mode === 'login' ? 'bg-white text-[var(--color-primary)] shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Entrar
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'register'}
+              onClick={() => { setMode('register'); setError(false); setMessage(''); }}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
+                mode === 'register' ? 'bg-white text-[var(--color-primary)] shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Criar Conta
+            </button>
+          </div>
 
-  if (mode === 'setup_qr') {
-    return (
-      <div className="flex flex-col items-center gap-4 text-center animate-in fade-in zoom-in-95">
-        <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2">Conectando o Robô</h3>
-        <p className="text-gray-600 mb-4">
-          Para que o sistema consiga enviar mensagens, escaneie o QR Code abaixo com o <b>seu WhatsApp</b>. (Vá em Aparelhos Conectados)
-        </p>
-        
-        <div className="bg-white p-4 rounded-2xl shadow-md border border-gray-100 flex items-center justify-center min-h-[256px]">
-          {qrCode ? (
-            <QRCodeSVG value={qrCode} size={200} />
-          ) : (
-            <div className="animate-pulse flex flex-col items-center">
-              <div className="h-40 w-40 bg-gray-200 rounded-lg mb-2"></div>
-              <span className="text-sm text-gray-500">Gerando QR Code...</span>
+          {mode === 'register' && (
+            <>
+              <Input
+                label="Seu Nome Completo"
+                type="text"
+                placeholder="Ex: Maria Silva"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                aria-required="true"
+              />
+              <Input
+                label="WhatsApp (com DDD)"
+                type="tel"
+                placeholder="Ex: 11999999999"
+                value={phoneWhats}
+                onChange={(e) => setPhoneWhats(e.target.value.replace(/\D/g, ''))}
+                required
+                maxLength={11}
+                minLength={10}
+                aria-required="true"
+              />
+            </>
+          )}
+
+          <Input
+            label="E-mail"
+            type="email"
+            placeholder="seu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            aria-required="true"
+          />
+
+          <Input
+            label="Senha"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6}
+            aria-required="true"
+          />
+
+          {error && (
+            <div role="alert" className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100 flex items-start gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <span>{message}</span>
             </div>
           )}
-        </div>
-        <p className="text-sm text-gray-500 mt-2">Aguardando escaneamento...</p>
-      </div>
-    );
-  }
 
-  if (mode === 'ready_to_send') {
-    return (
-      <div className="flex flex-col gap-6 w-full text-center animate-in fade-in zoom-in-95">
-        <div className="bg-green-50 p-6 rounded-2xl border border-green-100 mb-2">
-          <div className="text-4xl mb-3">✅</div>
-          <h4 className="font-bold text-green-800 text-xl mb-1">Robô Conectado!</h4>
-          <p className="text-sm text-green-700">Seu WhatsApp foi vinculado com sucesso. Você já pode disparar seu próprio link de acesso.</p>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100 text-left">
-            {message}
+          <div className="mt-2 pt-2">
+            <Button
+              type="submit"
+              variant="primary"
+              fullWidth
+              disabled={isLoading || (mode === 'register' && phoneWhats.length < 10)}
+              className="py-3.5 text-base shadow-lg shadow-[var(--color-primary)]/20"
+            >
+              {isLoading ? 'Processando...' : mode === 'login' ? 'Entrar' : 'Cadastrar Família'}
+            </Button>
           </div>
-        )}
-
-        <Button type="button" onClick={() => handleRequestLink()} variant="primary" fullWidth disabled={isLoading}>
-          {isLoading ? 'Enviando...' : 'Receber link mágico'}
-        </Button>
+        </form>
       </div>
-    );
-  }
-
-  // mode === 'idle'
-  return (
-    <form onSubmit={handleRequestLink} className="flex flex-col gap-6 w-full">
-      <p className="text-gray-600 mb-2">
-        Digite seu número de WhatsApp para receber um link de acesso seguro. Nenhuma senha necessária.
-      </p>
-
-      <Input
-        label="WhatsApp (com DDD)"
-        type="tel"
-        placeholder="Ex: 11999999999"
-        value={phoneWhats}
-        onChange={(e) => setPhoneWhats(e.target.value.replace(/\D/g, ''))}
-        required
-        maxLength={11}
-        minLength={10}
-      />
-
-      {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100">
-          {message}
-        </div>
-      )}
-
-      <div className="mt-2">
-        <Button
-          type="submit"
-          variant="primary"
-          fullWidth
-          disabled={isLoading || phoneWhats.length < 10}
-        >
-          {isLoading ? 'Enviando...' : 'Enviar'}
-        </Button>
-      </div>
-    </form>
+    </div>
   );
 }
