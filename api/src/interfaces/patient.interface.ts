@@ -1,4 +1,4 @@
-import type { Patient } from '../generated/prisma/client';
+import type { Patient, User } from '../generated/prisma/client';
 
 export interface IPatientCreate {
   name: string;
@@ -14,7 +14,7 @@ export interface IPatientUpdate {
 
 export interface IPatientRepository {
   create(data: IPatientCreate): Promise<Patient>;
-  findById(id: string, tenantId: string): Promise<Patient | null>;
+  findById(id: string, tenantId: string): Promise<(Patient & { users?: User[] }) | null>;
   findByTenantId(tenantId: string): Promise<Patient[]>;
   update(id: string, tenantId: string, data: IPatientUpdate): Promise<Patient>;
   delete(id: string, tenantId: string): Promise<void>;

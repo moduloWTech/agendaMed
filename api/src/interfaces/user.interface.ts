@@ -23,4 +23,5 @@ export interface IUserRepository {
   findByPatientId(patientId: string): Promise<User[]>;
   update(id: string, data: IUserUpdate): Promise<User>;
   delete(id: string): Promise<void>;
+  createAdminWithTenant(userData: any, tenantName: string): Promise<{ user: User, tenant: any }>;
 }
