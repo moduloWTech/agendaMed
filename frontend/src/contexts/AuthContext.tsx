@@ -19,7 +19,8 @@ interface AuthContextData {
   user: User | null;
   activePatient: Patient | null;
   isAuthenticated: boolean;
-  login: (token: string, user: User) => void;
+  login: (email: string, password?: string) => Promise<void>;
+  register: (data: { name: string, email: string, phoneWhats: string, password?: string }) => Promise<void>;
   logout: () => void;
   setActivePatient: (patient: Patient | null) => void;
   isLoading: boolean;
@@ -89,25 +90,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadStoredData();
   }, []);
 
-  const login = async (token: string, userData: User) => {
-    localStorage.setItem('@agendaMed:token', token);
-    localStorage.setItem('@agendaMed:user', JSON.stringify(userData));
-    setUser(userData);
-
-    // Busca o paciente assim que loga (para não ter que dar F5)
+  const login = async (email: string, password?: string) => {
     try {
-      const patients = await api.get(`/api/users/${userData.id}/patients`);
+      const response = await api.post('/api/auth/login', { email, password });
+      
+      localStorage.setItem('@agendaMed:token', response.accessToken);
+      localStorage.setItem('@agendaMed:user', JSON.stringify(response.user));
+      setUser(response.user);
+
+      // Busca o paciente assim que loga
+      const patients = await api.get(`/api/users/${response.user.id}/patients`);
       if (patients && patients.length > 0) {
         setActivePatient(patients[0]);
       } else {
         console.warn('Nenhum paciente encontrado para o usuário no login.');
+        setActivePatient(null);
       }
-    } catch (err) {
-      console.error('Erro ao buscar pacientes no login:', err);
-    }
 
-    // Após o login, inscreve o dispositivo para Push Notifications
-    subscribeToPushNotifications();
+      subscribeToPushNotifications();
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  const register = async (data: { name: string, email: string, phoneWhats: string, password?: string }) => {
+    try {
+      const response = await api.post('/api/auth/register', data);
+      
+      localStorage.setItem('@agendaMed:token', response.accessToken);
+      localStorage.setItem('@agendaMed:user', JSON.stringify(response.user));
+      setUser(response.user);
+      
+      // Como a conta acabou de ser criada, sabemos que não tem paciente
+      setActivePatient(null);
+
+      subscribeToPushNotifications();
+    } catch (err: any) {
+      throw err;
+    }
   };
 
   const logout = () => {
@@ -118,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, activePatient, isAuthenticated: !!user, login, logout, setActivePatient, isLoading }}>
+    <AuthContext.Provider value={{ user, activePatient, isAuthenticated: !!user, login, register, logout, setActivePatient, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
