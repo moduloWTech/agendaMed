@@ -67,7 +67,7 @@ export class UserUseCase {
     await this.userRepository.delete(id);
   }
 
-  async inviteCaregiver(adminId: string, data: any): Promise<User> {
+  async inviteCaregiver(adminId: string, data: any): Promise<{ success: boolean, message: string }> {
     const schema = z.object({
       phoneWhats: z.string().min(10, 'O telefone deve ter pelo menos 10 dígitos'),
       name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
@@ -79,27 +79,32 @@ export class UserUseCase {
 
     // Valida admin
     const admin = await this.userRepository.findById(adminId);
-    if (!admin || admin.role !== 'ADMIN') {
-      throw new Error('Apenas administradores podem convidar cuidadores.');
+    if (!admin || admin.role !== 'ADMIN' || !admin.tenantId) {
+      throw new Error('Apenas administradores de família podem convidar cuidadores.');
     }
 
     // Verifica se já existe
     let user = await this.userRepository.findByPhoneWhats(parsedData.phoneWhats);
     if (user) {
-      // Se existir, apenas atualiza para vincular ao paciente (se precisar)
       throw new Error('Este número já está cadastrado no sistema.');
     }
 
-    // Cria o usuário Cuidador
-    user = await this.userRepository.create({
-      phoneWhats: parsedData.phoneWhats,
-      name: parsedData.name,
-      role: 'CARE_GIVER',
-      patientId: parsedData.patientId
-    });
+    // Gera Token JWT para o convite (duração 48 horas)
+    const jwt = require('jsonwebtoken');
+    const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
+    const inviteToken = jwt.sign(
+      {
+        tenantId: admin.tenantId,
+        patientId: parsedData.patientId,
+        invitedPhone: parsedData.phoneWhats,
+        invitedName: parsedData.name
+      },
+      JWT_SECRET,
+      { expiresIn: '48h' }
+    );
 
     // Envia WhatsApp
-    const message = `Olá, ${parsedData.name}! 👋\n\nVocê foi convidado(a) por *${admin.name || 'um administrador'}* para fazer parte da equipe de cuidados de *${parsedData.patientName}* no aplicativo *AgendaMed*.\n\nAcesse o link abaixo para entrar no sistema:\n${process.env.FRONTEND_URL || 'http://localhost:5173'}\n\nLá, basta digitar o seu número de telefone para acessar a conta.`;
+    const message = `Olá, ${parsedData.name}! 👋\n\nVocê foi convidado(a) por *${admin.name || 'um administrador'}* para fazer parte da equipe de cuidados de *${parsedData.patientName}* no aplicativo *AgendaMed*.\n\nAcesse o link abaixo para criar sua conta de cuidador(a):\n${process.env.FRONTEND_URL || 'http://localhost:5173'}/convite?token=${inviteToken}`;
 
     try {
       await whatsappService.sendMessage(parsedData.phoneWhats, message);
@@ -107,7 +112,7 @@ export class UserUseCase {
       console.error('Erro ao enviar mensagem de convite no WhatsApp', e);
     }
 
-    return user;
+    return { success: true, message: 'Convite enviado com sucesso.' };
   }
 
   async getCaregivers(patientId: string): Promise<User[]> {

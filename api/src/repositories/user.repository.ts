@@ -11,6 +11,12 @@ export class UserRepository implements IUserRepository {
       email: data.email || null,
       role: data.role || 'CARE_GIVER',
     };
+    if (data.tenantId) {
+      payload.tenantId = data.tenantId;
+    }
+    if (data.passwordHash) {
+      payload.passwordHash = data.passwordHash;
+    }
     if (data.patientId) {
       payload.patients = {
         connect: { id: data.patientId }

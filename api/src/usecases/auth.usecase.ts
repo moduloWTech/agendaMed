@@ -2,7 +2,7 @@ import { IUserRepository } from '../interfaces/user.interface';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import type { User } from '../generated/prisma/client';
-import { IRegisterData, ILoginData } from '../types/auth.types';
+import { IRegisterData, ILoginData, IAcceptInviteData } from '../types/auth.types';
 
 import bcrypt from 'bcrypt';
 
@@ -67,6 +67,59 @@ export class AuthUseCase {
     if (!isMatch) {
       throw new Error('E-mail ou senha incorretos.');
     }
+
+    const accessToken = jwt.sign(
+      { id: user.id, role: user.role, tenantId: user.tenantId },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    return { user, accessToken };
+  }
+
+  async acceptInvite(data: IAcceptInviteData): Promise<{ user: User, accessToken: string }> {
+    const schema = z.object({
+      token: z.string(),
+      name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
+      email: z.string().email('E-mail inválido'),
+      phoneWhats: z.string().min(10, 'Telefone inválido'),
+      password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
+    });
+
+    const parsed = schema.parse(data);
+
+    // Valida o Token de Convite
+    let inviteData: any;
+    try {
+      inviteData = jwt.verify(parsed.token, JWT_SECRET);
+    } catch (e: any) {
+      console.error('JWT VERIFY ERROR:', e);
+      throw new Error(`Convite inválido ou expirado. Detalhe: ${e.message}`);
+    }
+
+    if (!inviteData.tenantId) {
+      throw new Error('Convite inválido (Tenant ausente).');
+    }
+
+    // Verifica se email ou telefone já existem
+    const existingUserByEmail = await this.userRepository.findByEmail(parsed.email);
+    if (existingUserByEmail) throw new Error('E-mail já cadastrado.');
+    
+    const existingUserByPhone = await this.userRepository.findByPhoneWhats(parsed.phoneWhats);
+    if (existingUserByPhone) throw new Error('Telefone já cadastrado.');
+
+    const passwordHash = await bcrypt.hash(parsed.password, 10);
+
+    // Cria o usuário Cuidador atrelado ao Tenant do convite
+    const user = await this.userRepository.create({
+      name: parsed.name,
+      email: parsed.email,
+      phoneWhats: parsed.phoneWhats,
+      passwordHash: passwordHash,
+      role: 'CARE_GIVER',
+      tenantId: inviteData.tenantId,
+      patientId: inviteData.patientId
+    });
 
     const accessToken = jwt.sign(
       { id: user.id, role: user.role, tenantId: user.tenantId },

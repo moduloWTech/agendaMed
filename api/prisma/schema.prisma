@@ -8,74 +8,66 @@ datasource db {
 }
 
 model Tenant {
-  id                 String   @id @default(uuid())
+  id                 String    @id @default(uuid())
   name               String
   ownerId            String
   stripeCustomerId   String?
-  subscriptionStatus String   @default("FREE")
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  owner    User      @relation("TenantOwner", fields: [ownerId], references: [id])
-  users    User[]    @relation("TenantUsers")
-  patients Patient[]
+  subscriptionStatus String    @default("FREE")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  patients           Patient[]
+  owner              User      @relation("TenantOwner", fields: [ownerId], references: [id])
+  users              User[]    @relation("TenantUsers")
 }
 
 model User {
-  id         String   @id @default(uuid())
-  phoneWhats String   @unique
-  email      String?  @unique // Deixamos email opcional para o Onboarding
-  name       String? // Opcional para preencher no Onboarding
-  passwordHash String? // Hash da senha para login (abandonando Magic Link)
-  role       String   @default("CARE_GIVER") // CARE_GIVER, ADMIN
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  tenantId   String?
-  tenant     Tenant?  @relation("TenantUsers", fields: [tenantId], references: [id])
-  ownedTenants Tenant[] @relation("TenantOwner")
-
-  patients Patient[] @relation("PatientCaregivers")
+  id                String              @id @default(uuid())
+  email             String?             @unique
+  name              String?
+  role              String              @default("CARE_GIVER")
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  phoneWhats        String              @unique
+  passwordHash      String?
+  tenantId          String?
   medicationHistory MedicationHistory[]
   pushSubscriptions PushSubscription[]
+  ownedTenants      Tenant[]            @relation("TenantOwner")
+  tenant            Tenant?             @relation("TenantUsers", fields: [tenantId], references: [id])
+  patients          Patient[]           @relation("PatientCaregivers")
 }
 
 model Patient {
-  id        String    @id @default(uuid())
-  name      String
-  birthDate DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  tenantId  String?
-  tenant    Tenant?   @relation(fields: [tenantId], references: [id])
-
-  users User[] @relation("PatientCaregivers")
-
-  medications Medication[]
-  documents   Document[]
-  appointments Appointment[]
+  id                String              @id @default(uuid())
+  name              String
+  birthDate         DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  tenantId          String?
+  appointments      Appointment[]
+  documents         Document[]
+  medications       Medication[]
   medicationHistory MedicationHistory[]
+  tenant            Tenant?             @relation(fields: [tenantId], references: [id])
+  users             User[]              @relation("PatientCaregivers")
 }
 
 model Medication {
-  id           String   @id @default(uuid())
+  id           String              @id @default(uuid())
   name         String
-  dosage       String   // e.g. "50mg", "10ml"
-  instructions String   // e.g. "1 comprimido", "20 gotas"
-  frequency    String   // e.g. "8h", "daily", "single"
+  dosage       String
+  frequency    String
   startDate    DateTime
-  startTime    String   // e.g. "08:00"
-  times        String[] // Para horários manuais ["08:00", "12:00"]
-  active    Boolean  @default(true)
-  photoUrl  String?  // URL da foto da caixa do medicamento
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
-  history   MedicationHistory[]
+  startTime    String
+  times        String[]
+  active       Boolean             @default(true)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  patientId    String
+  instructions String
+  photoUrl     String?
+  patient      Patient             @relation(fields: [patientId], references: [id])
+  history      MedicationHistory[]
 }
 
 model MedicationHistory {
@@ -83,49 +75,41 @@ model MedicationHistory {
   medicationId String
   patientId    String
   userId       String
-  date         String     // YYYY-MM-DD
-  time         String     // HH:MM
+  date         String
+  time         String
   takenAt      DateTime   @default(now())
-
   medication   Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
   patient      Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
   user         User       @relation(fields: [userId], references: [id])
 
-  // Um medicamento só pode ser marcado uma vez para um mesmo dia e horário
   @@unique([medicationId, date, time])
 }
 
 model Document {
-  id       String   @id @default(uuid())
-  title    String
-  category String // "recipe", "exam", "report", "other"
-  date     DateTime
-  fileUrl  String // URL do S3/Bucket
-
+  id        String   @id @default(uuid())
+  title     String
+  category  String
+  date      DateTime
+  fileUrl   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
+  patient   Patient  @relation(fields: [patientId], references: [id])
 }
 
 model Appointment {
   id               String   @id @default(uuid())
-  specialty        String   // Ex: Cardiologista, Fisioterapia, Exame
-  doctorName       String?  
-  date             DateTime // Data da consulta
-  time             String   // Horário (ex: "14:30")
-  location         String?  // Clínica ou Endereço
-  notes            String?  // Recomendações
-  
-  // Configurações de Alerta
+  specialty        String
+  doctorName       String?
+  date             DateTime
+  time             String
+  location         String?
+  notes            String?
   alertEnabled     Boolean  @default(true)
-  alertHoursBefore Int      @default(24) // Alerta padrão inicial (ex: 24h antes)
-  intensiveAlerts  Boolean  @default(false) // Alerta em Cascata (45m, 30m, 15m, 0m)
-  
+  alertHoursBefore Int      @default(24)
+  intensiveAlerts  Boolean  @default(false)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-
   patientId        String
   patient          Patient  @relation(fields: [patientId], references: [id])
 }
@@ -133,9 +117,9 @@ model Appointment {
 model PushSubscription {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   endpoint  String   @unique
   p256dh    String
   auth      String
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

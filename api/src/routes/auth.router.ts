@@ -34,6 +34,17 @@ export class AuthRouter {
       }
     });
 
+    // 3. Aceitar Convite (Cuidador)
+    app.post('/api/auth/accept-invite', async (request, reply) => {
+      try {
+        const result = await this.authUseCase.acceptInvite(request.body as any);
+        return reply.status(201).send(result);
+      } catch (error: any) {
+        app.log.error(error);
+        const statusCode = error.name === 'ZodError' ? 400 : 409;
+        return reply.status(statusCode).send({ error: error.message });
+      }
+    });
 
   }
 }
