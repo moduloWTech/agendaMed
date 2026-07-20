@@ -6,6 +6,8 @@ export interface IUserCreate {
   email?: string;
   role?: string;
   patientId?: string;
+  tenantId?: string;
+  passwordHash?: string;
 }
 
 export interface IUserUpdate {

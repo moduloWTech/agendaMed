@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { SplashScreen } from './screens/SplashScreen';
 import { LoginScreen } from './screens/LoginScreen';
 import { PatientSetupScreen } from './screens/PatientSetupScreen';
+import { InviteAcceptScreen } from './screens/InviteAcceptScreen';
 import { AgendaScreen } from './screens/AgendaScreen';
 import { VaultScreen } from './screens/VaultScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
@@ -14,6 +15,11 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'agenda' | 'consultas' | 'cofre' | 'perfil'>('agenda');
   if (isLoading) {
     return <SplashScreen />;
+  }
+
+  // Intercepta a rota de convite antes do fluxo de autenticação normal
+  if (window.location.pathname === '/convite') {
+    return <InviteAcceptScreen />;
   }
 
   if (isAuthenticated) {
