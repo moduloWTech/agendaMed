@@ -1,7 +1,6 @@
 import { IUserRepository } from '../interfaces/user.interface';
 import { z } from 'zod';
 import type { User } from '../generated/prisma/client';
-import { whatsappService } from '../services/whatsapp.service';
 
 export class UserUseCase {
   constructor(private userRepository: IUserRepository) { }
@@ -67,7 +66,7 @@ export class UserUseCase {
     await this.userRepository.delete(id);
   }
 
-  async inviteCaregiver(adminId: string, data: any): Promise<{ success: boolean, message: string }> {
+  async inviteCaregiver(adminId: string, data: any): Promise<{ success: boolean, message: string, inviteLink?: string }> {
     const schema = z.object({
       phoneWhats: z.string().min(10, 'O telefone deve ter pelo menos 10 dígitos'),
       name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
@@ -103,16 +102,19 @@ export class UserUseCase {
       { expiresIn: '48h' }
     );
 
-    // Envia WhatsApp
+    // Monta a mensagem de WhatsApp
     const message = `Olá, ${parsedData.name}! 👋\n\nVocê foi convidado(a) por *${admin.name || 'um administrador'}* para fazer parte da equipe de cuidados de *${parsedData.patientName}* no aplicativo *AgendaMed*.\n\nAcesse o link abaixo para criar sua conta de cuidador(a):\n${process.env.FRONTEND_URL || 'http://localhost:5173'}/convite?token=${inviteToken}`;
-
-    try {
-      await whatsappService.sendMessage(parsedData.phoneWhats, message);
-    } catch (e) {
-      console.error('Erro ao enviar mensagem de convite no WhatsApp', e);
+    
+    // Formata o número (remover caracteres especiais e adicionar 55 se precisar)
+    let numericPhone = parsedData.phoneWhats.replace(/\D/g, '');
+    if (numericPhone.length === 10 || numericPhone.length === 11) {
+      numericPhone = `55${numericPhone}`;
     }
 
-    return { success: true, message: 'Convite enviado com sucesso.' };
+    // Gera o Deep Link
+    const inviteLink = `https://wa.me/${numericPhone}?text=${encodeURIComponent(message)}`;
+
+    return { success: true, message: 'Convite gerado com sucesso.', inviteLink };
   }
 
   async getCaregivers(patientId: string): Promise<User[]> {

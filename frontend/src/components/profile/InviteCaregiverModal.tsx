@@ -45,12 +45,17 @@ export function InviteCaregiverModal({ onClose, onSuccess }: InviteCaregiverModa
     setError('');
 
     try {
-      await api.post('/api/users/invite', {
+      const response = await api.post('/api/users/invite', {
         phoneWhats: unformattedPhone,
         name: name,
         patientId: activePatient.id,
         patientName: activePatient.name
       });
+      
+      if (response.data && response.data.inviteLink) {
+        window.open(response.data.inviteLink, '_blank');
+      }
+      
       onSuccess();
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao enviar convite');

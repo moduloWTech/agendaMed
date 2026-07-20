@@ -8,7 +8,7 @@ export class WhatsappService {
   private currentQrCode: string | null = null;
 
   constructor() {
-    this.connect();
+    // this.connect(); // Desativado para usar Deep Linking (wa.me)
   }
 
   private async connect() {
@@ -119,4 +119,5 @@ export class WhatsappService {
 }
 
 // Instância global para ser importada e usada no sistema inteiro
-export const whatsappService = new WhatsappService();
+// export const whatsappService = new WhatsappService(); // Instanciação automática desativada para poupar memória
+// Use apenas se for necessário para envio automatizado de cron jobs no futuro.
