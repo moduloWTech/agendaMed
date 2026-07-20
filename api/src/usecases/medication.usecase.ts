@@ -12,7 +12,7 @@ export class MedicationUseCase {
     private userRepository: IUserRepository
   ) {}
 
-  async createMedication(data: any): Promise<Medication> {
+  async createMedication(tenantId: string, data: any): Promise<Medication> {
     const schema = z.object({
       name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
       dosage: z.string().min(1, 'A dosagem é obrigatória'),
@@ -28,8 +28,8 @@ export class MedicationUseCase {
 
     const parsed = schema.parse(data);
 
-    // Regra de Negócio: O paciente precisa existir
-    const patientExists = await this.patientRepository.findById(parsed.patientId);
+    // Regra de Negócio: O paciente precisa existir e pertencer ao Tenant
+    const patientExists = await this.patientRepository.findById(parsed.patientId, tenantId);
     if (!patientExists) {
       throw new Error('Paciente associado não encontrado na plataforma.');
     }
@@ -47,19 +47,29 @@ export class MedicationUseCase {
     });
   }
 
-  async getMedicationById(id: string): Promise<Medication> {
+  async getMedicationById(id: string, tenantId: string): Promise<Medication> {
     const medication = await this.medicationRepository.findById(id);
     if (!medication) {
       throw new Error('Medicamento não encontrado.');
     }
+
+    const patientExists = await this.patientRepository.findById(medication.patientId, tenantId);
+    if (!patientExists) {
+      throw new Error('Medicamento não encontrado.');
+    }
+
     return medication;
   }
 
-  async getMedicationsByPatientId(patientId: string): Promise<Medication[]> {
+  async getMedicationsByPatientId(patientId: string, tenantId: string): Promise<Medication[]> {
+    const patientExists = await this.patientRepository.findById(patientId, tenantId);
+    if (!patientExists) {
+      throw new Error('Paciente não encontrado ou acesso negado.');
+    }
     return await this.medicationRepository.findByPatientId(patientId);
   }
 
-  async updateMedication(id: string, data: any): Promise<Medication> {
+  async updateMedication(id: string, tenantId: string, data: any): Promise<Medication> {
     const schema = z.object({
       name: z.string().min(2).optional(),
       dosage: z.string().min(1).optional(),
@@ -79,23 +89,37 @@ export class MedicationUseCase {
       throw new Error('Medicamento não encontrado.');
     }
 
+    const patientExists = await this.patientRepository.findById(medication.patientId, tenantId);
+    if (!patientExists) {
+      throw new Error('Medicamento não encontrado.');
+    }
+
     return await this.medicationRepository.update(id, parsedData);
   }
 
-  async deleteMedication(id: string): Promise<void> {
+  async deleteMedication(id: string, tenantId: string): Promise<void> {
     const medication = await this.medicationRepository.findById(id);
     if (!medication) {
+      throw new Error('Medicamento não encontrado.');
+    }
+
+    const patientExists = await this.patientRepository.findById(medication.patientId, tenantId);
+    if (!patientExists) {
       throw new Error('Medicamento não encontrado.');
     }
 
     await this.medicationRepository.delete(id);
   }
 
-  async getHistory(patientId: string, date: string): Promise<any[]> {
+  async getHistory(patientId: string, date: string, tenantId: string): Promise<any[]> {
+    const patientExists = await this.patientRepository.findById(patientId, tenantId);
+    if (!patientExists) {
+      throw new Error('Paciente não encontrado ou acesso negado.');
+    }
     return await this.medicationRepository.getHistory(patientId, date);
   }
 
-  async toggleCheckin(userId: string, data: any): Promise<void> {
+  async toggleCheckin(userId: string, tenantId: string, data: any): Promise<void> {
     const schema = z.object({
       medicationId: z.string().uuid(),
       patientId: z.string().uuid(),
@@ -104,6 +128,12 @@ export class MedicationUseCase {
     });
     
     const parsed = schema.parse(data);
+
+    const patientExists = await this.patientRepository.findById(parsed.patientId, tenantId);
+    if (!patientExists) {
+      throw new Error('Paciente não encontrado ou acesso negado.');
+    }
+
     const wasCreated = await this.medicationRepository.toggleHistory(userId, parsed);
 
     if (wasCreated) {

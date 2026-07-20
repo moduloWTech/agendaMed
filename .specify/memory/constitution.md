@@ -49,3 +49,4 @@ Todo microsserviço Node.js/TypeScript deve ser estruturado em 3 camadas (Router
 - **Prevenção e Permissão:** Sempre explique a alteração que vai fazer *antes* e pergunte se deve fazer essa alteração.
 - **Modo Somente Leitura Inicial:** Sempre responda as perguntas que o usuário fizer *sem* mudar o código. Modifique o código *somente* se o usuário autorizar explicitamente.
 - **Registro de Progresso Obrigatório:** Sempre antes de subir uma nova versão para o GitHub (git push), atualize o arquivo `docs/PROGRESS_APLICATION.md` detalhando as alterações.
+- **Testes Automatizados Isolados:** Ao final de cada implementação, o agente deve criar scripts de teste na pasta `api/testes` para verificar a nova funcionalidade separadamente, e rodar também os testes anteriores para garantir que a nova implementação não quebrou nada.
