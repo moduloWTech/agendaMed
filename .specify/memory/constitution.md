@@ -30,8 +30,12 @@ Você deve proativamente evitar falhas comuns e implementar padrões robustos de
 ## 5. Padrão Organizacional do Backend (Layered R-U-R)
 Todo microsserviço Node.js/TypeScript deve ser estruturado em 3 camadas (Router, UseCase, Repositorie):
 - **`*.router.ts`:** Expõe rotas, aplica middlewares, valida dados imediatamente com Zod (fail-fast) e NÃO possui regras de negócio.
-- **`*.usecase.ts`:** Lógica de negócio pura, orquestrando repositórios e serviços (agnóstico ao framework web).
+- **`*.usecase.ts`:** Lógica de negócio pura, orquestrando repositórios e serviços (agnóstico ao framework web). **Proibido o uso de `prisma` ou conexões diretas ao DB nesta camada.**
 - **`*.repositorie.ts`:** Acesso direto ao banco de dados, isolando a dependência do ORM (Prisma/TypeORM).
+
+## 5.1. Diretrizes de Tipagem (TypeScript)
+- **Tipagem Estrita:** É terminantemente proibido o uso da tipagem `any`. Todas as variáveis, parâmetros e retornos devem ter tipagem explícita ou inferida corretamente.
+- **Pasta `types`:** Caso seja necessário criar tipos globais para o sistema API, eles devem ser armazenados em uma pasta `types` (ex: `api/src/types`).
 
 ## 6. Arquitetura Stateless e Otimização
 - O backend deve ser cego quanto à infraestrutura e totalmente configurável via `.env` para evitar Vendor Lock-in.
