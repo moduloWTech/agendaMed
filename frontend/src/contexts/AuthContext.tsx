@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
           }).catch(console.error);
 
-          const patients = await api.get(`/api/users/${parsedUser.id}/patients`);
+          const patients = await api.get(`/api/patients`);
           if (patients && patients.length > 0) {
             setActivePatient(patients[0]);
           } else {
