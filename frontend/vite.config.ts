@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -49,5 +50,11 @@ export default defineConfig({
     watch: {
       ignored: ['**/api/**', '**/auth_info_baileys/**']
     }
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/setupTests.ts',
+    include: ['src/**/*.test.tsx', 'src/**/*.test.ts']
   }
 })
