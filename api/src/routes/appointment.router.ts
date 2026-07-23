@@ -11,7 +11,8 @@ export class AppointmentRouter {
       
       scopedApp.post('/api/appointments', async (request, reply) => {
         try {
-          const appointment = await this.appointmentUseCase.createAppointment(request.body);
+          const tenantId = (request as any).user.tenantId;
+          const appointment = await this.appointmentUseCase.createAppointment(tenantId, request.body);
           return reply.status(201).send(appointment);
         } catch (error: any) {
           app.log.error(error);
@@ -23,7 +24,8 @@ export class AppointmentRouter {
       scopedApp.get('/api/patients/:patientId/appointments', async (request, reply) => {
         try {
           const { patientId } = request.params as { patientId: string };
-          const appointments = await this.appointmentUseCase.getAppointmentsByPatient(patientId);
+          const tenantId = (request as any).user.tenantId;
+          const appointments = await this.appointmentUseCase.getAppointmentsByPatient(patientId, tenantId);
           return reply.status(200).send(appointments);
         } catch (error: any) {
           app.log.error(error);
@@ -34,7 +36,8 @@ export class AppointmentRouter {
       scopedApp.get('/api/appointments/:id', async (request, reply) => {
         try {
           const { id } = request.params as { id: string };
-          const appointment = await this.appointmentUseCase.getAppointmentById(id);
+          const tenantId = (request as any).user.tenantId;
+          const appointment = await this.appointmentUseCase.getAppointmentById(id, tenantId);
           return reply.status(200).send(appointment);
         } catch (error: any) {
           app.log.error(error);
@@ -45,7 +48,8 @@ export class AppointmentRouter {
       scopedApp.put('/api/appointments/:id', async (request, reply) => {
         try {
           const { id } = request.params as { id: string };
-          const appointment = await this.appointmentUseCase.updateAppointment(id, request.body);
+          const tenantId = (request as any).user.tenantId;
+          const appointment = await this.appointmentUseCase.updateAppointment(id, tenantId, request.body);
           return reply.status(200).send(appointment);
         } catch (error: any) {
           app.log.error(error);
@@ -57,7 +61,8 @@ export class AppointmentRouter {
       scopedApp.delete('/api/appointments/:id', async (request, reply) => {
         try {
           const { id } = request.params as { id: string };
-          await this.appointmentUseCase.deleteAppointment(id);
+          const tenantId = (request as any).user.tenantId;
+          await this.appointmentUseCase.deleteAppointment(id, tenantId);
           return reply.status(204).send();
         } catch (error: any) {
           app.log.error(error);

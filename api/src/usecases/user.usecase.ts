@@ -31,15 +31,18 @@ export class UserUseCase {
     return await this.userRepository.create(parsedData);
   }
 
-  async getUserById(id: string): Promise<User> {
+  async getUserById(id: string, tenantId?: string): Promise<User> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new Error('Usuário não encontrado.');
     }
+    if (tenantId && user.tenantId !== tenantId) {
+      throw new Error('Acesso negado. O usuário não pertence à sua família.');
+    }
     return user;
   }
 
-  async updateUser(id: string, data: any): Promise<User> {
+  async updateUser(id: string, data: any, tenantId?: string): Promise<User> {
     const schema = z.object({
       phoneWhats: z.string().optional(),
       name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres').optional(),
@@ -53,14 +56,20 @@ export class UserUseCase {
     if (!user) {
       throw new Error('Usuário não encontrado.');
     }
+    if (tenantId && user.tenantId !== tenantId) {
+      throw new Error('Acesso negado. O usuário não pertence à sua família.');
+    }
 
     return await this.userRepository.update(id, parsedData);
   }
 
-  async deleteUser(id: string): Promise<void> {
+  async deleteUser(id: string, tenantId?: string): Promise<void> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new Error('Usuário não encontrado.');
+    }
+    if (tenantId && user.tenantId !== tenantId) {
+      throw new Error('Acesso negado. O usuário não pertence à sua família.');
     }
 
     await this.userRepository.delete(id);
@@ -117,8 +126,12 @@ export class UserUseCase {
     return { success: true, message: 'Convite gerado com sucesso.', inviteLink };
   }
 
-  async getCaregivers(patientId: string): Promise<User[]> {
-    return await this.userRepository.findByPatientId(patientId);
+  async getCaregivers(patientId: string, tenantId?: string): Promise<User[]> {
+    const users = await this.userRepository.findByPatientId(patientId);
+    if (tenantId) {
+      return users.filter(u => u.tenantId === tenantId);
+    }
+    return users;
   }
 
   async changeUserRole(adminId: string, targetUserId: string, newRole: string): Promise<User> {
@@ -140,6 +153,9 @@ export class UserUseCase {
     const targetUser = await this.userRepository.findById(targetUserId);
     if (!targetUser) {
       throw new Error('Usuário alvo não encontrado.');
+    }
+    if (targetUser.tenantId !== admin.tenantId) {
+      throw new Error('O usuário não pertence à sua família.');
     }
 
     return await this.userRepository.update(targetUserId, { role: parsedData.newRole });
