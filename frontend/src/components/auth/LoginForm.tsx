@@ -78,17 +78,19 @@ export function LoginForm() {
         </div>
 
         <div className="flex flex-col gap-4 mb-6">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => {
-              setError(true);
-              setMessage('Falha ao conectar com o Google');
-            }}
-            useOneTap
-            shape="pill"
-            theme="filled_blue"
-            size="large"
-          />
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => {
+                setError(true);
+                setMessage('Falha ao conectar com o Google');
+              }}
+              useOneTap
+              shape="pill"
+              theme="filled_blue"
+              size="large"
+            />
+          </div>
           <div className="relative flex py-2 items-center">
             <div className="flex-grow border-t border-gray-200"></div>
             <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">ou continue com e-mail</span>
