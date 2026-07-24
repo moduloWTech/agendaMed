@@ -42,8 +42,17 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
+          # Generate bubblewrap config to avoid interactive prompts
+          mkdir -p ~/.bubblewrap
+          cat <<EOF > ~/.bubblewrap/config.json
+          {
+            "jdkPath": "$JAVA_HOME",
+            "androidSdkPath": "/usr/local/lib/android/sdk"
+          }
+          EOF
+
           # The manifest contains the signingKey path pointing to ./android.keystore
-          yes | bubblewrap build \
+          bubblewrap build \
             --manifest=twa-manifest.json \
             --keyPassword="$ANDROID_KEYSTORE_PASSWORD" \
             --keyStorePassword="$ANDROID_KEYSTORE_PASSWORD"
