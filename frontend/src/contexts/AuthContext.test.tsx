@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
 import { api } from '../services/api';
-import React from 'react';
 
 // Mock do axios/api
 vi.mock('../services/api', () => ({
@@ -41,7 +40,7 @@ describe('AuthContext', () => {
       accessToken: 'fake-token-123',
       user: { id: '1', name: 'Usuario Teste', email: 'test@test.com' }
     });
-    
+
     (api.get as any).mockResolvedValueOnce([]); // Mock do get de pacientes
 
     render(
@@ -77,11 +76,11 @@ describe('AuthContext', () => {
     registerBtn.click();
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith('/api/auth/register', { 
-        name: 'Novo User', 
-        email: 'novo@test.com', 
-        phoneWhats: '11999999999', 
-        password: '123' 
+      expect(api.post).toHaveBeenCalledWith('/api/auth/register', {
+        name: 'Novo User',
+        email: 'novo@test.com',
+        phoneWhats: '11999999999',
+        password: '123'
       });
       expect(localStorage.getItem('@agendaMed:token')).toBe('fake-token-reg');
       expect(screen.getByTestId('auth-status').textContent).toBe('Logado');

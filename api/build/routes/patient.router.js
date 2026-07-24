@@ -14,7 +14,8 @@ class PatientRouter {
             // ROTA: Criar Paciente
             scopedApp.post('/api/patients', async (request, reply) => {
                 try {
-                    const patient = await this.patientUseCase.createPatient(request.body);
+                    const payload = { ...request.body, tenantId: request.user.tenantId };
+                    const patient = await this.patientUseCase.createPatient(payload);
                     return reply.status(201).send(patient);
                 }
                 catch (error) {
@@ -23,11 +24,11 @@ class PatientRouter {
                     return reply.status(statusCode).send({ error: error.message || 'Erro ao criar paciente' });
                 }
             });
-            // ROTA: Listar Pacientes de um Cuidador (User)
-            scopedApp.get('/api/users/:userId/patients', async (request, reply) => {
+            // ROTA: Listar Pacientes do Tenant Atual
+            scopedApp.get('/api/patients', async (request, reply) => {
                 try {
-                    const { userId } = request.params;
-                    const patients = await this.patientUseCase.getPatientsByUserId(userId);
+                    const tenantId = request.user.tenantId;
+                    const patients = await this.patientUseCase.getPatientsByTenantId(tenantId);
                     return reply.status(200).send(patients);
                 }
                 catch (error) {
@@ -39,7 +40,8 @@ class PatientRouter {
             scopedApp.get('/api/patients/:id', async (request, reply) => {
                 try {
                     const { id } = request.params;
-                    const patient = await this.patientUseCase.getPatientById(id);
+                    const tenantId = request.user.tenantId;
+                    const patient = await this.patientUseCase.getPatientById(id, tenantId);
                     return reply.status(200).send(patient);
                 }
                 catch (error) {
@@ -51,7 +53,8 @@ class PatientRouter {
             scopedApp.put('/api/patients/:id', async (request, reply) => {
                 try {
                     const { id } = request.params;
-                    const patient = await this.patientUseCase.updatePatient(id, request.body);
+                    const tenantId = request.user.tenantId;
+                    const patient = await this.patientUseCase.updatePatient(id, tenantId, request.body);
                     return reply.status(200).send(patient);
                 }
                 catch (error) {
@@ -64,7 +67,8 @@ class PatientRouter {
             scopedApp.delete('/api/patients/:id', async (request, reply) => {
                 try {
                     const { id } = request.params;
-                    await this.patientUseCase.deletePatient(id);
+                    const tenantId = request.user.tenantId;
+                    await this.patientUseCase.deletePatient(id, tenantId);
                     return reply.status(204).send(); // 204 No Content
                 }
                 catch (error) {

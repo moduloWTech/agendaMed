@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.whatsappService = exports.WhatsappService = void 0;
+exports.WhatsappService = void 0;
 const baileys_1 = require("@whiskeysockets/baileys");
 const path_1 = __importDefault(require("path"));
 class WhatsappService {
@@ -11,7 +11,7 @@ class WhatsappService {
     isConnected = false;
     currentQrCode = null;
     constructor() {
-        this.connect();
+        // this.connect(); // Desativado para usar Deep Linking (wa.me)
     }
     async connect() {
         const authPath = path_1.default.join(__dirname, '..', '..', 'auth_info_baileys');
@@ -114,4 +114,5 @@ class WhatsappService {
 }
 exports.WhatsappService = WhatsappService;
 // Instância global para ser importada e usada no sistema inteiro
-exports.whatsappService = new WhatsappService();
+// export const whatsappService = new WhatsappService(); // Instanciação automática desativada para poupar memória
+// Use apenas se for necessário para envio automatizado de cron jobs no futuro.

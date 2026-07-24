@@ -12,7 +12,8 @@ class AppointmentRouter {
             scopedApp.addHook('preHandler', auth_middleware_1.authMiddleware);
             scopedApp.post('/api/appointments', async (request, reply) => {
                 try {
-                    const appointment = await this.appointmentUseCase.createAppointment(request.body);
+                    const tenantId = request.user.tenantId;
+                    const appointment = await this.appointmentUseCase.createAppointment(tenantId, request.body);
                     return reply.status(201).send(appointment);
                 }
                 catch (error) {
@@ -24,7 +25,8 @@ class AppointmentRouter {
             scopedApp.get('/api/patients/:patientId/appointments', async (request, reply) => {
                 try {
                     const { patientId } = request.params;
-                    const appointments = await this.appointmentUseCase.getAppointmentsByPatient(patientId);
+                    const tenantId = request.user.tenantId;
+                    const appointments = await this.appointmentUseCase.getAppointmentsByPatient(patientId, tenantId);
                     return reply.status(200).send(appointments);
                 }
                 catch (error) {
@@ -35,7 +37,8 @@ class AppointmentRouter {
             scopedApp.get('/api/appointments/:id', async (request, reply) => {
                 try {
                     const { id } = request.params;
-                    const appointment = await this.appointmentUseCase.getAppointmentById(id);
+                    const tenantId = request.user.tenantId;
+                    const appointment = await this.appointmentUseCase.getAppointmentById(id, tenantId);
                     return reply.status(200).send(appointment);
                 }
                 catch (error) {
@@ -46,7 +49,8 @@ class AppointmentRouter {
             scopedApp.put('/api/appointments/:id', async (request, reply) => {
                 try {
                     const { id } = request.params;
-                    const appointment = await this.appointmentUseCase.updateAppointment(id, request.body);
+                    const tenantId = request.user.tenantId;
+                    const appointment = await this.appointmentUseCase.updateAppointment(id, tenantId, request.body);
                     return reply.status(200).send(appointment);
                 }
                 catch (error) {
@@ -58,7 +62,8 @@ class AppointmentRouter {
             scopedApp.delete('/api/appointments/:id', async (request, reply) => {
                 try {
                     const { id } = request.params;
-                    await this.appointmentUseCase.deleteAppointment(id);
+                    const tenantId = request.user.tenantId;
+                    await this.appointmentUseCase.deleteAppointment(id, tenantId);
                     return reply.status(204).send();
                 }
                 catch (error) {

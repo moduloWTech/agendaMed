@@ -37,7 +37,8 @@ class UserRouter {
         app.get('/api/users/family/:patientId', { preHandler: [auth_middleware_1.authMiddleware] }, async (request, reply) => {
             try {
                 const { patientId } = request.params;
-                const users = await this.userUseCase.getCaregivers(patientId);
+                const tenantId = request.user.tenantId;
+                const users = await this.userUseCase.getCaregivers(patientId, tenantId);
                 return reply.status(200).send(users);
             }
             catch (error) {
@@ -45,11 +46,12 @@ class UserRouter {
                 return reply.status(404).send({ error: error.message });
             }
         });
-        // ROTA: Obter Usuário
-        app.get('/api/users/:id', async (request, reply) => {
+        // ROTA: Obter Usuário (Protegida)
+        app.get('/api/users/:id', { preHandler: [auth_middleware_1.authMiddleware] }, async (request, reply) => {
             try {
                 const { id } = request.params;
-                const user = await this.userUseCase.getUserById(id);
+                const tenantId = request.user.tenantId;
+                const user = await this.userUseCase.getUserById(id, tenantId);
                 return reply.status(200).send(user);
             }
             catch (error) {
@@ -57,11 +59,12 @@ class UserRouter {
                 return reply.status(404).send({ error: error.message });
             }
         });
-        // ROTA: Atualizar Usuário
-        app.put('/api/users/:id', async (request, reply) => {
+        // ROTA: Atualizar Usuário (Protegida)
+        app.put('/api/users/:id', { preHandler: [auth_middleware_1.authMiddleware] }, async (request, reply) => {
             try {
                 const { id } = request.params;
-                const user = await this.userUseCase.updateUser(id, request.body);
+                const tenantId = request.user.tenantId;
+                const user = await this.userUseCase.updateUser(id, request.body, tenantId);
                 return reply.status(200).send(user);
             }
             catch (error) {
@@ -70,11 +73,12 @@ class UserRouter {
                 return reply.status(statusCode).send({ error: error.message });
             }
         });
-        // ROTA: Deletar Usuário
-        app.delete('/api/users/:id', async (request, reply) => {
+        // ROTA: Deletar Usuário (Protegida)
+        app.delete('/api/users/:id', { preHandler: [auth_middleware_1.authMiddleware] }, async (request, reply) => {
             try {
                 const { id } = request.params;
-                await this.userUseCase.deleteUser(id);
+                const tenantId = request.user.tenantId;
+                await this.userUseCase.deleteUser(id, tenantId);
                 return reply.status(204).send(); // 204 No Content
             }
             catch (error) {

@@ -54,26 +54,30 @@ class CronService {
                 const { dateStr: medStartDateStr } = this.getFortalezaTime(med.startDate);
                 // 2. Calcula os horários do medicamento para HOJE
                 const todayTimes = this.getTimesForToday(med, todayStr, medStartDateStr);
-                // 3. Se a hora atual está no array de horários de hoje
-                if (todayTimes.includes(currentTimeStr)) {
-                    // 4. Checar se JÁ EXISTE checkin
-                    const alreadyTaken = await prisma_config_1.prisma.medicationHistory.findFirst({
-                        where: {
-                            medicationId: med.id,
-                            date: todayStr,
-                            time: currentTimeStr
-                        }
-                    });
-                    if (!alreadyTaken) {
-                        // 5. Enviar Notificações para todos os usuários do paciente
-                        const userIds = med.patient.users.map((u) => u.id);
-                        if (userIds.length > 0) {
-                            console.log(`[Cron] Disparando Push para ${med.name} (${currentTimeStr}) - Paciente: ${med.patient.name}`);
-                            await push_service_1.pushService.sendNotificationToUsers(userIds, {
-                                title: 'AgendaMed Lembrete ⏰',
-                                body: `Hora de tomar ${med.name} (${med.dosage})\nPaciente: ${med.patient.name}`,
-                                url: '/', // Abre a raiz do PWA
-                            });
+                // 3. Verifica se a hora atual está dentro da janela de insistência
+                for (const scheduledTime of todayTimes) {
+                    const diffMinutes = this.getDiffMinutes(currentTimeStr, scheduledTime);
+                    // Janela de insistência: até 30 min de atraso, disparando a cada 5 min (0, 5, 10, 15, 20, 25, 30)
+                    if (diffMinutes >= 0 && diffMinutes <= 30 && diffMinutes % 5 === 0) {
+                        // 4. Checar se JÁ EXISTE checkin para a hora agendada ORIGINAL
+                        const alreadyTaken = await prisma_config_1.prisma.medicationHistory.findFirst({
+                            where: {
+                                medicationId: med.id,
+                                date: todayStr,
+                                time: scheduledTime
+                            }
+                        });
+                        if (!alreadyTaken) {
+                            // 5. Enviar Notificações para todos os usuários do paciente
+                            const userIds = med.patient.users.map((u) => u.id);
+                            if (userIds.length > 0) {
+                                console.log(`[Cron] Disparando Push para ${med.name} (Hora: ${scheduledTime} | Atraso: ${diffMinutes}m) - Paciente: ${med.patient.name}`);
+                                await push_service_1.pushService.sendNotificationToUsers(userIds, {
+                                    title: 'AgendaMed Lembrete ⏰',
+                                    body: `Atenção: Hora de tomar ${med.name} (${med.dosage})\nPaciente: ${med.patient.name}`,
+                                    url: '/', // Abre a raiz do PWA
+                                });
+                            }
                         }
                     }
                 }
@@ -82,6 +86,13 @@ class CronService {
         catch (error) {
             console.error('[Cron] Falha ao executar verificação de rotina:', error);
         }
+    }
+    getDiffMinutes(currentTime, scheduledTime) {
+        const [cHours, cMinutes] = currentTime.split(':').map(Number);
+        const [sHours, sMinutes] = scheduledTime.split(':').map(Number);
+        const cTotal = cHours * 60 + cMinutes;
+        const sTotal = sHours * 60 + sMinutes;
+        return cTotal - sTotal;
     }
     getTimesForToday(med, todayStr, medStartDateStr) {
         const freq = med.frequency;
