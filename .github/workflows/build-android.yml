@@ -17,20 +17,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
-
       - name: Setup Android Keystore
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -42,17 +28,11 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          # Generate bubblewrap config to avoid interactive prompts
-          mkdir -p ~/.bubblewrap
-          cat <<EOF > ~/.bubblewrap/config.json
-          {
-            "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "/usr/local/lib/android/sdk"
-          }
-          EOF
-
-          # The manifest contains the signingKey path pointing to ./android.keystore
-          bubblewrap build \
+          docker run --rm \
+            -v ${PWD}:/app \
+            -w /app \
+            ghcr.io/googlechromelabs/bubblewrap:latest \
+            build \
             --manifest=twa-manifest.json \
             --keyPassword="$ANDROID_KEYSTORE_PASSWORD" \
             --keyStorePassword="$ANDROID_KEYSTORE_PASSWORD"
