@@ -28,3 +28,5 @@ api/src/generated/prisma/
 .env
 .env.local
 .env.*.local
+android.keystore
+keystore.b64

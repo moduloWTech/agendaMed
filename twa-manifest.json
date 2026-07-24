@@ -1,0 +1,28 @@
+{
+  "packageId": "br.com.moduloweb.agendamed",
+  "host": "agendamed.moduloweb.com.br",
+  "name": "AgendaMed",
+  "launcherName": "AgendaMed",
+  "themeColor": "#14b8a6",
+  "navigationColor": "#ffffff",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#ffffff",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://agendamed.moduloweb.com.br/pwa-512x512.png",
+  "maskableIconUrl": "https://agendamed.moduloweb.com.br/pwa-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://agendamed.moduloweb.com.br/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {}
+}
