@@ -1,5 +1,5 @@
 import { IPatientRepository, IPatientCreate, IPatientUpdate } from '../interfaces/patient.interface';
-import type { Patient } from '../generated/prisma/client';
+import type { Patient, User } from '../generated/prisma/client';
 
 import { prisma } from '../DB/prisma.config';
 
@@ -9,6 +9,7 @@ export class PatientRepository implements IPatientRepository {
       data: {
         name: data.name,
         birthDate: data.birthDate ? new Date(data.birthDate) : null,
+        tenantId: data.tenantId,
         users: {
           connect: { id: data.userId }
         }
@@ -16,29 +17,27 @@ export class PatientRepository implements IPatientRepository {
     });
   }
 
-  async findById(id: string): Promise<Patient | null> {
+  async findById(id: string, tenantId: string): Promise<(Patient & { users?: User[] }) | null> {
     return await prisma.patient.findUnique({
-      where: { id },
+      where: { id, tenantId },
       include: {
         users: true
       }
     });
   }
 
-  async findByUserId(userId: string): Promise<Patient[]> {
+  async findByTenantId(tenantId: string): Promise<Patient[]> {
     return await prisma.patient.findMany({
       where: {
-        users: {
-          some: { id: userId }
-        }
+        tenantId: tenantId
       },
       orderBy: { createdAt: 'desc' }
     });
   }
 
-  async update(id: string, data: IPatientUpdate): Promise<Patient> {
+  async update(id: string, tenantId: string, data: IPatientUpdate): Promise<Patient> {
     return await prisma.patient.update({
-      where: { id },
+      where: { id, tenantId },
       data: {
         ...data,
         birthDate: data.birthDate ? new Date(data.birthDate) : undefined
@@ -46,9 +45,9 @@ export class PatientRepository implements IPatientRepository {
     });
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string, tenantId: string): Promise<void> {
     await prisma.patient.delete({
-      where: { id },
+      where: { id, tenantId },
     });
   }
 }

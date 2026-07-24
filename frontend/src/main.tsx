@@ -5,12 +5,18 @@ import App from './App.tsx'
 import { AuthProvider } from './contexts/AuthContext'
 import { PwaUpdateProvider } from './contexts/PwaUpdateContext'
 
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <PwaUpdateProvider>
-      <AuthProvider>
-      <App />
-      </AuthProvider>
-    </PwaUpdateProvider>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <PwaUpdateProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </PwaUpdateProvider>
+    </GoogleOAuthProvider>
   </StrictMode>,
 )

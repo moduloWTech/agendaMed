@@ -23,8 +23,9 @@ export async function subscribeToPushNotifications() {
   }
 
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js');
-    console.log('Service Worker registrado com sucesso!');
+    // Aguarda o Service Worker ser registrado automaticamente pelo plugin do Vite PWA
+    const registration = await navigator.serviceWorker.ready;
+    console.log('Service Worker recuperado com sucesso!');
 
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {

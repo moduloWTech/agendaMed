@@ -35,7 +35,8 @@ export class UserRouter {
     app.get('/api/users/family/:patientId', { preHandler: [authMiddleware] }, async (request, reply) => {
       try {
         const { patientId } = request.params as { patientId: string };
-        const users = await this.userUseCase.getCaregivers(patientId);
+        const tenantId = (request as any).user.tenantId;
+        const users = await this.userUseCase.getCaregivers(patientId, tenantId);
         return reply.status(200).send(users);
       } catch (error: any) {
         app.log.error(error);
@@ -43,11 +44,12 @@ export class UserRouter {
       }
     });
 
-    // ROTA: Obter Usuário
-    app.get('/api/users/:id', async (request, reply) => {
+    // ROTA: Obter Usuário (Protegida)
+    app.get('/api/users/:id', { preHandler: [authMiddleware] }, async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const user = await this.userUseCase.getUserById(id);
+        const tenantId = (request as any).user.tenantId;
+        const user = await this.userUseCase.getUserById(id, tenantId);
         return reply.status(200).send(user);
       } catch (error: any) {
         app.log.error(error);
@@ -55,11 +57,12 @@ export class UserRouter {
       }
     });
 
-    // ROTA: Atualizar Usuário
-    app.put('/api/users/:id', async (request, reply) => {
+    // ROTA: Atualizar Usuário (Protegida)
+    app.put('/api/users/:id', { preHandler: [authMiddleware] }, async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const user = await this.userUseCase.updateUser(id, request.body);
+        const tenantId = (request as any).user.tenantId;
+        const user = await this.userUseCase.updateUser(id, request.body, tenantId);
         return reply.status(200).send(user);
       } catch (error: any) {
         app.log.error(error);
@@ -68,11 +71,12 @@ export class UserRouter {
       }
     });
 
-    // ROTA: Deletar Usuário
-    app.delete('/api/users/:id', async (request, reply) => {
+    // ROTA: Deletar Usuário (Protegida)
+    app.delete('/api/users/:id', { preHandler: [authMiddleware] }, async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        await this.userUseCase.deleteUser(id);
+        const tenantId = (request as any).user.tenantId;
+        await this.userUseCase.deleteUser(id, tenantId);
         return reply.status(204).send(); // 204 No Content
       } catch (error: any) {
         app.log.error(error);

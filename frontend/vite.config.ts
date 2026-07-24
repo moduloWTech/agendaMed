@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite'
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -42,6 +43,10 @@ export default defineConfig({
             purpose: 'maskable'
           }
         ]
+      },
+      devOptions: {
+        enabled: true,
+        type: 'module',
       }
     })
   ],
@@ -49,5 +54,11 @@ export default defineConfig({
     watch: {
       ignored: ['**/api/**', '**/auth_info_baileys/**']
     }
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/setupTests.ts',
+    include: ['src/**/*.test.tsx', 'src/**/*.test.ts']
   }
 })

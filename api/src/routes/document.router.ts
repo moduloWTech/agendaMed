@@ -12,7 +12,8 @@ export class DocumentRouter {
       // ROTA: Criar Documento
       scopedApp.post('/api/documents', async (request, reply) => {
         try {
-          const document = await this.documentUseCase.createDocument(request.body);
+          const tenantId = (request as any).user.tenantId;
+          const document = await this.documentUseCase.createDocument(tenantId, request.body);
           return reply.status(201).send(document);
         } catch (error: any) {
           app.log.error(error);
@@ -25,7 +26,8 @@ export class DocumentRouter {
       scopedApp.get('/api/patients/:patientId/documents', async (request, reply) => {
         try {
           const { patientId } = request.params as { patientId: string };
-          const documents = await this.documentUseCase.getDocumentsByPatientId(patientId);
+          const tenantId = (request as any).user.tenantId;
+          const documents = await this.documentUseCase.getDocumentsByPatientId(patientId, tenantId);
           return reply.status(200).send(documents);
         } catch (error: any) {
           app.log.error(error);
@@ -37,7 +39,8 @@ export class DocumentRouter {
       scopedApp.get('/api/documents/:id', async (request, reply) => {
         try {
           const { id } = request.params as { id: string };
-          const document = await this.documentUseCase.getDocumentById(id);
+          const tenantId = (request as any).user.tenantId;
+          const document = await this.documentUseCase.getDocumentById(id, tenantId);
           return reply.status(200).send(document);
         } catch (error: any) {
           app.log.error(error);
@@ -49,7 +52,8 @@ export class DocumentRouter {
       scopedApp.put('/api/documents/:id', async (request, reply) => {
         try {
           const { id } = request.params as { id: string };
-          const document = await this.documentUseCase.updateDocument(id, request.body);
+          const tenantId = (request as any).user.tenantId;
+          const document = await this.documentUseCase.updateDocument(id, tenantId, request.body);
           return reply.status(200).send(document);
         } catch (error: any) {
           app.log.error(error);
@@ -62,7 +66,8 @@ export class DocumentRouter {
       scopedApp.delete('/api/documents/:id', async (request, reply) => {
         try {
           const { id } = request.params as { id: string };
-          await this.documentUseCase.deleteDocument(id);
+          const tenantId = (request as any).user.tenantId;
+          await this.documentUseCase.deleteDocument(id, tenantId);
           return reply.status(204).send();
         } catch (error: any) {
           app.log.error(error);

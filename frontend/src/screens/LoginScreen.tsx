@@ -3,7 +3,7 @@ import LoginHeaderImg from '../assets/login-header.png';
 
 export function LoginScreen() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center relative overflow-hidden animate-in fade-in duration-500">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center relative overflow-x-hidden overflow-y-auto animate-in fade-in duration-500">
       
       {/* Imagem de Fundo/Cabeçalho */}
       <div className="absolute top-0 w-full max-w-lg h-[45vh] flex justify-center items-end overflow-hidden pb-8 pointer-events-none">

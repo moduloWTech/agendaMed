@@ -14,6 +14,7 @@ export class PatientUseCase {
       name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
       birthDate: z.string().datetime().optional().or(z.date().optional()),
       userId: z.string().uuid('ID do cuidador (userId) inválido'),
+      tenantId: z.string().uuid('TenantId inválido'),
     });
 
     const parsedData = schema.parse(data);
@@ -27,19 +28,19 @@ export class PatientUseCase {
     return await this.patientRepository.create(parsedData);
   }
 
-  async getPatientById(id: string): Promise<Patient> {
-    const patient = await this.patientRepository.findById(id);
+  async getPatientById(id: string, tenantId: string): Promise<Patient> {
+    const patient = await this.patientRepository.findById(id, tenantId);
     if (!patient) {
       throw new Error('Paciente não encontrado.');
     }
     return patient;
   }
 
-  async getPatientsByUserId(userId: string): Promise<Patient[]> {
-    return await this.patientRepository.findByUserId(userId);
+  async getPatientsByTenantId(tenantId: string): Promise<Patient[]> {
+    return await this.patientRepository.findByTenantId(tenantId);
   }
 
-  async updatePatient(id: string, data: any): Promise<Patient> {
+  async updatePatient(id: string, tenantId: string, data: any): Promise<Patient> {
     const schema = z.object({
       name: z.string().min(2, 'O nome deve ter no mínimo 2 caracteres').optional(),
       birthDate: z.string().datetime().optional().or(z.date().optional()),
@@ -47,20 +48,20 @@ export class PatientUseCase {
 
     const parsedData = schema.parse(data);
 
-    const patient = await this.patientRepository.findById(id);
+    const patient = await this.patientRepository.findById(id, tenantId);
     if (!patient) {
       throw new Error('Paciente não encontrado.');
     }
 
-    return await this.patientRepository.update(id, parsedData);
+    return await this.patientRepository.update(id, tenantId, parsedData);
   }
 
-  async deletePatient(id: string): Promise<void> {
-    const patient = await this.patientRepository.findById(id);
+  async deletePatient(id: string, tenantId: string): Promise<void> {
+    const patient = await this.patientRepository.findById(id, tenantId);
     if (!patient) {
       throw new Error('Paciente não encontrado.');
     }
 
-    await this.patientRepository.delete(id);
+    await this.patientRepository.delete(id, tenantId);
   }
 }

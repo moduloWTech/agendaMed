@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { MedicationUseCase } from '../usecases/medication.usecase';
 import { authMiddleware } from '../middlewares/auth.middleware';
+import { IMedicationCreateData, IMedicationUpdateData, ICheckinData } from '../types/medication.types';
 
 export class MedicationRouter {
   constructor(private medicationUseCase: MedicationUseCase) {}
@@ -12,7 +13,8 @@ export class MedicationRouter {
       // ROTA: Criar Medicamento
       scopedApp.post('/api/medications', async (request, reply) => {
         try {
-          const medication = await this.medicationUseCase.createMedication(request.body);
+          const tenantId = (request as any).user.tenantId;
+          const medication = await this.medicationUseCase.createMedication(tenantId, request.body as IMedicationCreateData);
           return reply.status(201).send(medication);
         } catch (error: any) {
           app.log.error(error);
@@ -25,7 +27,8 @@ export class MedicationRouter {
       scopedApp.get('/api/patients/:patientId/medications', async (request, reply) => {
         try {
           const { patientId } = request.params as { patientId: string };
-          const medications = await this.medicationUseCase.getMedicationsByPatientId(patientId);
+          const tenantId = (request as any).user.tenantId;
+          const medications = await this.medicationUseCase.getMedicationsByPatientId(patientId, tenantId);
           return reply.status(200).send(medications);
         } catch (error: any) {
           app.log.error(error);
@@ -37,7 +40,8 @@ export class MedicationRouter {
       scopedApp.get('/api/medications/:id', async (request, reply) => {
         try {
           const { id } = request.params as { id: string };
-          const medication = await this.medicationUseCase.getMedicationById(id);
+          const tenantId = (request as any).user.tenantId;
+          const medication = await this.medicationUseCase.getMedicationById(id, tenantId);
           return reply.status(200).send(medication);
         } catch (error: any) {
           app.log.error(error);
@@ -52,7 +56,8 @@ export class MedicationRouter {
             return reply.status(403).send({ error: 'Apenas administradores podem editar medicamentos.' });
           }
           const { id } = request.params as { id: string };
-          const medication = await this.medicationUseCase.updateMedication(id, request.body);
+          const tenantId = (request as any).user.tenantId;
+          const medication = await this.medicationUseCase.updateMedication(id, tenantId, request.body as IMedicationUpdateData);
           return reply.status(200).send(medication);
         } catch (error: any) {
           app.log.error(error);
@@ -68,7 +73,8 @@ export class MedicationRouter {
             return reply.status(403).send({ error: 'Apenas administradores podem excluir medicamentos.' });
           }
           const { id } = request.params as { id: string };
-          await this.medicationUseCase.deleteMedication(id);
+          const tenantId = (request as any).user.tenantId;
+          await this.medicationUseCase.deleteMedication(id, tenantId);
           return reply.status(204).send();
         } catch (error: any) {
           app.log.error(error);
@@ -81,9 +87,10 @@ export class MedicationRouter {
         try {
           const { patientId } = request.params as { patientId: string };
           const { date } = request.query as { date: string };
+          const tenantId = (request as any).user.tenantId;
           if (!date) return reply.status(400).send({ error: 'Data é obrigatória (date=YYYY-MM-DD)' });
 
-          const history = await this.medicationUseCase.getHistory(patientId, date);
+          const history = await this.medicationUseCase.getHistory(patientId, date, tenantId);
           return reply.status(200).send(history);
         } catch (error: any) {
           app.log.error(error);
@@ -95,7 +102,8 @@ export class MedicationRouter {
       scopedApp.post('/api/medications/history/toggle', async (request: any, reply) => {
         try {
           const userId = request.user.id;
-          await this.medicationUseCase.toggleCheckin(userId, request.body);
+          const tenantId = request.user.tenantId;
+          await this.medicationUseCase.toggleCheckin(userId, tenantId, request.body as ICheckinData);
           return reply.status(200).send({ success: true });
         } catch (error: any) {
           app.log.error(error);

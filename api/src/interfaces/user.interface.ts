@@ -6,6 +6,8 @@ export interface IUserCreate {
   email?: string;
   role?: string;
   patientId?: string;
+  tenantId?: string;
+  passwordHash?: string;
 }
 
 export interface IUserUpdate {
@@ -23,4 +25,5 @@ export interface IUserRepository {
   findByPatientId(patientId: string): Promise<User[]>;
   update(id: string, data: IUserUpdate): Promise<User>;
   delete(id: string): Promise<void>;
+  createAdminWithTenant(userData: any, tenantName: string): Promise<{ user: User, tenant: any }>;
 }
