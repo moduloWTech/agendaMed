@@ -31,11 +31,6 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      - name: Configure Bubblewrap
-        run: |
-          mkdir -p ~/.bubblewrap
-          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_SDK_ROOT\"}" > ~/.bubblewrap/config.json
-
       - name: Setup Android Keystore
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -48,7 +43,7 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           # The manifest contains the signingKey path pointing to ./android.keystore
-          bubblewrap build \
+          yes | bubblewrap build \
             --manifest=twa-manifest.json \
             --keyPassword="$ANDROID_KEYSTORE_PASSWORD" \
             --keyStorePassword="$ANDROID_KEYSTORE_PASSWORD"
