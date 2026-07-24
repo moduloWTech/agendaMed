@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { InviteCaregiverModal } from './InviteCaregiverModal';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -29,16 +29,16 @@ describe('InviteCaregiverModal', () => {
 
   it('formats phone input correctly', () => {
     renderWithContext(<InviteCaregiverModal onClose={vi.fn()} onSuccess={vi.fn()} />);
-    
+
     const phoneInput = screen.getByPlaceholderText(/\(DD\) 9XXXX-XXXX/i);
     fireEvent.change(phoneInput, { target: { value: '11988887777' } });
-    
+
     expect((phoneInput as HTMLInputElement).value).toBe('(11) 98888-7777');
   });
 
   it('shows error if name is too short', async () => {
     renderWithContext(<InviteCaregiverModal onClose={vi.fn()} onSuccess={vi.fn()} />);
-    
+
     const nameInput = screen.getByPlaceholderText(/Nome do cuidador/i);
     const phoneInput = screen.getByPlaceholderText(/\(DD\) 9XXXX-XXXX/i);
     const submitBtn = screen.getByRole('button', { name: /Enviar Convite/i });

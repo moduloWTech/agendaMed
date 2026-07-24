@@ -104,7 +104,7 @@ export class App {
 
     // Injeção de Dependências Manual (OOP) - APPOINTMENT
     const appointmentRepository = new AppointmentRepository();
-    const appointmentUseCase = new AppointmentUseCase(appointmentRepository);
+    const appointmentUseCase = new AppointmentUseCase(appointmentRepository, patientRepository);
     const appointmentRouter = new AppointmentRouter(appointmentUseCase);
 
     // Injeção de Dependências Manual (OOP) - AUTH

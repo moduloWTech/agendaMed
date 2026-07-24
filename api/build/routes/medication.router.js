@@ -13,7 +13,8 @@ class MedicationRouter {
             // ROTA: Criar Medicamento
             scopedApp.post('/api/medications', async (request, reply) => {
                 try {
-                    const medication = await this.medicationUseCase.createMedication(request.body);
+                    const tenantId = request.user.tenantId;
+                    const medication = await this.medicationUseCase.createMedication(tenantId, request.body);
                     return reply.status(201).send(medication);
                 }
                 catch (error) {
@@ -26,7 +27,8 @@ class MedicationRouter {
             scopedApp.get('/api/patients/:patientId/medications', async (request, reply) => {
                 try {
                     const { patientId } = request.params;
-                    const medications = await this.medicationUseCase.getMedicationsByPatientId(patientId);
+                    const tenantId = request.user.tenantId;
+                    const medications = await this.medicationUseCase.getMedicationsByPatientId(patientId, tenantId);
                     return reply.status(200).send(medications);
                 }
                 catch (error) {
@@ -38,7 +40,8 @@ class MedicationRouter {
             scopedApp.get('/api/medications/:id', async (request, reply) => {
                 try {
                     const { id } = request.params;
-                    const medication = await this.medicationUseCase.getMedicationById(id);
+                    const tenantId = request.user.tenantId;
+                    const medication = await this.medicationUseCase.getMedicationById(id, tenantId);
                     return reply.status(200).send(medication);
                 }
                 catch (error) {
@@ -53,7 +56,8 @@ class MedicationRouter {
                         return reply.status(403).send({ error: 'Apenas administradores podem editar medicamentos.' });
                     }
                     const { id } = request.params;
-                    const medication = await this.medicationUseCase.updateMedication(id, request.body);
+                    const tenantId = request.user.tenantId;
+                    const medication = await this.medicationUseCase.updateMedication(id, tenantId, request.body);
                     return reply.status(200).send(medication);
                 }
                 catch (error) {
@@ -69,7 +73,8 @@ class MedicationRouter {
                         return reply.status(403).send({ error: 'Apenas administradores podem excluir medicamentos.' });
                     }
                     const { id } = request.params;
-                    await this.medicationUseCase.deleteMedication(id);
+                    const tenantId = request.user.tenantId;
+                    await this.medicationUseCase.deleteMedication(id, tenantId);
                     return reply.status(204).send();
                 }
                 catch (error) {
@@ -82,9 +87,10 @@ class MedicationRouter {
                 try {
                     const { patientId } = request.params;
                     const { date } = request.query;
+                    const tenantId = request.user.tenantId;
                     if (!date)
                         return reply.status(400).send({ error: 'Data é obrigatória (date=YYYY-MM-DD)' });
-                    const history = await this.medicationUseCase.getHistory(patientId, date);
+                    const history = await this.medicationUseCase.getHistory(patientId, date, tenantId);
                     return reply.status(200).send(history);
                 }
                 catch (error) {
@@ -96,7 +102,8 @@ class MedicationRouter {
             scopedApp.post('/api/medications/history/toggle', async (request, reply) => {
                 try {
                     const userId = request.user.id;
-                    await this.medicationUseCase.toggleCheckin(userId, request.body);
+                    const tenantId = request.user.tenantId;
+                    await this.medicationUseCase.toggleCheckin(userId, tenantId, request.body);
                     return reply.status(200).send({ success: true });
                 }
                 catch (error) {

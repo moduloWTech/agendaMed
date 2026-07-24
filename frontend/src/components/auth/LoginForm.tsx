@@ -88,7 +88,6 @@ export function LoginForm() {
             shape="pill"
             theme="filled_blue"
             size="large"
-            locale="pt-BR"
           />
           <div className="relative flex py-2 items-center">
             <div className="flex-grow border-t border-gray-200"></div>
