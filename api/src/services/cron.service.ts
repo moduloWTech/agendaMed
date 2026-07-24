@@ -55,28 +55,33 @@ export class CronService {
         // 2. Calcula os horários do medicamento para HOJE
         const todayTimes = this.getTimesForToday(med, todayStr, medStartDateStr);
         
-        // 3. Se a hora atual está no array de horários de hoje
-        if (todayTimes.includes(currentTimeStr)) {
+        // 3. Verifica se a hora atual está dentro da janela de insistência
+        for (const scheduledTime of todayTimes) {
+          const diffMinutes = this.getDiffMinutes(currentTimeStr, scheduledTime);
           
-          // 4. Checar se JÁ EXISTE checkin
-          const alreadyTaken = await prisma.medicationHistory.findFirst({
-            where: {
-              medicationId: med.id,
-              date: todayStr,
-              time: currentTimeStr
-            }
-          });
+          // Janela de insistência: até 30 min de atraso, disparando a cada 5 min (0, 5, 10, 15, 20, 25, 30)
+          if (diffMinutes >= 0 && diffMinutes <= 30 && diffMinutes % 5 === 0) {
+            
+            // 4. Checar se JÁ EXISTE checkin para a hora agendada ORIGINAL
+            const alreadyTaken = await prisma.medicationHistory.findFirst({
+              where: {
+                medicationId: med.id,
+                date: todayStr,
+                time: scheduledTime
+              }
+            });
 
-          if (!alreadyTaken) {
-            // 5. Enviar Notificações para todos os usuários do paciente
-            const userIds = med.patient.users.map((u: any) => u.id);
-            if (userIds.length > 0) {
-              console.log(`[Cron] Disparando Push para ${med.name} (${currentTimeStr}) - Paciente: ${med.patient.name}`);
-              await pushService.sendNotificationToUsers(userIds, {
-                title: 'AgendaMed Lembrete ⏰',
-                body: `Hora de tomar ${med.name} (${med.dosage})\nPaciente: ${med.patient.name}`,
-                url: '/', // Abre a raiz do PWA
-              });
+            if (!alreadyTaken) {
+              // 5. Enviar Notificações para todos os usuários do paciente
+              const userIds = med.patient.users.map((u: any) => u.id);
+              if (userIds.length > 0) {
+                console.log(`[Cron] Disparando Push para ${med.name} (Hora: ${scheduledTime} | Atraso: ${diffMinutes}m) - Paciente: ${med.patient.name}`);
+                await pushService.sendNotificationToUsers(userIds, {
+                  title: 'AgendaMed Lembrete ⏰',
+                  body: `Atenção: Hora de tomar ${med.name} (${med.dosage})\nPaciente: ${med.patient.name}`,
+                  url: '/', // Abre a raiz do PWA
+                });
+              }
             }
           }
         }
@@ -84,6 +89,16 @@ export class CronService {
     } catch (error) {
       console.error('[Cron] Falha ao executar verificação de rotina:', error);
     }
+  }
+
+  private getDiffMinutes(currentTime: string, scheduledTime: string): number {
+    const [cHours, cMinutes] = currentTime.split(':').map(Number);
+    const [sHours, sMinutes] = scheduledTime.split(':').map(Number);
+    
+    const cTotal = cHours * 60 + cMinutes;
+    const sTotal = sHours * 60 + sMinutes;
+    
+    return cTotal - sTotal;
   }
 
   private getTimesForToday(med: any, todayStr: string, medStartDateStr: string): string[] {
