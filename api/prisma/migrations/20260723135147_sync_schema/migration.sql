@@ -6,7 +6,7 @@
 
 */
 -- DropForeignKey
-ALTER TABLE "Patient" DROP CONSTRAINT "Patient_userId_fkey";
+ALTER TABLE "Patient" DROP CONSTRAINT IF EXISTS "Patient_userId_fkey";
 
 -- AlterTable
 ALTER TABLE "Medication" ADD COLUMN     "instructions" TEXT NOT NULL,
