@@ -34,6 +34,21 @@ export class AuthRouter {
       }
     });
 
+    // 2.5 Login B2C com Google
+    app.post('/api/auth/google', async (request, reply) => {
+      try {
+        const body = request.body as { credential?: string };
+        if (!body.credential) {
+          throw new Error('Credential ausente.');
+        }
+        const result = await this.authUseCase.loginWithGoogle(body.credential);
+        return reply.status(200).send(result);
+      } catch (error: any) {
+        app.log.error(error);
+        return reply.status(401).send({ error: error.message });
+      }
+    });
+
     // 3. Aceitar Convite (Cuidador)
     app.post('/api/auth/accept-invite', async (request, reply) => {
       try {

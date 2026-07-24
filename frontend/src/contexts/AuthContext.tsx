@@ -20,6 +20,7 @@ interface AuthContextData {
   activePatient: Patient | null;
   isAuthenticated: boolean;
   login: (email: string, password?: string) => Promise<void>;
+  loginWithGoogle: (credential: string) => Promise<void>;
   register: (data: { name: string, email: string, phoneWhats: string, password?: string }) => Promise<void>;
   logout: () => void;
   setActivePatient: (patient: Patient | null) => void;
@@ -113,6 +114,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const loginWithGoogle = async (credential: string) => {
+    try {
+      const response = await api.post('/api/auth/google', { credential });
+      
+      localStorage.setItem('@agendaMed:token', response.accessToken);
+      localStorage.setItem('@agendaMed:user', JSON.stringify(response.user));
+      setUser(response.user);
+
+      // Busca o paciente assim que loga
+      const patients = await api.get(`/api/patients`);
+      if (patients && patients.length > 0) {
+        setActivePatient(patients[0]);
+      } else {
+        console.warn('Nenhum paciente encontrado para o usuário no login com Google.');
+        setActivePatient(null);
+      }
+
+      subscribeToPushNotifications();
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
   const register = async (data: { name: string, email: string, phoneWhats: string, password?: string }) => {
     try {
       const response = await api.post('/api/auth/register', data);
@@ -138,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, activePatient, isAuthenticated: !!user, login, register, logout, setActivePatient, isLoading }}>
+    <AuthContext.Provider value={{ user, activePatient, isAuthenticated: !!user, login, loginWithGoogle, register, logout, setActivePatient, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

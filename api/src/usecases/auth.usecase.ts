@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import type { User } from '../generated/prisma/client';
 import { IRegisterData, ILoginData, IAcceptInviteData } from '../types/auth.types';
-
+import { OAuth2Client } from 'google-auth-library';
 import bcrypt from 'bcrypt';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
@@ -66,6 +66,55 @@ export class AuthUseCase {
     const isMatch = await bcrypt.compare(parsed.password, user.passwordHash);
     if (!isMatch) {
       throw new Error('E-mail ou senha incorretos.');
+    }
+
+    const accessToken = jwt.sign(
+      { id: user.id, role: user.role, tenantId: user.tenantId },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    return { user, accessToken };
+  }
+
+  async loginWithGoogle(credential: string): Promise<{ user: User, accessToken: string }> {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) throw new Error('Servidor não configurado para Login com Google.');
+
+    const client = new OAuth2Client(clientId);
+    
+    let payload;
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: clientId,
+      });
+      payload = ticket.getPayload();
+    } catch (e: any) {
+      throw new Error('Token do Google inválido ou expirado.');
+    }
+
+    if (!payload || !payload.email) {
+      throw new Error('Não foi possível obter o e-mail do Google.');
+    }
+
+    const { email, name } = payload;
+    
+    // Procura usuário
+    let user = await this.userRepository.findByEmail(email);
+
+    if (!user) {
+      // Cria usuário Admin B2C automaticamente (Não exige senha)
+      const tenantName = `Família de ${name?.split(' ')[0] || 'Novo Usuário'}`;
+      const dummyPhone = `google-${Date.now()}`;
+      
+      const result = await this.userRepository.createAdminWithTenant({
+        name: name || 'Usuário do Google',
+        email: email,
+        phoneWhats: dummyPhone,
+        passwordHash: null // Não tem senha!
+      }, tenantName);
+      user = result.user;
     }
 
     const accessToken = jwt.sign(
