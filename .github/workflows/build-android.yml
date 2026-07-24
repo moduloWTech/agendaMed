@@ -28,7 +28,7 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          docker run --rm \
+          yes | docker run -i --rm \
             -v ${PWD}:/app \
             -w /app \
             ghcr.io/googlechromelabs/bubblewrap:latest \
