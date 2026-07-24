@@ -91,7 +91,7 @@ class App {
         const documentRouter = new document_router_1.DocumentRouter(documentUseCase);
         // Injeção de Dependências Manual (OOP) - APPOINTMENT
         const appointmentRepository = new appointment_repository_1.AppointmentRepository();
-        const appointmentUseCase = new appointment_usecase_1.AppointmentUseCase(appointmentRepository);
+        const appointmentUseCase = new appointment_usecase_1.AppointmentUseCase(appointmentRepository, patientRepository);
         const appointmentRouter = new appointment_router_1.AppointmentRouter(appointmentUseCase);
         // Injeção de Dependências Manual (OOP) - AUTH
         const authUseCase = new auth_usecase_1.AuthUseCase(userRepository);

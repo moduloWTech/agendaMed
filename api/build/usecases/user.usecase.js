@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserUseCase = void 0;
 const zod_1 = require("zod");
-const whatsapp_service_1 = require("../services/whatsapp.service");
 class UserUseCase {
     userRepository;
     constructor(userRepository) {
@@ -30,14 +29,17 @@ class UserUseCase {
         // Regras de negócio passaram, enviar para o repositório salvar
         return await this.userRepository.create(parsedData);
     }
-    async getUserById(id) {
+    async getUserById(id, tenantId) {
         const user = await this.userRepository.findById(id);
         if (!user) {
             throw new Error('Usuário não encontrado.');
         }
+        if (tenantId && user.tenantId !== tenantId) {
+            throw new Error('Acesso negado. O usuário não pertence à sua família.');
+        }
         return user;
     }
-    async updateUser(id, data) {
+    async updateUser(id, data, tenantId) {
         const schema = zod_1.z.object({
             phoneWhats: zod_1.z.string().optional(),
             name: zod_1.z.string().min(2, 'O nome deve ter no mínimo 2 caracteres').optional(),
@@ -49,12 +51,18 @@ class UserUseCase {
         if (!user) {
             throw new Error('Usuário não encontrado.');
         }
+        if (tenantId && user.tenantId !== tenantId) {
+            throw new Error('Acesso negado. O usuário não pertence à sua família.');
+        }
         return await this.userRepository.update(id, parsedData);
     }
-    async deleteUser(id) {
+    async deleteUser(id, tenantId) {
         const user = await this.userRepository.findById(id);
         if (!user) {
             throw new Error('Usuário não encontrado.');
+        }
+        if (tenantId && user.tenantId !== tenantId) {
+            throw new Error('Acesso negado. O usuário não pertence à sua família.');
         }
         await this.userRepository.delete(id);
     }
@@ -68,34 +76,40 @@ class UserUseCase {
         const parsedData = schema.parse(data);
         // Valida admin
         const admin = await this.userRepository.findById(adminId);
-        if (!admin || admin.role !== 'ADMIN') {
-            throw new Error('Apenas administradores podem convidar cuidadores.');
+        if (!admin || admin.role !== 'ADMIN' || !admin.tenantId) {
+            throw new Error('Apenas administradores de família podem convidar cuidadores.');
         }
         // Verifica se já existe
         let user = await this.userRepository.findByPhoneWhats(parsedData.phoneWhats);
         if (user) {
-            // Se existir, apenas atualiza para vincular ao paciente (se precisar)
             throw new Error('Este número já está cadastrado no sistema.');
         }
-        // Cria o usuário Cuidador
-        user = await this.userRepository.create({
-            phoneWhats: parsedData.phoneWhats,
-            name: parsedData.name,
-            role: 'CARE_GIVER',
-            patientId: parsedData.patientId
-        });
-        // Envia WhatsApp
-        const message = `Olá, ${parsedData.name}! 👋\n\nVocê foi convidado(a) por *${admin.name || 'um administrador'}* para fazer parte da equipe de cuidados de *${parsedData.patientName}* no aplicativo *AgendaMed*.\n\nAcesse o link abaixo para entrar no sistema:\n${process.env.FRONTEND_URL || 'http://localhost:5173'}\n\nLá, basta digitar o seu número de telefone para acessar a conta.`;
-        try {
-            await whatsapp_service_1.whatsappService.sendMessage(parsedData.phoneWhats, message);
+        // Gera Token JWT para o convite (duração 48 horas)
+        const jwt = require('jsonwebtoken');
+        const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
+        const inviteToken = jwt.sign({
+            tenantId: admin.tenantId,
+            patientId: parsedData.patientId,
+            invitedPhone: parsedData.phoneWhats,
+            invitedName: parsedData.name
+        }, JWT_SECRET, { expiresIn: '48h' });
+        // Monta a mensagem de WhatsApp
+        const message = `Olá, ${parsedData.name}! 👋\n\nVocê foi convidado(a) por *${admin.name || 'um administrador'}* para fazer parte da equipe de cuidados de *${parsedData.patientName}* no aplicativo *AgendaMed*.\n\nAcesse o link abaixo para criar sua conta de cuidador(a):\n${process.env.FRONTEND_URL || 'http://localhost:5173'}/convite?token=${inviteToken}`;
+        // Formata o número (remover caracteres especiais e adicionar 55 se precisar)
+        let numericPhone = parsedData.phoneWhats.replace(/\D/g, '');
+        if (numericPhone.length === 10 || numericPhone.length === 11) {
+            numericPhone = `55${numericPhone}`;
         }
-        catch (e) {
-            console.error('Erro ao enviar mensagem de convite no WhatsApp', e);
-        }
-        return user;
+        // Gera o Deep Link
+        const inviteLink = `https://wa.me/${numericPhone}?text=${encodeURIComponent(message)}`;
+        return { success: true, message: 'Convite gerado com sucesso.', inviteLink };
     }
-    async getCaregivers(patientId) {
-        return await this.userRepository.findByPatientId(patientId);
+    async getCaregivers(patientId, tenantId) {
+        const users = await this.userRepository.findByPatientId(patientId);
+        if (tenantId) {
+            return users.filter(u => u.tenantId === tenantId);
+        }
+        return users;
     }
     async changeUserRole(adminId, targetUserId, newRole) {
         const schema = zod_1.z.object({
@@ -112,6 +126,9 @@ class UserUseCase {
         const targetUser = await this.userRepository.findById(targetUserId);
         if (!targetUser) {
             throw new Error('Usuário alvo não encontrado.');
+        }
+        if (targetUser.tenantId !== admin.tenantId) {
+            throw new Error('O usuário não pertence à sua família.');
         }
         return await this.userRepository.update(targetUserId, { role: parsedData.newRole });
     }

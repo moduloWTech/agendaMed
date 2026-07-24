@@ -12,7 +12,7 @@ class MedicationUseCase {
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
     }
-    async createMedication(data) {
+    async createMedication(tenantId, data) {
         const schema = zod_1.z.object({
             name: zod_1.z.string().min(2, 'O nome deve ter no mínimo 2 caracteres'),
             dosage: zod_1.z.string().min(1, 'A dosagem é obrigatória'),
@@ -26,8 +26,8 @@ class MedicationUseCase {
             photoUrl: zod_1.z.string().nullable().optional()
         });
         const parsed = schema.parse(data);
-        // Regra de Negócio: O paciente precisa existir
-        const patientExists = await this.patientRepository.findById(parsed.patientId);
+        // Regra de Negócio: O paciente precisa existir e pertencer ao Tenant
+        const patientExists = await this.patientRepository.findById(parsed.patientId, tenantId);
         if (!patientExists) {
             throw new Error('Paciente associado não encontrado na plataforma.');
         }
@@ -43,17 +43,25 @@ class MedicationUseCase {
             photoUrl: parsed.photoUrl
         });
     }
-    async getMedicationById(id) {
+    async getMedicationById(id, tenantId) {
         const medication = await this.medicationRepository.findById(id);
         if (!medication) {
             throw new Error('Medicamento não encontrado.');
         }
+        const patientExists = await this.patientRepository.findById(medication.patientId, tenantId);
+        if (!patientExists) {
+            throw new Error('Medicamento não encontrado.');
+        }
         return medication;
     }
-    async getMedicationsByPatientId(patientId) {
+    async getMedicationsByPatientId(patientId, tenantId) {
+        const patientExists = await this.patientRepository.findById(patientId, tenantId);
+        if (!patientExists) {
+            throw new Error('Paciente não encontrado ou acesso negado.');
+        }
         return await this.medicationRepository.findByPatientId(patientId);
     }
-    async updateMedication(id, data) {
+    async updateMedication(id, tenantId, data) {
         const schema = zod_1.z.object({
             name: zod_1.z.string().min(2).optional(),
             dosage: zod_1.z.string().min(1).optional(),
@@ -70,19 +78,31 @@ class MedicationUseCase {
         if (!medication) {
             throw new Error('Medicamento não encontrado.');
         }
+        const patientExists = await this.patientRepository.findById(medication.patientId, tenantId);
+        if (!patientExists) {
+            throw new Error('Medicamento não encontrado.');
+        }
         return await this.medicationRepository.update(id, parsedData);
     }
-    async deleteMedication(id) {
+    async deleteMedication(id, tenantId) {
         const medication = await this.medicationRepository.findById(id);
         if (!medication) {
             throw new Error('Medicamento não encontrado.');
         }
+        const patientExists = await this.patientRepository.findById(medication.patientId, tenantId);
+        if (!patientExists) {
+            throw new Error('Medicamento não encontrado.');
+        }
         await this.medicationRepository.delete(id);
     }
-    async getHistory(patientId, date) {
+    async getHistory(patientId, date, tenantId) {
+        const patientExists = await this.patientRepository.findById(patientId, tenantId);
+        if (!patientExists) {
+            throw new Error('Paciente não encontrado ou acesso negado.');
+        }
         return await this.medicationRepository.getHistory(patientId, date);
     }
-    async toggleCheckin(userId, data) {
+    async toggleCheckin(userId, tenantId, data) {
         const schema = zod_1.z.object({
             medicationId: zod_1.z.string().uuid(),
             patientId: zod_1.z.string().uuid(),
@@ -90,11 +110,15 @@ class MedicationUseCase {
             time: zod_1.z.string()
         });
         const parsed = schema.parse(data);
+        const patientExists = await this.patientRepository.findById(parsed.patientId, tenantId);
+        if (!patientExists) {
+            throw new Error('Paciente não encontrado ou acesso negado.');
+        }
         const wasCreated = await this.medicationRepository.toggleHistory(userId, parsed);
         if (wasCreated) {
             try {
                 const medication = await this.medicationRepository.findById(parsed.medicationId);
-                const patient = await this.patientRepository.findById(parsed.patientId);
+                const patient = await this.patientRepository.findById(parsed.patientId, tenantId);
                 const userWhoDidIt = await this.userRepository.findById(userId);
                 const userName = userWhoDidIt?.name || 'Um cuidador';
                 if (patient && medication) {

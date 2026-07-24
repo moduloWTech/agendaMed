@@ -8,42 +8,41 @@ class PatientRepository {
             data: {
                 name: data.name,
                 birthDate: data.birthDate ? new Date(data.birthDate) : null,
+                tenantId: data.tenantId,
                 users: {
                     connect: { id: data.userId }
                 }
             },
         });
     }
-    async findById(id) {
+    async findById(id, tenantId) {
         return await prisma_config_1.prisma.patient.findUnique({
-            where: { id },
+            where: { id, tenantId },
             include: {
                 users: true
             }
         });
     }
-    async findByUserId(userId) {
+    async findByTenantId(tenantId) {
         return await prisma_config_1.prisma.patient.findMany({
             where: {
-                users: {
-                    some: { id: userId }
-                }
+                tenantId: tenantId
             },
             orderBy: { createdAt: 'desc' }
         });
     }
-    async update(id, data) {
+    async update(id, tenantId, data) {
         return await prisma_config_1.prisma.patient.update({
-            where: { id },
+            where: { id, tenantId },
             data: {
                 ...data,
                 birthDate: data.birthDate ? new Date(data.birthDate) : undefined
             },
         });
     }
-    async delete(id) {
+    async delete(id, tenantId) {
         await prisma_config_1.prisma.patient.delete({
-            where: { id },
+            where: { id, tenantId },
         });
     }
 }

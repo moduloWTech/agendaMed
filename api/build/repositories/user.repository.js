@@ -10,6 +10,12 @@ class UserRepository {
             email: data.email || null,
             role: data.role || 'CARE_GIVER',
         };
+        if (data.tenantId) {
+            payload.tenantId = data.tenantId;
+        }
+        if (data.passwordHash) {
+            payload.passwordHash = data.passwordHash;
+        }
         if (data.patientId) {
             payload.patients = {
                 connect: { id: data.patientId }
@@ -52,6 +58,30 @@ class UserRepository {
     async delete(id) {
         await prisma_config_1.prisma.user.delete({
             where: { id },
+        });
+    }
+    async createAdminWithTenant(userData, tenantName) {
+        return await prisma_config_1.prisma.$transaction(async (tx) => {
+            const user = await tx.user.create({
+                data: {
+                    name: userData.name,
+                    email: userData.email,
+                    phoneWhats: userData.phoneWhats,
+                    passwordHash: userData.passwordHash,
+                    role: 'ADMIN',
+                }
+            });
+            const tenant = await tx.tenant.create({
+                data: {
+                    name: tenantName,
+                    ownerId: user.id,
+                }
+            });
+            const updatedUser = await tx.user.update({
+                where: { id: user.id },
+                data: { tenantId: tenant.id }
+            });
+            return { user: updatedUser, tenant };
         });
     }
 }
