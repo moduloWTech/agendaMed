@@ -44,7 +44,7 @@ jobs:
             -e BUBBLEWRAP_KEY_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
             --entrypoint /bin/sh \
             ghcr.io/googlechromelabs/bubblewrap:latest \
-            -c "for i in 1 2 3 4 5; do echo y; sleep 2; done | bubblewrap build --manifest=twa-manifest.json"
+            -c "printf 'y\n\n\ny\ny\ny\ny\ny\ny\ny\n' | bubblewrap build --manifest=twa-manifest.json"
             
           # Fix permissions because Docker creates files as root
           sudo chown -R $USER:$USER .
