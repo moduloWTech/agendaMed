@@ -44,9 +44,12 @@ jobs:
             --manifest=twa-manifest.json \
             --keyPassword="$ANDROID_KEYSTORE_PASSWORD" \
             --keyStorePassword="$ANDROID_KEYSTORE_PASSWORD"
+            
+          echo "Build finished. Looking for .aab files:"
+          find . -name "*.aab"
 
       - name: Upload Android App Artifact
         uses: actions/upload-artifact@v4
         with:
           name: agendamed-android-app
-          path: app-release-bundle.aab
+          path: '**/*.aab'
