@@ -36,30 +36,15 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          # 1. Update/Generate the project unconditionally (answering yes if prompted)
-          echo "y" | docker run -i --rm \
-            -v ${PWD}:/app \
-            -w /app \
-            ghcr.io/googlechromelabs/bubblewrap:latest \
-            update
-            
-          echo "Debugging Keystore:"
-          ls -la
-          
-          if [ ! -s android.keystore ]; then
-            echo "ERROR: android.keystore is missing or empty!"
-            echo "Please check if ANDROID_KEYSTORE_BASE64 secret is correctly set in GitHub."
-          fi
-            
-          # 2. Build the Android app bundle
+          # Build the Android app bundle while automatically answering "y" to SDK license prompts
           docker run --rm \
             -v ${PWD}:/app \
             -w /app \
             -e BUBBLEWRAP_KEYSTORE_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
             -e BUBBLEWRAP_KEY_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
+            --entrypoint /bin/sh \
             ghcr.io/googlechromelabs/bubblewrap:latest \
-            build \
-            --manifest=twa-manifest.json
+            -c "yes | bubblewrap build --manifest=twa-manifest.json"
             
           echo "Build finished. Looking for .aab files:"
           find . -name "*.aab"
