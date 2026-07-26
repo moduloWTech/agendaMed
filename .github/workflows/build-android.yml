@@ -21,7 +21,15 @@ jobs:
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android.keystore
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "ERROR: ANDROID_KEYSTORE_BASE64 secret is empty in the runner!"
+            exit 1
+          fi
+          # Print length for debugging (safely)
+          echo "Secret is present. Length: ${#ANDROID_KEYSTORE_BASE64}"
+          # Use printf and tr to safely decode multi-line base64 without echo glitches
+          printf "%s" "$ANDROID_KEYSTORE_BASE64" | tr -d '\n\r ' | base64 --decode > android.keystore
+          ls -la android.keystore
 
       - name: Build Android App (.aab)
         env:
@@ -47,11 +55,11 @@ jobs:
           docker run --rm \
             -v ${PWD}:/app \
             -w /app \
+            -e BUBBLEWRAP_KEYSTORE_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
+            -e BUBBLEWRAP_KEY_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
             ghcr.io/googlechromelabs/bubblewrap:latest \
             build \
-            --manifest=twa-manifest.json \
-            --keyPassword="$ANDROID_KEYSTORE_PASSWORD" \
-            --keyStorePassword="$ANDROID_KEYSTORE_PASSWORD"
+            --manifest=twa-manifest.json
             
           echo "Build finished. Looking for .aab files:"
           find . -name "*.aab"
