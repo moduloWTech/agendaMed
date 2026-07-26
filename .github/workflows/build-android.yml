@@ -35,6 +35,14 @@ jobs:
             ghcr.io/googlechromelabs/bubblewrap:latest \
             update
             
+          echo "Debugging Keystore:"
+          ls -la
+          
+          if [ ! -s android.keystore ]; then
+            echo "ERROR: android.keystore is missing or empty!"
+            echo "Please check if ANDROID_KEYSTORE_BASE64 secret is correctly set in GitHub."
+          fi
+            
           # 2. Build the Android app bundle
           docker run --rm \
             -v ${PWD}:/app \
