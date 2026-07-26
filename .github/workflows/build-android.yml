@@ -46,6 +46,9 @@ jobs:
             ghcr.io/googlechromelabs/bubblewrap:latest \
             -c "yes | bubblewrap build --manifest=twa-manifest.json"
             
+          # Fix permissions because Docker creates files as root
+          sudo chown -R $USER:$USER .
+            
           echo "Build finished. Looking for .aab files:"
           find . -name "*.aab"
 
@@ -53,4 +56,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: agendamed-android-app
-          path: '**/*.aab'
+          path: app-release-bundle.aab
