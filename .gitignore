@@ -30,3 +30,4 @@ api/src/generated/prisma/
 .env.*.local
 android.keystore
 keystore.b64
+\nagendamed-android-app/

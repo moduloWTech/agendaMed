@@ -87,7 +87,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: agendamed-android-app
-          path: "**/*.aab"
+          path: |
+            **/*.aab
+            **/*.apk
           if-no-files-found: error
 
       - name: Cleanup
