@@ -44,7 +44,7 @@ jobs:
             -e BUBBLEWRAP_KEY_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
             --entrypoint /bin/sh \
             ghcr.io/googlechromelabs/bubblewrap:latest \
-            -c "printf 'y\n\n\ny\ny\ny\ny\ny\ny\ny\ny\n' | bubblewrap build --skipUpdateCheck --manifest=twa-manifest.json"
+            -c "yes | bubblewrap build --manifest=twa-manifest.json"
             
           # Fix permissions because Docker creates files as root
           sudo chown -R $USER:$USER .
