@@ -5,55 +5,92 @@ on:
     branches:
       - main
     paths:
-      - 'twa-manifest.json'
-      - 'frontend/public/**'
-      - '.github/workflows/build-android.yml'
+      - "twa-manifest.json"
+      - "frontend/public/**"
+      - ".github/workflows/build-android.yml"
+
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Validate Manifest
+        run: |
+          set -euo pipefail
+
+          if [ ! -f "twa-manifest.json" ]; then
+            echo "twa-manifest.json not found."
+            exit 1
+          fi
 
       - name: Setup Android Keystore
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
-            echo "ERROR: ANDROID_KEYSTORE_BASE64 secret is empty in the runner!"
+          set -euo pipefail
+
+          if [ -z "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            echo "ANDROID_KEYSTORE_BASE64 secret is empty."
             exit 1
           fi
-          # Print length for debugging (safely)
-          echo "Secret is present. Length: ${#ANDROID_KEYSTORE_BASE64}"
-          # Use printf and tr to safely decode multi-line base64 without echo glitches
-          printf "%s" "$ANDROID_KEYSTORE_BASE64" | tr -d '\n\r ' | base64 --decode > android.keystore
-          ls -la android.keystore
+
+          printf "%s" "$ANDROID_KEYSTORE_BASE64" \
+            | tr -d '\n\r ' \
+            | base64 --decode > android.keystore
+
+          if [ ! -f android.keystore ]; then
+            echo "Failed to create android.keystore."
+            exit 1
+          fi
+
+          echo "Keystore successfully created."
 
       - name: Build Android App (.aab)
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          # Build the Android app bundle while automatically answering "y" to SDK license prompts
+          set -euo pipefail
+
           docker run --rm \
-            -v ${PWD}:/app \
+            -v "${PWD}:/app" \
             -w /app \
             -e BUBBLEWRAP_KEYSTORE_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
             -e BUBBLEWRAP_KEY_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
             --entrypoint /bin/sh \
             ghcr.io/googlechromelabs/bubblewrap:latest \
             -c "yes | bubblewrap build --manifest=twa-manifest.json"
-            
-          # Fix permissions because Docker creates files as root
-          sudo chown -R $USER:$USER .
-            
-          echo "Build finished. Looking for .aab files:"
-          find . -name "*.aab"
+
+          sudo chown -R "$USER:$USER" .
+
+          echo "Searching for generated .aab..."
+
+          AAB_FILE=$(find . -type f -name "*.aab" | head -n 1)
+
+          if [ -z "$AAB_FILE" ]; then
+            echo "No Android App Bundle (.aab) was generated."
+            exit 1
+          fi
+
+          echo "Generated bundle:"
+          echo "$AAB_FILE"
 
       - name: Upload Android App Artifact
         uses: actions/upload-artifact@v4
         with:
           name: agendamed-android-app
-          path: app-release-bundle.aab
+          path: "**/*.aab"
+          if-no-files-found: error
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f android.keystore
