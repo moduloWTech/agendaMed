@@ -68,23 +68,23 @@ export function WeeklyCarousel({ selectedDate, onDateSelect }: WeeklyCarouselPro
     <div className="w-full px-6 py-4">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-gray-400 font-medium text-sm mb-1 uppercase tracking-wider">Selecione o Dia</p>
+          <p className="text-gray-400 dark:text-slate-500 font-medium text-sm mb-1 uppercase tracking-wider">Selecione o Dia</p>
           <div className="flex items-center gap-2">
-            <h2 className="text-3xl font-extrabold text-[var(--color-primary)] tracking-tight">{capitalizedMonth}</h2>
-            <span className="text-2xl font-bold text-gray-300">/</span>
-            <p className="text-gray-500 font-bold text-xl mt-1">{selectedDate.getFullYear()}</p>
+            <h2 className="text-3xl font-extrabold text-[var(--color-primary)] dark:text-slate-200 tracking-tight">{capitalizedMonth}</h2>
+            <span className="text-2xl font-bold text-gray-300 dark:text-slate-600">/</span>
+            <p className="text-gray-500 dark:text-slate-400 font-bold text-xl mt-1">{selectedDate.getFullYear()}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handlePrevMonth}
-            className="p-2 rounded-full bg-white shadow-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-50 transition-colors"
+            className="p-2 rounded-full bg-white dark:bg-slate-800 shadow-sm text-gray-600 dark:text-slate-300 hover:text-[var(--color-primary)] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={handleNextMonth}
-            className="p-2 rounded-full bg-white shadow-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-50 transition-colors"
+            className="p-2 rounded-full bg-white dark:bg-slate-800 shadow-sm text-gray-600 dark:text-slate-300 hover:text-[var(--color-primary)] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -102,14 +102,14 @@ export function WeeklyCarousel({ selectedDate, onDateSelect }: WeeklyCarouselPro
               ${day.isSelected
                 ? 'bg-[var(--color-secondary)] text-[var(--color-primary)] shadow-md shadow-[var(--color-secondary)]/30 scale-105'
                 : day.isToday
-                  ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                  : 'bg-transparent text-gray-400 hover:bg-gray-50 border border-transparent hover:border-gray-100'}
+                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50'
+                  : 'bg-transparent text-gray-400 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-gray-100 dark:hover:border-slate-700'}
             `}
           >
-            <span className={`text-2xl font-bold ${day.isSelected ? 'text-[var(--color-primary)]' : day.isToday ? 'text-blue-600' : 'text-gray-700'}`}>
+            <span className={`text-2xl font-bold ${day.isSelected ? 'text-[var(--color-primary)]' : day.isToday ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-slate-300'}`}>
               {day.dayNumber}
             </span>
-            <span className={`text-sm font-semibold mt-1 ${day.isSelected ? 'text-[var(--color-accent)]' : day.isToday ? 'text-blue-500' : 'text-gray-400'}`}>
+            <span className={`text-sm font-semibold mt-1 ${day.isSelected ? 'text-[var(--color-accent)]' : day.isToday ? 'text-blue-500 dark:text-blue-300' : 'text-gray-400 dark:text-slate-500'}`}>
               {day.dayName}
             </span>
           </button>

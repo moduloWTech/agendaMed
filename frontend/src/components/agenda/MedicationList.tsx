@@ -166,8 +166,8 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
   if (!activePatient) {
     return (
       <div className="w-full px-4 pt-12 pb-2 flex flex-col items-center justify-center text-center">
-        <CalendarX2 className="w-12 h-12 text-gray-300 mb-4" />
-        <p className="text-gray-500 font-medium">Selecione ou crie um paciente no Perfil para ver a agenda.</p>
+        <CalendarX2 className="w-12 h-12 text-gray-300 dark:text-slate-600 mb-4" />
+        <p className="text-gray-500 dark:text-slate-400 font-medium">Selecione ou crie um paciente no Perfil para ver a agenda.</p>
       </div>
     );
   }
@@ -175,8 +175,8 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
   return (
     <div className="w-full px-4 pt-6 pb-2 relative z-0 min-h-[40vh]">
       <div className="mb-6 px-2">
-        <h3 className="text-xl font-bold text-gray-800">{title}</h3>
-        <p className="text-gray-500 font-medium">{subtitle}</p>
+        <h3 className="text-xl font-bold text-gray-800 dark:text-slate-100">{title}</h3>
+        <p className="text-gray-500 dark:text-slate-400 font-medium">{subtitle}</p>
       </div>
 
       <div className="flex flex-col">
@@ -197,11 +197,11 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
           ))
         ) : (
           <div className="flex flex-col items-center justify-center py-12 px-6 text-center animate-in fade-in duration-500">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <CalendarX2 className="w-10 h-10 text-gray-400" />
+            <div className="w-20 h-20 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+              <CalendarX2 className="w-10 h-10 text-gray-400 dark:text-slate-500" />
             </div>
-            <h4 className="text-lg font-bold text-gray-700 mb-2">Dia Livre</h4>
-            <p className="text-gray-500 text-sm">
+            <h4 className="text-lg font-bold text-gray-700 dark:text-slate-300 mb-2">Dia Livre</h4>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">
               Nenhum medicamento agendado para esta data.
             </p>
           </div>

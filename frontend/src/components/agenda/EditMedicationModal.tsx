@@ -124,28 +124,28 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center animate-in fade-in duration-300">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-md bg-white rounded-t-[40px] sm:rounded-[40px] shadow-2xl flex flex-col h-[85vh] sm:h-auto sm:max-h-[85vh] animate-in slide-in-from-bottom duration-300">
+      <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-t-[40px] sm:rounded-[40px] shadow-2xl flex flex-col h-[85vh] sm:h-auto sm:max-h-[85vh] animate-in slide-in-from-bottom duration-300">
         
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100">
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100 dark:border-slate-800">
           <div>
-            <h2 className="text-2xl font-bold text-[var(--color-primary)]">
+            <h2 className="text-2xl font-bold text-[var(--color-primary)] dark:text-slate-100">
               {isAdmin ? 'Editar Medicamento' : 'Detalhes do Medicamento'}
             </h2>
-            {!isAdmin && <p className="text-sm text-gray-500 mt-1">Modo de visualização (Apenas Administradores podem editar)</p>}
+            {!isAdmin && <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Modo de visualização (Apenas Administradores podem editar)</p>}
           </div>
-          <button onClick={onClose} className="p-2 bg-gray-50 rounded-full text-gray-500 hover:text-gray-800 transition-colors self-start">
+          <button onClick={onClose} className="p-2 bg-gray-50 dark:bg-slate-800 rounded-full text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 transition-colors self-start">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5 custom-scrollbar">
           
-          <div className="bg-[#F8FAFC] p-5 rounded-[24px] flex items-center justify-between border border-gray-100">
+          <div className="bg-[#F8FAFC] dark:bg-slate-800 p-5 rounded-[24px] flex items-center justify-between border border-gray-100 dark:border-slate-700">
             <div>
-              <p className="text-gray-500 text-sm font-medium">Horário da Dose</p>
+              <p className="text-gray-500 dark:text-slate-400 text-sm font-medium">Horário da Dose</p>
               <div className="flex items-center gap-2 mt-1">
-                <Clock className="w-5 h-5 text-[var(--color-primary)]" />
-                <span className="text-xl font-bold text-gray-800">{uniqueId.split('-').pop()}</span>
+                <Clock className="w-5 h-5 text-[var(--color-primary)] dark:text-[var(--color-primary)]" />
+                <span className="text-xl font-bold text-gray-800 dark:text-slate-100">{uniqueId.split('-').pop()}</span>
               </div>
             </div>
             <button 
@@ -171,8 +171,8 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
 
           {/* Seção da Foto */}
           <div className="flex flex-col gap-2">
-            <label className="text-gray-700 font-medium text-[15px] ml-1">Foto da Caixa</label>
-            <div className="flex-1 min-h-[150px] border-2 border-dashed border-[var(--color-primary)]/40 bg-[var(--color-primary)]/5 rounded-[24px] overflow-hidden relative group">
+            <label className="text-gray-700 dark:text-slate-300 font-medium text-[15px] ml-1">Foto da Caixa</label>
+            <div className="flex-1 min-h-[150px] border-2 border-dashed border-[var(--color-primary)]/40 bg-[var(--color-primary)]/5 dark:bg-[var(--color-primary)]/10 rounded-[24px] overflow-hidden relative group">
               {(selectedFile || photoUrl) ? (
                 <div 
                   className="w-full h-[150px] relative cursor-pointer"
@@ -207,22 +207,22 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
                     <>
                       <button 
                         onClick={() => cameraInputRef.current?.click()} 
-                        className="flex flex-col items-center justify-center flex-1 h-full gap-2 hover:bg-[var(--color-primary)]/10 transition-colors"
+                        className="flex flex-col items-center justify-center flex-1 h-full gap-2 hover:bg-[var(--color-primary)]/10 dark:hover:bg-[var(--color-primary)]/20 transition-colors"
                       >
-                        <Camera className="w-6 h-6 text-[var(--color-primary)]" />
-                        <span className="text-xs font-semibold text-[var(--color-primary)]">Câmera</span>
+                        <Camera className="w-6 h-6 text-[var(--color-primary)] dark:text-[var(--color-primary)]" />
+                        <span className="text-xs font-semibold text-[var(--color-primary)] dark:text-[var(--color-primary)]">Câmera</span>
                       </button>
-                      <div className="w-px h-16 bg-[var(--color-primary)]/20" />
+                      <div className="w-px h-16 bg-[var(--color-primary)]/20 dark:bg-[var(--color-primary)]/30" />
                       <button 
                         onClick={() => fileInputRef.current?.click()} 
-                        className="flex flex-col items-center justify-center flex-1 h-full gap-2 hover:bg-[var(--color-primary)]/10 transition-colors"
+                        className="flex flex-col items-center justify-center flex-1 h-full gap-2 hover:bg-[var(--color-primary)]/10 dark:hover:bg-[var(--color-primary)]/20 transition-colors"
                       >
-                        <ImageIcon className="w-6 h-6 text-[var(--color-primary)]" />
-                        <span className="text-xs font-semibold text-[var(--color-primary)]">Galeria</span>
+                        <ImageIcon className="w-6 h-6 text-[var(--color-primary)] dark:text-[var(--color-primary)]" />
+                        <span className="text-xs font-semibold text-[var(--color-primary)] dark:text-[var(--color-primary)]">Galeria</span>
                       </button>
                     </>
                   ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-400 gap-2 h-full">
+                    <div className="flex flex-col items-center justify-center text-gray-400 dark:text-slate-500 gap-2 h-full">
                       <ImageIcon className="w-8 h-8" />
                       <span className="text-sm">Sem foto</span>
                     </div>
@@ -265,11 +265,11 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
           {isAdmin ? (
             <div className="flex flex-col gap-4 mt-2">
               <div className="flex flex-col gap-2">
-                <label className="text-gray-700 font-medium text-[15px] ml-1">Frequência</label>
+                <label className="text-gray-700 dark:text-slate-300 font-medium text-[15px] ml-1">Frequência</label>
                 <select
                   value={frequency}
                   onChange={(e) => setFrequency(e.target.value)}
-                  className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-lg outline-none transition-all cursor-pointer"
+                  className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent hover:border-gray-200 dark:hover:border-slate-700 focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[24px] px-4 py-4 text-gray-800 dark:text-slate-200 text-lg outline-none transition-all cursor-pointer"
                 >
                   <option value="4h">A cada 4 horas</option>
                   <option value="6h">A cada 6 horas</option>
@@ -285,14 +285,14 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
 
               {frequency === 'manual' ? (
                 <div className="flex flex-col gap-3">
-                  <label className="text-gray-700 font-medium text-[15px] ml-1">Quais horários?</label>
+                  <label className="text-gray-700 dark:text-slate-300 font-medium text-[15px] ml-1">Quais horários?</label>
                   {times.map((time, index) => (
-                    <div key={index} className="flex items-center gap-3 bg-[#F8FAFC] p-2 pr-4 rounded-[24px] border border-gray-100">
+                    <div key={index} className="flex items-center gap-3 bg-[#F8FAFC] dark:bg-slate-800 p-2 pr-4 rounded-[24px] border border-gray-100 dark:border-slate-700">
                       <input
                         type="time"
                         value={time}
                         onChange={(e) => updateTime(index, e.target.value)}
-                        className="flex-1 bg-transparent text-xl font-bold text-gray-800 outline-none px-4 py-2"
+                        className="flex-1 bg-transparent text-xl font-bold text-gray-800 dark:text-slate-100 outline-none px-4 py-2"
                       />
                       {times.length > 1 && (
                         <button
@@ -306,7 +306,7 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
                   ))}
                   <button
                     onClick={handleAddTime}
-                    className="flex items-center justify-center gap-2 py-4 border-2 border-dashed border-gray-300 rounded-[24px] text-gray-500 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all"
+                    className="flex items-center justify-center gap-2 py-4 border-2 border-dashed border-gray-300 dark:border-slate-700 rounded-[24px] text-gray-500 dark:text-slate-400 font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 hover:border-gray-400 dark:hover:border-slate-500 transition-all"
                   >
                     <Plus className="w-5 h-5" /> Adicionar outro horário
                   </button>
@@ -314,37 +314,37 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
               ) : (
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-col gap-2">
-                    <label className="text-gray-700 font-medium text-[15px] ml-1">Data de Início</label>
+                    <label className="text-gray-700 dark:text-slate-300 font-medium text-[15px] ml-1">Data de Início</label>
                     <input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-base outline-none transition-all cursor-pointer"
+                      className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent hover:border-gray-200 dark:hover:border-slate-700 focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[24px] px-4 py-4 text-gray-800 dark:text-slate-200 text-base outline-none transition-all cursor-pointer"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-gray-700 font-medium text-[15px] ml-1">Horário Base</label>
+                    <label className="text-gray-700 dark:text-slate-300 font-medium text-[15px] ml-1">Horário Base</label>
                     <input
                       type="time"
                       value={startTime}
                       onChange={(e) => setStartTime(e.target.value)}
-                      className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-base outline-none transition-all cursor-pointer text-center"
+                      className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent hover:border-gray-200 dark:hover:border-slate-700 focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[24px] px-4 py-4 text-gray-800 dark:text-slate-200 text-base outline-none transition-all cursor-pointer text-center"
                     />
                   </div>
                 </div>
               )}
             </div>
           ) : (
-            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mt-2">
-              <p className="text-sm text-gray-600 font-medium">Frequência: <span className="text-gray-800 font-bold">{formatFrequency(medication.frequency)}</span></p>
-              <p className="text-xs text-gray-400 mt-1">Apenas administradores podem editar os horários e frequências do medicamento.</p>
+            <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 mt-2">
+              <p className="text-sm text-gray-600 dark:text-slate-300 font-medium">Frequência: <span className="text-gray-800 dark:text-slate-100 font-bold">{formatFrequency(medication.frequency)}</span></p>
+              <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Apenas administradores podem editar os horários e frequências do medicamento.</p>
             </div>
           )}
 
         </div>
 
         {isAdmin && (
-          <div className="p-6 border-t border-gray-100 bg-white rounded-b-[40px] flex gap-3">
+          <div className="p-6 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-b-[40px] flex gap-3">
             <Button
               variant="outline"
               className="flex-1 flex items-center justify-center gap-2 text-[var(--color-alert)] hover:bg-red-50 hover:border-red-100"

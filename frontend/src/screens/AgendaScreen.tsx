@@ -14,8 +14,8 @@ export function AgendaScreen() {
         <ProfileHeader />
         
         {/* Container Branco Inferior (Sobrepõe a imagem) */}
-        <div className="flex-1 bg-[#F4F7FA] rounded-t-[40px] -mt-8 relative z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pt-2">
-          <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-4 mb-2"></div>
+        <div className="flex-1 bg-[#F4F7FA] dark:bg-slate-900 rounded-t-[40px] -mt-8 relative z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pt-2">
+          <div className="w-12 h-1.5 bg-gray-300 dark:bg-slate-700 rounded-full mx-auto mt-4 mb-2"></div>
           <WeeklyCarousel selectedDate={selectedDate} onDateSelect={setSelectedDate} />
           <MedicationList selectedDate={selectedDate} />
         </div>

@@ -136,21 +136,21 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
       />
 
       {/* Container (Bottom Sheet no mobile, Modal no desktop) */}
-      <div className="relative w-full max-w-md bg-white rounded-t-[40px] sm:rounded-[40px] shadow-2xl flex flex-col h-[85vh] sm:h-auto sm:max-h-[85vh] animate-in slide-in-from-bottom duration-300">
+      <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-t-[40px] sm:rounded-[40px] shadow-2xl flex flex-col h-[85vh] sm:h-auto sm:max-h-[85vh] animate-in slide-in-from-bottom duration-300">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-6 pb-2 border-b border-gray-100">
+        <div className="flex items-center justify-between p-6 pb-2 border-b border-gray-100 dark:border-slate-800">
           <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-[var(--color-primary)]">Novo Remédio</h2>
+            <h2 className="text-2xl font-bold text-[var(--color-primary)] dark:text-slate-100">Novo Remédio</h2>
             <div className="flex gap-1 mt-2">
-              <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 1 ? 'bg-[var(--color-primary)]' : 'bg-gray-200'}`} />
-              <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 2 ? 'bg-[var(--color-primary)]' : 'bg-gray-200'}`} />
-              <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 3 ? 'bg-[var(--color-primary)]' : 'bg-gray-200'}`} />
+              <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 1 ? 'bg-[var(--color-primary)]' : 'bg-gray-200 dark:bg-slate-700'}`} />
+              <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 2 ? 'bg-[var(--color-primary)]' : 'bg-gray-200 dark:bg-slate-700'}`} />
+              <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 3 ? 'bg-[var(--color-primary)]' : 'bg-gray-200 dark:bg-slate-700'}`} />
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 bg-gray-50 rounded-full text-gray-500 hover:text-gray-800 transition-colors self-start"
+            className="p-2 bg-gray-50 dark:bg-slate-800 rounded-full text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 transition-colors self-start"
           >
             <X className="w-5 h-5" />
           </button>
@@ -194,7 +194,7 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-gray-100 bg-white rounded-b-[40px] flex gap-3">
+        <div className="p-6 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-b-[40px] flex gap-3">
           {step > 1 && (
             <Button
               variant="outline"

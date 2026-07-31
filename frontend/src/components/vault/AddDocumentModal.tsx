@@ -74,14 +74,14 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
       />
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-md bg-white rounded-t-[40px] sm:rounded-[40px] shadow-2xl flex flex-col max-h-[90vh] animate-in slide-in-from-bottom duration-300">
+      <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-t-[40px] sm:rounded-[40px] shadow-2xl flex flex-col max-h-[90vh] animate-in slide-in-from-bottom duration-300">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-800">Novo Documento</h2>
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100 dark:border-slate-800">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100">Novo Documento</h2>
           <button
             onClick={onClose}
-            className="p-2 bg-gray-50 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors"
+            className="p-2 bg-gray-50 dark:bg-slate-800 rounded-full text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-800 dark:hover:text-slate-200 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -110,9 +110,9 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
                     </div>
                   </>
                 ) : (
-                  <div className="flex flex-col items-center justify-center w-full h-full bg-black/5">
-                    <FileText className="w-10 h-10 text-[var(--color-primary)] mb-2" />
-                    <span className="font-medium text-gray-700 px-4 text-center">{selectedFile.name}</span>
+                  <div className="flex flex-col items-center justify-center w-full h-full bg-black/5 dark:bg-black/20">
+                    <FileText className="w-10 h-10 text-[var(--color-primary)] dark:text-[var(--color-primary)] mb-2" />
+                    <span className="font-medium text-gray-700 dark:text-slate-300 px-4 text-center">{selectedFile.name}</span>
                   </div>
                 )}
               </div>
@@ -135,7 +135,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
           {/* Nome do Documento */}
           <div>
-            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Detalhes</h3>
+            <h3 className="text-sm font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-2 ml-1">Detalhes</h3>
             <Input
               label="Título"
               placeholder="Ex: Receita Dr. Silva, Hemograma..."
@@ -146,22 +146,22 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
           {/* Data */}
           <div>
-            <label className="text-gray-700 font-medium text-[15px] ml-1 mb-2 block">Data do Documento</label>
+            <label className="text-gray-700 dark:text-slate-300 font-medium text-[15px] ml-1 mb-2 block">Data do Documento</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-base outline-none transition-all cursor-pointer"
+              className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent hover:border-gray-200 dark:hover:border-slate-700 focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[24px] px-4 py-4 text-gray-800 dark:text-slate-100 text-base outline-none transition-all cursor-pointer"
             />
           </div>
 
           {/* Categoria */}
           <div>
-            <label className="text-gray-700 font-medium text-[15px] ml-1 mb-2 block">Categoria</label>
+            <label className="text-gray-700 dark:text-slate-300 font-medium text-[15px] ml-1 mb-2 block">Categoria</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setCategory('recipe')}
-                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'recipe' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 text-[var(--color-primary)]' : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'recipe' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 dark:bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
               >
                 <Stethoscope className="w-6 h-6" />
                 <span className="font-semibold text-sm">Receita</span>
@@ -169,7 +169,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
               <button
                 onClick={() => setCategory('exam')}
-                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'exam' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 text-[var(--color-primary)]' : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'exam' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 dark:bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
               >
                 <FlaskConical className="w-6 h-6" />
                 <span className="font-semibold text-sm">Exame</span>
@@ -177,7 +177,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
               <button
                 onClick={() => setCategory('report')}
-                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'report' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 text-[var(--color-primary)]' : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'report' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 dark:bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
               >
                 <FileText className="w-6 h-6" />
                 <span className="font-semibold text-sm">Laudo</span>
@@ -185,7 +185,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
               <button
                 onClick={() => setCategory('other')}
-                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'other' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 text-[var(--color-primary)]' : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'other' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 dark:bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
               >
                 <FilePlus2 className="w-6 h-6" />
                 <span className="font-semibold text-sm">Outros</span>
@@ -195,7 +195,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-100 bg-white rounded-b-[40px]">
+        <div className="p-6 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-b-[40px]">
           <Button
             fullWidth
             onClick={handleSave}

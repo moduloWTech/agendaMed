@@ -19,7 +19,7 @@ export function ProfileHeader() {
 
       {/* Painel Vitral 1: Ações Rápidas (Apenas Mensagem) */}
       <div className="w-full flex items-center justify-end mb-4 pr-2">
-        <button className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[var(--color-primary)] shadow-[0_8px_30px_rgb(0,0,0,0.1)] hover:scale-105 active:scale-95 transition-transform border border-white/50">
+        <button className="w-14 h-14 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md flex items-center justify-center text-[var(--color-primary)] dark:text-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.1)] hover:scale-105 active:scale-95 transition-transform border border-white/50 dark:border-slate-700/50">
           <MessageCircle className="w-6 h-6" />
         </button>
       </div>
