@@ -66,6 +66,20 @@ class UserUseCase {
         }
         await this.userRepository.delete(id);
     }
+    async updatePreferences(id, data) {
+        const schema = zod_1.z.object({
+            defaultIntensiveAlerts: zod_1.z.boolean().optional(),
+            defaultAlertAdvance: zod_1.z.string().optional(),
+            syncGoogle: zod_1.z.boolean().optional(),
+            darkMode: zod_1.z.boolean().optional(),
+        });
+        const parsedData = schema.parse(data);
+        const user = await this.userRepository.findById(id);
+        if (!user) {
+            throw new Error('Usuário não encontrado.');
+        }
+        return await this.userRepository.update(id, parsedData);
+    }
     async inviteCaregiver(adminId, data) {
         const schema = zod_1.z.object({
             phoneWhats: zod_1.z.string().min(10, 'O telefone deve ter pelo menos 10 dígitos'),
