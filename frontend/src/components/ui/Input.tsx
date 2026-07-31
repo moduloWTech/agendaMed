@@ -13,7 +13,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={inputId} className="text-gray-700 font-medium text-[16px] ml-1">
+          <label htmlFor={inputId} className="text-gray-700 dark:text-slate-300 font-medium text-[16px] ml-1">
             {label}
           </label>
         )}
@@ -21,10 +21,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           id={inputId}
           ref={ref}
           className={`
-            w-full min-h-[56px] px-6 py-3 bg-[#F8FAFC] text-gray-900 text-lg
+            w-full min-h-[56px] px-6 py-3 bg-[#F8FAFC] dark:bg-slate-800 text-gray-900 dark:text-slate-100 text-lg
             border-2 rounded-[24px] transition-all duration-300
-            focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)] placeholder:text-gray-400
-            ${error ? 'border-[var(--color-alert)]' : 'border-transparent focus:border-[var(--color-primary)] hover:border-gray-200'}
+            focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)] placeholder:text-gray-400 dark:placeholder:text-slate-500
+            ${error ? 'border-[var(--color-alert)]' : 'border-transparent focus:border-[var(--color-primary)] dark:focus:border-slate-500 hover:border-gray-200 dark:hover:border-slate-700'}
             ${className}
           `}
           {...props}

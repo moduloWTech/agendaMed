@@ -135,7 +135,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
           {/* Nome do Documento */}
           <div>
-            <h3 className="text-sm font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-2 ml-1">Detalhes</h3>
+            <h3 className="text-sm font-bold text-gray-400 dark:text-slate-300 uppercase tracking-wider mb-2 ml-1">Detalhes</h3>
             <Input
               label="Título"
               placeholder="Ex: Receita Dr. Silva, Hemograma..."
@@ -151,7 +151,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent hover:border-gray-200 dark:hover:border-slate-700 focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[24px] px-4 py-4 text-gray-800 dark:text-slate-100 text-base outline-none transition-all cursor-pointer"
+              className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent hover:border-gray-200 dark:hover:border-slate-700 focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[24px] px-4 py-4 text-gray-800 dark:text-slate-100 text-base outline-none transition-all cursor-pointer dark:[color-scheme:dark]"
             />
           </div>
 
@@ -161,7 +161,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setCategory('recipe')}
-                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'recipe' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 dark:bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'recipe' ? 'border-[var(--color-primary)] dark:border-[var(--color-secondary)] bg-[var(--color-primary)]/5 dark:bg-slate-700 text-[var(--color-primary)] dark:text-slate-100' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
               >
                 <Stethoscope className="w-6 h-6" />
                 <span className="font-semibold text-sm">Receita</span>
@@ -169,7 +169,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
               <button
                 onClick={() => setCategory('exam')}
-                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'exam' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 dark:bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'exam' ? 'border-[var(--color-primary)] dark:border-[var(--color-secondary)] bg-[var(--color-primary)]/5 dark:bg-slate-700 text-[var(--color-primary)] dark:text-slate-100' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
               >
                 <FlaskConical className="w-6 h-6" />
                 <span className="font-semibold text-sm">Exame</span>
@@ -177,7 +177,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
               <button
                 onClick={() => setCategory('report')}
-                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'report' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 dark:bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'report' ? 'border-[var(--color-primary)] dark:border-[var(--color-secondary)] bg-[var(--color-primary)]/5 dark:bg-slate-700 text-[var(--color-primary)] dark:text-slate-100' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
               >
                 <FileText className="w-6 h-6" />
                 <span className="font-semibold text-sm">Laudo</span>
@@ -185,7 +185,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
               <button
                 onClick={() => setCategory('other')}
-                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'other' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 dark:bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${category === 'other' ? 'border-[var(--color-primary)] dark:border-[var(--color-secondary)] bg-[var(--color-primary)]/5 dark:bg-slate-700 text-[var(--color-primary)] dark:text-slate-100' : 'border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-slate-600'}`}
               >
                 <FilePlus2 className="w-6 h-6" />
                 <span className="font-semibold text-sm">Outros</span>
