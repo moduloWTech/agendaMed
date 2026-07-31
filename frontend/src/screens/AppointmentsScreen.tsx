@@ -55,8 +55,8 @@ export function AppointmentsScreen() {
           onClick={() => setIsAddModalOpen(true)}
           className="w-full bg-white dark:bg-slate-800 border-2 border-dashed border-[var(--color-primary)]/30 dark:border-[var(--color-primary)]/40 rounded-3xl p-5 flex flex-col items-center justify-center gap-3 text-[var(--color-primary)] dark:text-slate-200 hover:bg-[var(--color-primary)]/5 dark:hover:bg-slate-700 hover:border-[var(--color-primary)]/50 transition-all shadow-sm hover:shadow-md mb-8 group"
         >
-          <div className="w-14 h-14 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <Plus className="w-7 h-7 text-[var(--color-primary)]" />
+          <div className="w-14 h-14 rounded-full bg-[var(--color-primary)]/10 dark:bg-slate-700 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <Plus className="w-7 h-7 text-[var(--color-primary)] dark:text-slate-200" />
           </div>
           <span className="font-bold text-lg">Nova Consulta</span>
         </button>
