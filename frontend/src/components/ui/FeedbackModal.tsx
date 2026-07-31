@@ -22,10 +22,10 @@ export function FeedbackModal({ isOpen, onClose, title, message, type = 'info', 
   };
 
   const bgColors = {
-    success: 'bg-green-50',
-    error: 'bg-red-50',
-    warning: 'bg-amber-50',
-    info: 'bg-blue-50'
+    success: 'bg-green-50 dark:bg-green-900/30',
+    error: 'bg-red-50 dark:bg-red-900/30',
+    warning: 'bg-amber-50 dark:bg-amber-900/30',
+    info: 'bg-blue-50 dark:bg-blue-900/30'
   };
 
   return (
@@ -37,10 +37,10 @@ export function FeedbackModal({ isOpen, onClose, title, message, type = 'info', 
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-sm bg-white rounded-[32px] shadow-2xl p-6 flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-[32px] shadow-2xl p-6 flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors"
+          className="absolute top-4 right-4 p-2 text-gray-400 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -49,8 +49,8 @@ export function FeedbackModal({ isOpen, onClose, title, message, type = 'info', 
           {icons[type]}
         </div>
         
-        <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
-        <p className="text-gray-500 mb-6 leading-relaxed">{message}</p>
+        <h3 className="text-xl font-bold text-gray-800 dark:text-slate-100 mb-2">{title}</h3>
+        <p className="text-gray-500 dark:text-slate-400 mb-6 leading-relaxed">{message}</p>
         
         <div className="w-full flex gap-3">
           <Button onClick={onClose} variant={onConfirm ? 'outline' : 'primary'} className="flex-1">

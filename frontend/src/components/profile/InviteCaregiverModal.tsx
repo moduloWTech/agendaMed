@@ -78,12 +78,12 @@ export function InviteCaregiverModal({ onClose, onSuccess }: InviteCaregiverModa
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => !isLoading && onClose()} />
-      <div className="relative bg-white rounded-[32px] w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-300">
-        <div className="flex items-center gap-3 mb-2 text-[var(--color-primary)]">
+      <div className="relative bg-white dark:bg-slate-900 rounded-[32px] w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="flex items-center gap-3 mb-2 text-[var(--color-primary)] dark:text-slate-100">
           <Users className="w-6 h-6" />
-          <h3 className="text-xl font-bold text-gray-800">Convidar Cuidador</h3>
+          <h3 className="text-xl font-bold text-gray-800 dark:text-slate-100">Convidar Cuidador</h3>
         </div>
-        <p className="text-sm text-gray-500 mb-6">
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
           Adicione alguém da família ou equipe para ajudar nos cuidados de {activePatient?.name}. Eles receberão um convite no WhatsApp.
         </p>
 
@@ -95,28 +95,28 @@ export function InviteCaregiverModal({ onClose, onSuccess }: InviteCaregiverModa
 
         <div className="space-y-4 mb-6">
           <div className="relative">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-500">
               <User className="w-5 h-5" />
             </div>
             <input 
               type="text" 
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-[#F8FAFC] border-2 border-transparent focus:border-[var(--color-primary)] rounded-[20px] pl-12 pr-4 py-4 text-gray-800 text-sm outline-none transition-all"
+              className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[20px] pl-12 pr-4 py-4 text-gray-800 dark:text-slate-100 text-sm outline-none transition-all"
               placeholder="Nome do cuidador"
               disabled={isLoading}
             />
           </div>
 
           <div className="relative">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-500">
               <Phone className="w-5 h-5" />
             </div>
             <input 
               type="tel" 
               value={phone}
               onChange={handlePhoneChange}
-              className="w-full bg-[#F8FAFC] border-2 border-transparent focus:border-[var(--color-primary)] rounded-[20px] pl-12 pr-4 py-4 text-gray-800 text-sm outline-none transition-all"
+              className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[20px] pl-12 pr-4 py-4 text-gray-800 dark:text-slate-100 text-sm outline-none transition-all"
               placeholder="(DD) 9XXXX-XXXX"
               disabled={isLoading}
             />
@@ -125,7 +125,7 @@ export function InviteCaregiverModal({ onClose, onSuccess }: InviteCaregiverModa
 
         <div className="flex gap-3">
           <button 
-            className="flex-1 py-3.5 text-gray-500 font-bold hover:bg-gray-100 rounded-2xl transition-colors"
+            className="flex-1 py-3.5 text-gray-500 dark:text-slate-400 font-bold hover:bg-gray-100 dark:hover:bg-slate-800 rounded-2xl transition-colors"
             onClick={onClose}
             disabled={isLoading}
           >

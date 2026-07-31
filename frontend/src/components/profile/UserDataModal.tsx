@@ -40,14 +40,14 @@ export function UserDataModal({ onClose }: UserDataModalProps) {
       />
 
       {/* Container do Modal */}
-      <div className="relative w-full max-w-sm bg-white/95 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 sm:p-8 border border-white flex flex-col gap-5 animate-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-sm bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 sm:p-8 border border-white dark:border-slate-700 flex flex-col gap-5 animate-in zoom-in-95 duration-300">
 
         {/* Header do Modal */}
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-2xl font-bold text-[var(--color-primary)]">Meus Dados</h2>
+          <h2 className="text-2xl font-bold text-[var(--color-primary)] dark:text-slate-100">Meus Dados</h2>
           <button
             onClick={onClose}
-            className="p-2 bg-gray-100 rounded-full text-gray-500 hover:text-gray-800 transition-colors"
+            className="p-2 bg-gray-100 dark:bg-slate-800 rounded-full text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

@@ -16,22 +16,22 @@ export function EditPatientModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => !isSavingPatient && onClose()} />
-      <div className="relative bg-white rounded-[32px] w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-300">
-        <h3 className="text-xl font-bold text-gray-800 mb-2">Editar Nome</h3>
-        <p className="text-sm text-gray-500 mb-6">Como vocês chamam o familiar que estão cuidando?</p>
+      <div className="relative bg-white dark:bg-slate-900 rounded-[32px] w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-300">
+        <h3 className="text-xl font-bold text-gray-800 dark:text-slate-100 mb-2">Editar Nome</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">Como vocês chamam o familiar que estão cuidando?</p>
         
         <input 
           type="text" 
           value={newPatientName}
           onChange={(e) => setNewPatientName(e.target.value)}
-          className="w-full bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200 focus:border-[var(--color-primary)] rounded-[24px] px-4 py-4 text-gray-800 text-base outline-none transition-all mb-6"
+          className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent hover:border-gray-200 dark:hover:border-slate-700 focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[24px] px-4 py-4 text-gray-800 dark:text-slate-100 text-base outline-none transition-all mb-6"
           placeholder="Ex: Dona Maria, Vovô João..."
           autoFocus
         />
 
         <div className="flex gap-3">
           <button 
-            className="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-2xl transition-colors"
+            className="flex-1 py-3 text-gray-500 dark:text-slate-400 font-bold hover:bg-gray-100 dark:hover:bg-slate-800 rounded-2xl transition-colors"
             onClick={onClose}
             disabled={isSavingPatient}
           >

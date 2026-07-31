@@ -9,10 +9,10 @@ export function InstallPwaModal({ onClose }: InstallPwaModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-white rounded-[32px] w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-300">
+      <div className="relative bg-white dark:bg-slate-900 rounded-[32px] w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-300">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -22,13 +22,13 @@ export function InstallPwaModal({ onClose }: InstallPwaModalProps) {
             <Share className="w-8 h-8" />
           </div>
 
-          <h3 className="text-xl font-extrabold text-gray-800 mb-2">Instale o AgendaMed</h3>
-          <p className="text-gray-500 text-sm mb-6">
+          <h3 className="text-xl font-extrabold text-gray-800 dark:text-slate-100 mb-2">Instale o AgendaMed</h3>
+          <p className="text-gray-500 dark:text-slate-400 text-sm mb-6">
             Instale nosso aplicativo no seu iPhone para ter uma experiência completa e receber Notificações Push!
           </p>
 
-          <div className="bg-gray-50 rounded-2xl p-4 w-full mb-6 border border-gray-100 text-left">
-            <ol className="flex flex-col gap-4 text-sm text-gray-700">
+          <div className="bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 w-full mb-6 border border-gray-100 dark:border-slate-700 text-left">
+            <ol className="flex flex-col gap-4 text-sm text-gray-700 dark:text-slate-300">
               <li className="flex gap-3 items-start">
                 <span className="font-bold text-[var(--color-primary)]">1.</span>
                 <span>Toque no botão <span className="font-bold">Compartilhar</span> na barra inferior do Safari.</span>
@@ -37,7 +37,7 @@ export function InstallPwaModal({ onClose }: InstallPwaModalProps) {
               <li className="flex gap-3 items-start">
                 <span className="font-bold text-[var(--color-primary)]">2.</span>
                 <span>Role para baixo e selecione <br /><span className="font-bold">Adicionar à Tela de Início</span>.</span>
-                <PlusSquare className="w-4 h-4 text-gray-800 flex-shrink-0 mt-0.5" />
+                <PlusSquare className="w-4 h-4 text-gray-800 dark:text-slate-100 flex-shrink-0 mt-0.5" />
               </li>
               <li className="flex gap-3 items-start">
                 <span className="font-bold text-[var(--color-primary)]">3.</span>
