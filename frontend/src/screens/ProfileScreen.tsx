@@ -80,7 +80,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-gray-50 pb-24 relative animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="flex flex-col w-full min-h-screen bg-gray-50 dark:bg-slate-900 pb-24 relative animate-in fade-in slide-in-from-bottom-2 duration-500">
 
       {/* Fundo Decorativo com Imagem e Máscara Escura */}
       <div className="absolute top-0 left-0 right-0 h-72 rounded-b-[48px] overflow-hidden pointer-events-none z-0 shadow-lg">
@@ -90,7 +90,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
           className="w-full h-full object-cover"
         />
         {/* Máscara escura com transparência para dar o efeito solicitado */}
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-[2px]" />
       </div>
 
       <div className="w-full max-w-md mx-auto px-6 pt-10 z-10">
@@ -100,7 +100,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
 
         {/* Opções de Perfil */}
         <div className="flex flex-col gap-1 w-full mt-4">
-          <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">Quem estamos cuidando</h2>
+          <h2 className="text-sm font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-2">Quem estamos cuidando</h2>
 
           <ActivePatientCard
             activePatient={activePatient}
@@ -124,7 +124,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             onToggleRole={handleToggleRole}
           />
 
-          <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-2">Conta</h2>
+          <h2 className="text-sm font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-2 mt-6 px-2">Conta</h2>
 
           <ProfileMenuItem
             icon={<User />}
@@ -154,7 +154,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             </div>
           )}
 
-          <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Preferências</h2>
+          <h2 className="text-sm font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-2 mt-4 px-2">Preferências</h2>
 
           <ProfileMenuItem
             icon={<Settings />}

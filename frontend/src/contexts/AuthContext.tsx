@@ -100,6 +100,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadStoredData();
   }, []);
 
+  // Sync dark mode
+  useEffect(() => {
+    if (user?.darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [user?.darkMode]);
+
   const login = async (email: string, password?: string) => {
     try {
       const response = await api.post('/api/auth/login', { email, password });

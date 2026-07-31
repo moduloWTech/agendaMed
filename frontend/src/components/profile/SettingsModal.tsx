@@ -60,20 +60,17 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
       />
 
       {/* Container */}
-      <div className="relative w-full max-w-sm bg-white/95 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 sm:p-8 border border-white flex flex-col gap-6 animate-in zoom-in-95 duration-300">
-
+      <div className="relative bg-[#F4F7FA] dark:bg-slate-900 w-full max-w-md h-[90vh] sm:h-auto sm:max-h-[90vh] rounded-t-[32px] sm:rounded-[32px] shadow-2xl flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 overflow-hidden">
+        
         {/* Header */}
-        <div className="flex items-center justify-between mb-1">
-          <h2 className="text-2xl font-bold text-[var(--color-primary)]">Configurações</h2>
-          <button
-            onClick={onClose}
-            className="p-2 bg-gray-100 rounded-full text-gray-500 hover:text-gray-800 transition-colors"
-          >
+        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700 z-10">
+          <h2 className="text-xl font-bold text-[var(--color-primary)] dark:text-white">Configurações</h2>
+          <button onClick={handleSaveAndClose} className="p-2 bg-gray-50 dark:bg-slate-700 text-gray-400 dark:text-slate-300 hover:text-gray-600 dark:hover:text-white rounded-full transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="flex flex-col gap-6 overflow-y-auto max-h-[65vh] custom-scrollbar pb-2 pr-1">
+        <div className="flex flex-col gap-6 overflow-y-auto max-h-[65vh] custom-scrollbar pb-2 pr-1 p-6">
 
           {/* Seção: Lembretes Essenciais */}
           <section className="flex flex-col gap-4">
@@ -83,25 +80,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
 
             <BaseAdvanceSetting value={baseAdvance} onChange={setBaseAdvance} />
           </section>
-
-          {/* Destaque: Lembrete de Medicamentos (Obrigatório) Esta feature será desenvolvida mais tarde*/}
-          {/* <section className="bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/20 p-5 rounded-[24px]">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-[var(--color-primary)]" />
-                <h4 className="font-bold text-[var(--color-primary)]">Grupo da Família</h4>
-              </div>
-              <Toggle checked={true} disabled={true} />
-            </div>
-            <p className="text-sm text-gray-600 leading-relaxed mb-3">
-              O aviso de medicamentos para a rede de cuidadores é <strong className="text-[var(--color-primary)]">obrigatório</strong>.
-            </p>
-            <ul className="text-sm text-gray-500 space-y-1.5 font-medium">
-              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> Horário administrado</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> Quem deu o remédio</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500" /> Lista diária completa</li>
-            </ul>
-          </section> */}
 
           {/* Seção: Preferências */}
           <GeneralPreferencesSection
@@ -134,18 +112,23 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             </section>
           )}
 
-          {/* Botão Central de Ajuda */}
-          <button className="flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-700 py-4 rounded-[24px] transition-colors border border-gray-200 mt-2 font-semibold">
-            <HelpCircle className="w-5 h-5" />
-            Central de Ajuda
-          </button>
         </div>
 
         {/* Footer */}
+        <div className="p-6 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700 z-10 flex flex-col gap-3">
+          
+          <button 
+            className="flex items-center justify-center gap-2 py-3 px-4 w-full bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 hover:border-gray-200 dark:hover:border-slate-600 text-gray-600 dark:text-slate-300 font-bold rounded-[16px] transition-all"
+            onClick={() => alert('Central de Ajuda em breve')}
+          >
+            <HelpCircle className="w-5 h-5" />
+            Central de Ajuda
+          </button>
         <div className="mt-2">
           <Button fullWidth onClick={handleSaveAndClose} disabled={isSaving}>
             {isSaving ? 'Salvando...' : 'Salvar e Fechar'}
           </Button>
+        </div>
         </div>
 
       </div>

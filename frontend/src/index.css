@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --color-primary: #04273A; /* Azul escuro premium */
   --color-secondary: #CBE6EB; /* Azul claro / ciano pálido para fundos e pílulas */
@@ -9,5 +11,5 @@
 }
 
 body {
-  @apply bg-[#F4F7FA] text-gray-900 font-sans antialiased;
+  @apply bg-[#F4F7FA] dark:bg-slate-900 text-gray-900 dark:text-slate-100 font-sans antialiased transition-colors duration-300;
 }
