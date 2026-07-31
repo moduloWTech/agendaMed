@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN "darkMode" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN "defaultAlertAdvance" TEXT NOT NULL DEFAULT '24h',
+ADD COLUMN "defaultIntensiveAlerts" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN "syncGoogle" BOOLEAN NOT NULL DEFAULT false;
