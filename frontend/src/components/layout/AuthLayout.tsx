@@ -9,7 +9,7 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children, currentTab = 'agenda', onChangeTab }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-24">
       <main className="w-full max-w-md mx-auto min-h-screen relative">
         {children}
       </main>
