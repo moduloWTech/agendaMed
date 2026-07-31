@@ -1,4 +1,4 @@
-# 🏥 AgendaMed
+# 🏥 AgendaMed v1.0
 
 > **AgendaMed** é uma plataforma moderna e inteligente (PWA) desenvolvida para gerenciar o cuidado contínuo de pacientes. Criada com foco em cuidadores, familiares e profissionais de saúde, a aplicação centraliza rotinas médicas, lembretes de medicamentos, gestão de documentos e históricos de consultas em uma única interface fluida, responsiva e com experiência de aplicativo nativo.
 
@@ -15,6 +15,7 @@ Desenvolvido por **MWTech** 🚀
 - [Estrutura do Repositório](#-estrutura-do-repositório)
 - [Como Executar o Projeto Localmente](#-como-executar-o-projeto-localmente)
 - [Notificações Push e PWA](#-notificações-push-e-pwa)
+- [Automação e Deploy (CI/CD)](#-automação-e-deploy-cicd)
 
 ---
 
@@ -139,6 +140,23 @@ O servidor backend foi projetado para ser resiliente a diferenças de fuso horá
 
 ### Experiência de Instalação (PWA)
 O aplicativo possui detecção inteligente de ambiente. Caso o usuário esteja no navegador Safari (iOS), o sistema identifica a ausência de prompts nativos automáticos e exibe instruções customizadas (Modal) instruindo a usar o botão "Compartilhar" -> "Adicionar à Tela de Início", resolvendo limitações históricas da Apple para PWAs.
+
+---
+
+## ⚙️ Automação e Deploy (CI/CD)
+
+O ecossistema do AgendaMed foi projetado para operações modernas com o mínimo de fricção. As implantações da Versão 1.0 ocorrem automaticamente:
+
+### 1. Frontend (Vercel)
+A interface é hospedada na Vercel, que é conectada à branch `main`. Qualquer `git push` com mudanças na pasta `frontend/` (ou globais) aciona um build rápido. Em segundos, as atualizações ficam disponíveis em produção, sem intervenção humana.
+
+### 2. Backend API (GitHub Actions + GCP)
+A infraestrutura de servidores roda através do GitHub Actions (ver `.github/workflows/deploy-agendamed-api.yml`). Se um `commit` modificar arquivos dentro da pasta `api/`, uma nova imagem Docker é construída e enviada automaticamente via SSH para a máquina virtual no Google Cloud, atualizando os contêineres e protegendo volumes persistentes.
+
+### 3. Aplicativo Android na Play Store (TWA)
+Temos uma automação dedicada (`build-android.yml`) para compilar nosso arquivo `.aab` (Android App Bundle).
+A grande vantagem do TWA (Trusted Web Activity) é que **não precisamos enviar o app para a Google Play Store a cada atualização de código.** 
+Como as telas e regras de negócio refletem o site PWA instantaneamente, apenas construímos e atualizamos a versão na loja em casos excepcionais (como alteração do Ícone principal, nome do aplicativo, splash screens ou do `twa-manifest.json`).
 
 ---
 *Documentação mantida e atualizada pela equipe da MWTech.*
