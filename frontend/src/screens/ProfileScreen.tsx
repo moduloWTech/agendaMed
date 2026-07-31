@@ -11,6 +11,7 @@ import { UserHeader } from '../components/profile/UserHeader';
 import { CareTeamHeader } from '../components/profile/CareTeamHeader';
 import { CaregiversList } from '../components/profile/CaregiversList';
 import { EditPatientModal } from '../components/profile/EditPatientModal';
+import { ActivePatientCard } from '../components/profile/ActivePatientCard';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { usePwaInstall } from '../hooks/usePwaInstall';
@@ -101,28 +102,14 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
         <div className="flex flex-col gap-1 w-full mt-4">
           <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">Quem estamos cuidando</h2>
 
-          <div className="flex items-center justify-between bg-white px-4 py-4 rounded-2xl shadow-sm border border-gray-100 mb-2">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-[var(--color-primary)]/10 rounded-xl text-[var(--color-primary)]">
-                <User className="w-6 h-6" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-gray-800">{activePatient?.name || 'Carregando...'}</span>
-                <span className="text-sm text-gray-500">Paciente Ativo</span>
-              </div>
-            </div>
-            {user?.role === 'ADMIN' && activePatient && (
-              <button
-                onClick={() => {
-                  setNewPatientName(activePatient.name);
-                  setIsEditPatientModalOpen(true);
-                }}
-                className="text-sm font-bold text-[var(--color-primary)] px-3 py-1 bg-[var(--color-primary)]/10 rounded-full hover:bg-[var(--color-primary)]/20 transition-colors"
-              >
-                Editar
-              </button>
-            )}
-          </div>
+          <ActivePatientCard
+            activePatient={activePatient}
+            userRole={user?.role}
+            onEditClick={(name) => {
+              setNewPatientName(name);
+              setIsEditPatientModalOpen(true);
+            }}
+          />
 
           {/* Nova Seção: Equipe de Cuidados */}
           <CareTeamHeader

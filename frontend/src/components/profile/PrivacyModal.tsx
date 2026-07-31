@@ -13,20 +13,20 @@ export function PrivacyModal({ onClose }: PrivacyModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-in fade-in duration-300">
-      
+
       {/* Overlay */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Container */}
       <div className="relative w-full max-w-sm bg-white/95 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 sm:p-8 border border-white flex flex-col gap-6 animate-in zoom-in-95 duration-300">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-2xl font-bold text-[var(--color-primary)]">Privacidade</h2>
-          <button 
+          <button
             onClick={onClose}
             className="p-2 bg-gray-100 rounded-full text-gray-500 hover:text-gray-800 transition-colors"
           >
@@ -35,19 +35,19 @@ export function PrivacyModal({ onClose }: PrivacyModalProps) {
         </div>
 
         <div className="flex flex-col gap-6 overflow-y-auto max-h-[65vh] custom-scrollbar pb-2 pr-1">
-          
+
           {/* Seção: Alterar Senha */}
           <section className="flex flex-col gap-3">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider px-1">Alterar Senha</h3>
-            <Input 
+            <Input
               type="password"
               placeholder="Senha atual"
             />
-            <Input 
+            <Input
               type="password"
               placeholder="Nova senha"
             />
-            <Input 
+            <Input
               type="password"
               placeholder="Confirmar nova senha"
             />
@@ -56,7 +56,7 @@ export function PrivacyModal({ onClose }: PrivacyModalProps) {
           {/* Seção: Segurança Avançada */}
           <section className="flex flex-col gap-3">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider px-1 mt-2">Segurança</h3>
-            
+
             <div className="flex items-center justify-between bg-white p-4 rounded-[20px] shadow-sm border border-gray-100">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-indigo-50 text-indigo-500 rounded-xl">
@@ -88,7 +88,7 @@ export function PrivacyModal({ onClose }: PrivacyModalProps) {
           </section>
 
         </div>
-        
+
         {/* Footer */}
         <div className="mt-2">
           <Button fullWidth onClick={onClose}>
