@@ -11,7 +11,7 @@ interface AddAppointmentModalProps {
 }
 
 export function AddAppointmentModal({ onClose, onSaved, appointment }: AddAppointmentModalProps) {
-  const { activePatient } = useAuth();
+  const { activePatient, user } = useAuth();
   
   const [specialty, setSpecialty] = useState(appointment?.specialty || '');
   const [doctorName, setDoctorName] = useState(appointment?.doctorName || '');
@@ -19,7 +19,7 @@ export function AddAppointmentModal({ onClose, onSaved, appointment }: AddAppoin
   const [time, setTime] = useState(appointment?.time || '');
   const [location, setLocation] = useState(appointment?.location || '');
   const [notes, setNotes] = useState(appointment?.notes || '');
-  const [intensiveAlerts, setIntensiveAlerts] = useState(appointment ? appointment.intensiveAlerts : false);
+  const [intensiveAlerts, setIntensiveAlerts] = useState(appointment ? appointment.intensiveAlerts : (user?.defaultIntensiveAlerts ?? true));
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -34,7 +34,8 @@ export function AddAppointmentModal({ onClose, onSaved, appointment }: AddAppoin
         time,
         location,
         notes,
-        intensiveAlerts
+        intensiveAlerts,
+        alertHoursBefore: parseInt(user?.defaultAlertAdvance?.replace('h', '') || '24')
       };
 
       if (appointment) {

@@ -75,6 +75,24 @@ export class UserUseCase {
     await this.userRepository.delete(id);
   }
 
+  async updatePreferences(id: string, data: any): Promise<User> {
+    const schema = z.object({
+      defaultIntensiveAlerts: z.boolean().optional(),
+      defaultAlertAdvance: z.string().optional(),
+      syncGoogle: z.boolean().optional(),
+      darkMode: z.boolean().optional(),
+    });
+
+    const parsedData = schema.parse(data);
+
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('Usuário não encontrado.');
+    }
+
+    return await this.userRepository.update(id, parsedData);
+  }
+
   async inviteCaregiver(adminId: string, data: any): Promise<{ success: boolean, message: string, inviteLink?: string }> {
     const schema = z.object({
       phoneWhats: z.string().min(10, 'O telefone deve ter pelo menos 10 dígitos'),

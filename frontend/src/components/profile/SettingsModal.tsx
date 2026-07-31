@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { X, HelpCircle, RefreshCw } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 import { usePwaUpdate } from '../../contexts/PwaUpdateContext';
+import { api } from '../../services/api';
 import { FeedbackModal } from '../ui/FeedbackModal';
 import { Button } from '../ui/Button';
 import { IntensiveAlertSetting } from './IntensiveAlertSetting';
@@ -12,12 +14,41 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
-  const [remindersConsultations, setRemindersConsultations] = useState(true);
-  const [syncGoogle, setSyncGoogle] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const { user, updateUserPreferences } = useAuth();
+
+  const [remindersConsultations, setRemindersConsultations] = useState(user?.defaultIntensiveAlerts ?? true);
+  const [baseAdvance, setBaseAdvance] = useState(user?.defaultAlertAdvance ?? '24h');
+  const [syncGoogle, setSyncGoogle] = useState(user?.syncGoogle ?? false);
+  const [darkMode, setDarkMode] = useState(user?.darkMode ?? false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { needRefresh, updateApp } = usePwaUpdate();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+
+  const handleSaveAndClose = async () => {
+    if (!user) {
+      onClose();
+      return;
+    }
+    
+    setIsSaving(true);
+    try {
+      const payload = {
+        defaultIntensiveAlerts: remindersConsultations,
+        defaultAlertAdvance: baseAdvance,
+        syncGoogle,
+        darkMode
+      };
+      await api.patch(`/api/users/${user.id}/preferences`, payload);
+      updateUserPreferences(payload);
+    } catch (error) {
+      console.error('Erro ao salvar preferências', error);
+      alert('Houve um erro ao tentar salvar as preferências.');
+    } finally {
+      setIsSaving(false);
+      onClose();
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-in fade-in duration-300">
@@ -25,7 +56,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={handleSaveAndClose}
       />
 
       {/* Container */}
@@ -50,7 +81,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
 
             <IntensiveAlertSetting checked={remindersConsultations} onChange={setRemindersConsultations} />
 
-            <BaseAdvanceSetting />
+            <BaseAdvanceSetting value={baseAdvance} onChange={setBaseAdvance} />
           </section>
 
           {/* Destaque: Lembrete de Medicamentos (Obrigatório) Esta feature será desenvolvida mais tarde*/}
@@ -112,8 +143,8 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
 
         {/* Footer */}
         <div className="mt-2">
-          <Button fullWidth onClick={onClose}>
-            Salvar e Fechar
+          <Button fullWidth onClick={handleSaveAndClose} disabled={isSaving}>
+            {isSaving ? 'Salvando...' : 'Salvar e Fechar'}
           </Button>
         </div>
 

@@ -71,6 +71,25 @@ export class UserRouter {
       }
     });
 
+    // ROTA: Atualizar Preferências (Protegida)
+    app.patch('/api/users/:id/preferences', { preHandler: [authMiddleware] }, async (request, reply) => {
+      try {
+        const { id } = request.params as { id: string };
+        const userIdFromToken = (request as any).user.id;
+        
+        if (id !== userIdFromToken) {
+          return reply.status(403).send({ error: 'Você só pode alterar suas próprias preferências.' });
+        }
+
+        const user = await this.userUseCase.updatePreferences(id, request.body);
+        return reply.status(200).send(user);
+      } catch (error: any) {
+        app.log.error(error);
+        const statusCode = error.name === 'ZodError' ? 400 : 400;
+        return reply.status(statusCode).send({ error: error.message });
+      }
+    });
+
     // ROTA: Deletar Usuário (Protegida)
     app.delete('/api/users/:id', { preHandler: [authMiddleware] }, async (request, reply) => {
       try {

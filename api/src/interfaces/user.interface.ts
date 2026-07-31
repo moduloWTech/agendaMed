@@ -15,6 +15,10 @@ export interface IUserUpdate {
   name?: string;
   email?: string;
   role?: string;
+  defaultIntensiveAlerts?: boolean;
+  defaultAlertAdvance?: string;
+  syncGoogle?: boolean;
+  darkMode?: boolean;
 }
 
 export interface IUserRepository {

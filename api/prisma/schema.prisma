@@ -35,6 +35,12 @@ model User {
   ownedTenants      Tenant[]            @relation("TenantOwner")
   tenant            Tenant?             @relation("TenantUsers", fields: [tenantId], references: [id])
   patients          Patient[]           @relation("PatientCaregivers")
+  
+  // Preferências do Usuário
+  defaultIntensiveAlerts Boolean             @default(true)
+  defaultAlertAdvance    String              @default("24h")
+  syncGoogle             Boolean             @default(false)
+  darkMode               Boolean             @default(false)
 }
 
 model Patient {

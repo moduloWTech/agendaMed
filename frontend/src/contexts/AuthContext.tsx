@@ -8,6 +8,10 @@ interface User {
   phoneWhats: string;
   email: string | null;
   role: string;
+  defaultIntensiveAlerts?: boolean;
+  defaultAlertAdvance?: string;
+  syncGoogle?: boolean;
+  darkMode?: boolean;
 }
 
 interface Patient {
@@ -25,6 +29,7 @@ interface AuthContextData {
   logout: () => void;
   setActivePatient: (patient: Patient | null) => void;
   isLoading: boolean;
+  updateUserPreferences: (prefs: Partial<User>) => void;
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -54,7 +59,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 name: updatedUser.name, 
                 phoneWhats: updatedUser.phoneWhats, 
                 email: updatedUser.email, 
-                role: updatedUser.role 
+                role: updatedUser.role,
+                defaultIntensiveAlerts: updatedUser.defaultIntensiveAlerts,
+                defaultAlertAdvance: updatedUser.defaultAlertAdvance,
+                syncGoogle: updatedUser.syncGoogle,
+                darkMode: updatedUser.darkMode
               };
               setUser(u);
               localStorage.setItem('@agendaMed:user', JSON.stringify(u));
@@ -161,8 +170,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setActivePatient(null);
   };
 
+  const updateUserPreferences = (prefs: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...prefs };
+      setUser(updatedUser);
+      localStorage.setItem('@agendaMed:user', JSON.stringify(updatedUser));
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, activePatient, isAuthenticated: !!user, login, loginWithGoogle, register, logout, setActivePatient, isLoading }}>
+    <AuthContext.Provider value={{ user, activePatient, isAuthenticated: !!user, login, loginWithGoogle, register, logout, setActivePatient, isLoading, updateUserPreferences }}>
       {children}
     </AuthContext.Provider>
   );
