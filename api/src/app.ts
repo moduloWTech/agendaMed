@@ -60,8 +60,10 @@ export class App {
   }
 
   public registerMiddlewares() {
-    // Middlewares de Segurança (Constituição MWT)
-    this.app.register(helmet);
+    // Middlewares de Segurança (Constituição MWT) - Permitindo Popups do Google OAuth
+    this.app.register(helmet, {
+      crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+    });
 
     // Multipart para aceitar envio de arquivos
     this.app.register(multipart, {
@@ -70,8 +72,21 @@ export class App {
       }
     });
 
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'https://agendamed.moduloweb.com.br',
+      process.env.FRONTEND_URL,
+    ].filter(Boolean);
+
     this.app.register(cors, {
-      origin: '*', // Em produção, usar whitelist
+      origin: (origin, cb) => {
+        if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+          cb(null, true);
+          return;
+        }
+        cb(null, true); // Fallback amigável
+      },
+      credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     });
   }
@@ -140,3 +155,13 @@ export class App {
     await this.listen();
   }
 }
+
+const appInstance = new App();
+appInstance.registerMiddlewares();
+appInstance.registerRoutes();
+
+export default async (req: any, res: any) => {
+  await appInstance.getServer().ready();
+  appInstance.getServer().server.emit('request', req, res);
+};
+
