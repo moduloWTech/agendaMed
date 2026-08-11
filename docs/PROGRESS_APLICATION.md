@@ -15,10 +15,10 @@ Este documento registra o histórico de desenvolvimento, a situação atual da a
 - **Cron Job & Timezone:** Motor interno agendado (`cron.service.ts`) operando a cada minuto. Cálculo de fuso horário blindado para `America/Fortaleza` (Brasília) garantindo precisão nos alertas, independentemente do local físico do servidor em nuvem.
 
 ### 🚀 Deploy e Infraestrutura
-- **Servidor Backend (VM GCP):** API implantada em uma Máquina Virtual (VM) no Google Cloud Platform usando Docker.
-- **CI/CD Automático:** Pipeline no GitHub Actions. Push na `main` gera imagem Docker e reinicia a VM (Watchtower).
-- **Domínio e Segurança (Cloudflare):** API rodando no subdomínio `api-agendamed.moduloweb.com.br` criptografada.
-- **Frontend Vercel:** Hospedado no domínio `agendamed.moduloweb.com.br` com suporte de proxy seguro e cache agressivo (PWA).
+- **Servidor Backend (Vercel Serverless):** API migrada com sucesso da VM antiga da GCP para a arquitetura Serverless na Vercel no endereço `api-agenda-med-mwt.vercel.app`.
+- **Persistência de Sessão WhatsApp (Supabase Storage):** Criação e sincronização do bucket privado `whatsapp-auth` no Supabase Storage para armazenamento persistente de sessão do Baileys sem perdas em deploys stateless.
+- **Segurança de Autenticação:** Validação com suporte a popups do Google OAuth (COOP) e sanitização automática de segredos JWT e Client IDs.
+- **Frontend Vercel:** Hospedado no domínio `agendamed.moduloweb.com.br` apontando para a API Vercel Serverless.
 
 ### 📱 Experiência de App (PWA & Notificações Push)
 - [x] **4. Notificações e Atualizações PWA**
