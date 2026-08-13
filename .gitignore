@@ -30,6 +30,7 @@ api/src/generated/prisma/
 .env.*.local
 env_keys_agendamed.md
 .agents/
+docs/private/
 android.keystore
 keystore.b64
 agendamed-android-app/
