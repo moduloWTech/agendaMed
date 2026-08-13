@@ -2,6 +2,7 @@ node_modules
 dist
 .env
 .env.*
+!.env.example
 .DS_Store
 src/generated/prisma/
 auth_info_baileys/
