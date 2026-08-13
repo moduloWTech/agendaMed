@@ -40,11 +40,15 @@ Através de uma interface limpa, focada em UX (com modais elegantes e feedbacks 
    - Cadastro e histórico de consultas médicas, retornos e especialistas.
 4. **Cofre Médico (Vault):** 
    - Armazenamento seguro de receitas, atestados e exames diretamente na nuvem.
-5. **Experiência Nativa (PWA):** 
+5. **Relatórios Médicos Inteligentes (PDF):** 
+   - Geração e exportação com 1 clique de relatórios médicos de adesão à medicação e histórico clínico.
+   - Cálculo automático do percentual de sucesso do tratamento, doses tomadas vs. previstas e espaço para anotação/carimbo médico.
+6. **Experiência Nativa (PWA):** 
    - Instalação direta na tela inicial de dispositivos iOS e Android.
    - Funciona como um app real sem precisar baixar pelas lojas de aplicativos convencionais.
 
 ---
+
 
 ## 🏗 Arquitetura do Sistema
 
@@ -145,18 +149,21 @@ O aplicativo possui detecção inteligente de ambiente. Caso o usuário esteja n
 
 ## ⚙️ Automação e Deploy (CI/CD)
 
-O ecossistema do AgendaMed foi projetado para operações modernas com o mínimo de fricção. As implantações da Versão 1.0 ocorrem automaticamente:
+O ecossistema do AgendaMed foi projetado para operações modernas com o mínimo de fricção:
 
-### 1. Frontend (Vercel)
-A interface é hospedada na Vercel, que é conectada à branch `main`. Qualquer `git push` com mudanças na pasta `frontend/` (ou globais) aciona um build rápido. Em segundos, as atualizações ficam disponíveis em produção, sem intervenção humana.
+### 1. Frontend & Backend Serverless (Vercel)
+A interface Web (PWA) e a API Backend (Node.js/Fastify Serverless) estão hospedadas na Vercel e integradas à branch `main`. Qualquer `git push` publicado aciona o deploy em produção em segundos.
 
-### 2. Backend API (GitHub Actions + GCP)
-A infraestrutura de servidores roda através do GitHub Actions (ver `.github/workflows/deploy-agendamed-api.yml`). Se um `commit` modificar arquivos dentro da pasta `api/`, uma nova imagem Docker é construída e enviada automaticamente via SSH para a máquina virtual no Google Cloud, atualizando os contêineres e protegendo volumes persistentes.
+### 2. Validação Contínua & Quality Gate (GitHub Actions)
+Temos a esteira `.github/workflows/ci.yml` configurada para rodar a cada `push` ou `pull_request` na branch `main`, validando tipagens TypeScript (`tsc`), linting (`oxlint`), testes unitários (`vitest`) e compilação de build.
 
-### 3. Aplicativo Android na Play Store (TWA)
-Temos uma automação dedicada (`build-android.yml`) para compilar nosso arquivo `.aab` (Android App Bundle).
-A grande vantagem do TWA (Trusted Web Activity) é que **não precisamos enviar o app para a Google Play Store a cada atualização de código.** 
-Como as telas e regras de negócio refletem o site PWA instantaneamente, apenas construímos e atualizamos a versão na loja em casos excepcionais (como alteração do Ícone principal, nome do aplicativo, splash screens ou do `twa-manifest.json`).
+### 3. Migrações do Banco de Dados (Prisma + Supabase)
+O workflow `.github/workflows/prisma-migrate.yml` executa migrações de schema do Prisma ORM no Supabase PostgreSQL automaticamente sempre que houver alterações na pasta `api/prisma/`.
+
+### 4. Aplicativo Android na Play Store (TWA via Bubblewrap)
+Temos uma automação dedicada (`build-android.yml`) para compilar o arquivo `.aab` / `.apk` (Android App Bundle).
+Como as telas e regras de negócio refletem a aplicação web instantaneamente via TWA (Trusted Web Activity), **não é necessário re-enviar o app para a Google Play Store a cada atualização de código.**
+
 
 ---
 *Documentação mantida e atualizada pela equipe da MWTech.*

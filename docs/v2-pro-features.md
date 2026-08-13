@@ -34,5 +34,5 @@ Sistema de segurança avançado: se o cuidador principal (ou o paciente) não co
 ### 4. Cofre de Documentos Ilimitado
 Armazenamento na nuvem irrestrito para arquivar todos os exames de sangue, laudos, raios-x e prontuários de forma segura e organizada, criando um "dossiê" completo da saúde do paciente.
 
-### 5. Relatórios Médicos Inteligentes (Exportação)
-Geração de relatórios PDF com 1 clique, resumindo todo o histórico de medicamentos tomados, falhas, evolução de sintomas e agenda, preparado especificamente para o usuário imprimir ou enviar por e-mail para o médico antes de uma consulta.
+### 5. Relatórios Médicos Inteligentes (Exportação) ✅ [IMPLEMENTADO]
+Geração de relatórios PDF com 1 clique diretamente da API via jsPDF, resumindo o histórico de medicamentos tomados, taxa de adesão (%), doses previstas vs. confirmadas e lista de remédios, preparado especificamente para o usuário imprimir ou baixar antes de uma consulta.
