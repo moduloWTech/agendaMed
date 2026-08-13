@@ -142,10 +142,16 @@ Acesse `http://localhost:5173` no navegador.
 ### Motor de Fuso Horário (Timezone Engine)
 O servidor backend foi projetado para ser resiliente a diferenças de fuso horário de servidores em nuvem. Utilizando `Intl.DateTimeFormat` configurado para `America/Fortaleza`, a API calcula o disparo correto dos medicamentos garantindo que pacientes brasileiros sejam notificados na exata hora local cadastrada, mesmo se o servidor estiver em UTC.
 
+### Notificações Push & Chaves VAPID (Como Funciona)
+O sistema utiliza o padrão W3C **VAPID** (*Voluntary Application Server Identification*) para autenticação de Web Push nativo:
+- **`VAPID_PUBLIC_KEY` (Pública):** Utilizada no aplicativo (Frontend) para registrar a permissão de notificação do celular nos servidores do Google (Android/FCM) ou Apple (iOS/APNs).
+- **`VAPID_PRIVATE_KEY` (Privada):** Armazenada de forma restrita no servidor (`api/.env`), utilizada pelo motor de Cron para assinar e entregar alertas na tela de bloqueio com custo zero de mensagens e alta confiabilidade.
+
 ### Experiência de Instalação (PWA)
 O aplicativo possui detecção inteligente de ambiente. Caso o usuário esteja no navegador Safari (iOS), o sistema identifica a ausência de prompts nativos automáticos e exibe instruções customizadas (Modal) instruindo a usar o botão "Compartilhar" -> "Adicionar à Tela de Início", resolvendo limitações históricas da Apple para PWAs.
 
 ---
+
 
 ## ⚙️ Automação e Deploy (CI/CD)
 

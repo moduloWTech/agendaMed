@@ -88,9 +88,14 @@ PORT=3000
 ```env
 VITE_API_URL="http://localhost:3000"
 VITE_VAPID_PUBLIC_KEY="sua-chave-publica-push"
+VITE_GOOGLE_CLIENT_ID="seu-google-client-id"
 ```
 
+> 💡 **Nota sobre as Chaves VAPID (Web Push):**  
+> As chaves `VAPID_PUBLIC_KEY` (pública) e `VAPID_PRIVATE_KEY` (privada) são o par de chaves criptográficas do padrão W3C Web Push. A chave pública autoriza a permissão de notificação no celular (iOS/Android) e a chave privada permite que o backend envie alertas no horário exato do remédio com custo zero de mensagem.
+
 ---
+
 
 ## ⚙️ 5. Esteira de CI/CD & Deploy
 
