@@ -65,6 +65,17 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
     }
   };
 
+  const handleRemoveCaregiver = async (targetId: string, caregiverName: string) => {
+    if (confirm(`Tem certeza que deseja remover ${caregiverName} da equipe de cuidados?`)) {
+      try {
+        await api.delete(`/api/users/${targetId}`);
+        loadCaregivers();
+      } catch (error: any) {
+        alert(error.response?.data?.error || error.message || 'Erro ao remover cuidador');
+      }
+    }
+  };
+
   useEffect(() => {
     loadCaregivers();
   }, [activePatient]);
@@ -135,6 +146,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             currentUserId={user?.id}
             currentUserRole={user?.role}
             onToggleRole={handleToggleRole}
+            onRemoveCaregiver={handleRemoveCaregiver}
           />
 
           <h2 className="text-sm font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-2 mt-6 px-2">Conta</h2>

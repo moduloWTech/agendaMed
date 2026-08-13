@@ -91,15 +91,17 @@ export class UserRouter {
     });
 
     // ROTA: Deletar Usuário (Protegida)
-    app.delete('/api/users/:id', { preHandler: [authMiddleware] }, async (request, reply) => {
+    app.delete('/api/users/:id', { preHandler: [authMiddleware] }, async (request: any, reply) => {
       try {
-        const { id } = request.params as { id: string };
-        const tenantId = (request as any).user.tenantId;
-        await this.userUseCase.deleteUser(id, tenantId);
+        const targetUserId = request.params.id;
+        const requesterId = request.user.id;
+        const tenantId = request.user.tenantId;
+        await this.userUseCase.deleteUser(requesterId, targetUserId, tenantId);
         return reply.status(204).send(); // 204 No Content
       } catch (error: any) {
         app.log.error(error);
-        return reply.status(404).send({ error: error.message });
+        const statusCode = error.message.includes('Apenas') || error.message.includes('negado') ? 403 : 400;
+        return reply.status(statusCode).send({ error: error.message });
       }
     });
 
