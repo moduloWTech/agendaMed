@@ -32,6 +32,17 @@ jobs:
 
       - name: Run Prisma Migrate Deploy
         env:
-          DATABASE_URL: ${{ secrets.DIRECT_URL_PROD || secrets.DATABASE_URL }}
-        run: npx prisma migrate deploy
+          SECRET_DIRECT: ${{ secrets.DIRECT_URL_PROD }}
+          SECRET_DB: ${{ secrets.DATABASE_URL }}
+        run: |
+          URL="${SECRET_DIRECT:-$SECRET_DB}"
+          if [ -z "$URL" ]; then
+            echo "::error::Nenhuma secret de banco de dados (DATABASE_URL ou DIRECT_URL_PROD) foi cadastrada no GitHub Secrets."
+            echo "Para resolver, adicione a secret DATABASE_URL no seu repositório no GitHub:"
+            echo "  Acesse: Settings -> Secrets and variables -> Actions -> New repository secret"
+            echo "  Nome: DATABASE_URL (ou DIRECT_URL_PROD)"
+            echo "  Valor: URL de conexão do PostgreSQL Supabase"
+            exit 1
+          fi
+          DATABASE_URL="$URL" npx prisma migrate deploy
         working-directory: api
