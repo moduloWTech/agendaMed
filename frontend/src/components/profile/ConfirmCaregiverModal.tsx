@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trash2, ShieldAlert, Loader2 } from 'lucide-react';
+import { Trash2, ShieldAlert, Loader2, AlertCircle } from 'lucide-react';
 
 interface ConfirmCaregiverModalProps {
   type: 'REMOVE' | 'TOGGLE_ROLE';
@@ -17,14 +17,17 @@ export function ConfirmCaregiverModal({
   onConfirm,
 }: ConfirmCaregiverModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleConfirm = async () => {
     setIsLoading(true);
+    setError('');
     try {
       await onConfirm();
       onClose();
-    } catch (e) {
+    } catch (e: any) {
       setIsLoading(false);
+      setError(e.message || 'Não foi possível realizar esta ação.');
     }
   };
 
@@ -59,6 +62,14 @@ export function ConfirmCaregiverModal({
               : 'Remover Permissão de Admin'
           }
         </h3>
+
+        {/* Banner de Erro caso a API falhe */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 text-xs font-semibold rounded-2xl border border-red-100 dark:border-red-900/50 flex items-center gap-2 text-left">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+            <span>{error}</span>
+          </div>
+        )}
 
         {/* Mensagem Explicativa */}
         <p className="text-xs text-gray-500 dark:text-slate-400 mb-6 leading-relaxed">

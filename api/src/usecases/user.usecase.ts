@@ -79,7 +79,8 @@ export class UserUseCase {
       throw new Error('Usuário não encontrado.');
     }
 
-    if (tenantId && targetUser.tenantId !== tenantId) {
+    const effectiveTenantId = tenantId || requester.tenantId;
+    if (effectiveTenantId && targetUser.tenantId && targetUser.tenantId !== effectiveTenantId) {
       throw new Error('Acesso negado. O usuário não pertence à sua família.');
     }
 
