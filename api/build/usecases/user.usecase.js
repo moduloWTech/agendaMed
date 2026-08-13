@@ -58,6 +58,9 @@ class UserUseCase {
         return await this.userRepository.update(id, parsedData);
     }
     async deleteUser(requesterId, targetId, tenantId) {
+        if (!requesterId || !targetId) {
+            throw new Error('Identificador de usuário inválido.');
+        }
         const requester = await this.userRepository.findById(requesterId);
         if (!requester || requester.role !== 'ADMIN') {
             throw new Error('Apenas administradores podem remover membros da equipe.');

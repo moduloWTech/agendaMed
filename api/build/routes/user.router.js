@@ -23,7 +23,7 @@ class UserRouter {
         // ROTA: Convidar Cuidador (Protegida)
         app.post('/api/users/invite', { preHandler: [auth_middleware_1.authMiddleware] }, async (request, reply) => {
             try {
-                const adminId = request.user.id; // Correção: O payload do JWT salva como "id" e não "userId"
+                const adminId = request.user.id || request.user.userId;
                 const user = await this.userUseCase.inviteCaregiver(adminId, request.body);
                 return reply.status(201).send(user);
             }
@@ -77,7 +77,7 @@ class UserRouter {
         app.patch('/api/users/:id/preferences', { preHandler: [auth_middleware_1.authMiddleware] }, async (request, reply) => {
             try {
                 const { id } = request.params;
-                const userIdFromToken = request.user.id;
+                const userIdFromToken = request.user.id || request.user.userId;
                 if (id !== userIdFromToken) {
                     return reply.status(403).send({ error: 'Você só pode alterar suas próprias preferências.' });
                 }
@@ -94,21 +94,21 @@ class UserRouter {
         app.delete('/api/users/:id', { preHandler: [auth_middleware_1.authMiddleware] }, async (request, reply) => {
             try {
                 const targetUserId = request.params.id;
-                const requesterId = request.user.id;
-                const tenantId = request.user.tenantId;
+                const requesterId = request.user?.id || request.user?.userId;
+                const tenantId = request.user?.tenantId;
                 await this.userUseCase.deleteUser(requesterId, targetUserId, tenantId);
                 return reply.status(204).send(); // 204 No Content
             }
             catch (error) {
                 app.log.error(error);
-                const statusCode = error.message.includes('Apenas') || error.message.includes('negado') ? 403 : 400;
-                return reply.status(statusCode).send({ error: error.message });
+                const statusCode = error.message?.includes('Apenas') || error.message?.includes('negado') ? 403 : 400;
+                return reply.status(statusCode).send({ error: error.message || 'Erro ao remover cuidador' });
             }
         });
         // ROTA: Alterar cargo do usuário (Protegida, apenas ADMIN)
         app.patch('/api/users/:id/role', { preHandler: [auth_middleware_1.authMiddleware] }, async (request, reply) => {
             try {
-                const adminId = request.user.id;
+                const adminId = request.user?.id || request.user?.userId;
                 const targetUserId = request.params.id;
                 const { role } = request.body;
                 const updatedUser = await this.userUseCase.changeUserRole(adminId, targetUserId, role);
@@ -116,7 +116,7 @@ class UserRouter {
             }
             catch (error) {
                 app.log.error(error);
-                const statusCode = error.name === 'ZodError' ? 400 : (error.message.includes('Apenas admin') ? 403 : 400);
+                const statusCode = error.name === 'ZodError' ? 400 : (error.message?.includes('Apenas') ? 403 : 400);
                 return reply.status(statusCode).send({ error: error.message });
             }
         });

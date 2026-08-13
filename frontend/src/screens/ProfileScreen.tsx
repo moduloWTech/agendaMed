@@ -76,7 +76,6 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
       }
       loadCaregivers();
     } catch (error: any) {
-      alert(error.response?.data?.error || error.message || 'Erro ao realizar ação');
       throw error;
     }
   };
