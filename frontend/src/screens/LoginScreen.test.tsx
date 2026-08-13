@@ -3,6 +3,11 @@ import { describe, it, expect, vi } from 'vitest';
 import { LoginScreen } from './LoginScreen';
 import { AuthContext } from '../contexts/AuthContext';
 
+vi.mock('@react-oauth/google', () => ({
+  GoogleLogin: () => <div data-testid="google-login-mock">Google Login</div>,
+  GoogleOAuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 const mockLogin = vi.fn();
 const mockRegister = vi.fn();
 
