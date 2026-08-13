@@ -35,7 +35,7 @@ export function InviteAcceptScreen() {
     setError('');
 
     try {
-      const response = await api.post('/api/auth/accept-invite', {
+      const data = await api.post('/api/auth/accept-invite', {
         token,
         name,
         email,
@@ -43,10 +43,15 @@ export function InviteAcceptScreen() {
         password
       });
 
-      if (response.data && response.data.accessToken) {
-        // Save token and reload page to trigger normal auth flow
-        localStorage.setItem('@AgendaMed:token', response.data.accessToken);
+      if (data && data.accessToken) {
+        // Salva token e dados do usuário para login instantâneo
+        localStorage.setItem('@agendaMed:token', data.accessToken);
+        if (data.user) {
+          localStorage.setItem('@agendaMed:user', JSON.stringify(data.user));
+        }
         window.location.href = '/';
+      } else {
+        setError('Erro ao aceitar convite.');
       }
     } catch (err: any) {
       setError(err.response?.data?.error || err.message || 'Erro ao aceitar convite.');
