@@ -11,3 +11,4 @@
 - 📘 PROJETO DE ARQUITETURA: ESTEIRA AUTO-REPLICÁVEL DE CODE REVIEW E ECOSSISTEMA DE AUTO-CURA (SELF-HEALING) VIA MULTI-AGENTES
 - 🧬 DNA MW Technology | Manual de Cultura e Operação
 - 📘 Manual de Arquitetura e Negócios: Micro-SaaS e Licenciamento Escalonável
+- 📋 Como Preparar o Projeto para a Venda (Guia Reutilizável MW Technology)
