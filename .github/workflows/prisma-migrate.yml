@@ -1,4 +1,5 @@
 name: Prisma Database Migrate (Supabase)
+# Workflow de migrações automáticas do Prisma no Supabase
 
 on:
   push:
