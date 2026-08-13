@@ -93,14 +93,16 @@ class UserRouter {
         // ROTA: Deletar Usuário (Protegida)
         app.delete('/api/users/:id', { preHandler: [auth_middleware_1.authMiddleware] }, async (request, reply) => {
             try {
-                const { id } = request.params;
+                const targetUserId = request.params.id;
+                const requesterId = request.user.id;
                 const tenantId = request.user.tenantId;
-                await this.userUseCase.deleteUser(id, tenantId);
+                await this.userUseCase.deleteUser(requesterId, targetUserId, tenantId);
                 return reply.status(204).send(); // 204 No Content
             }
             catch (error) {
                 app.log.error(error);
-                return reply.status(404).send({ error: error.message });
+                const statusCode = error.message.includes('Apenas') || error.message.includes('negado') ? 403 : 400;
+                return reply.status(statusCode).send({ error: error.message });
             }
         });
         // ROTA: Alterar cargo do usuário (Protegida, apenas ADMIN)

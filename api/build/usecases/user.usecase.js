@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserUseCase = void 0;
 const zod_1 = require("zod");
+const prisma_config_1 = require("../DB/prisma.config");
 class UserUseCase {
     userRepository;
     constructor(userRepository) {
@@ -56,15 +57,45 @@ class UserUseCase {
         }
         return await this.userRepository.update(id, parsedData);
     }
-    async deleteUser(id, tenantId) {
-        const user = await this.userRepository.findById(id);
-        if (!user) {
+    async deleteUser(requesterId, targetId, tenantId) {
+        const requester = await this.userRepository.findById(requesterId);
+        if (!requester || requester.role !== 'ADMIN') {
+            throw new Error('Apenas administradores podem remover membros da equipe.');
+        }
+        if (requesterId === targetId) {
+            throw new Error('Você não pode remover a si mesmo.');
+        }
+        const targetUser = await this.userRepository.findById(targetId);
+        if (!targetUser) {
             throw new Error('Usuário não encontrado.');
         }
-        if (tenantId && user.tenantId !== tenantId) {
+        if (tenantId && targetUser.tenantId !== tenantId) {
             throw new Error('Acesso negado. O usuário não pertence à sua família.');
         }
-        await this.userRepository.delete(id);
+        // Verifica se é o dono do Tenant
+        if (targetUser.tenantId) {
+            const tenant = await prisma_config_1.prisma.tenant.findUnique({ where: { id: targetUser.tenantId } });
+            if (tenant && tenant.ownerId === targetId) {
+                throw new Error('O proprietário da conta não pode ser removido.');
+            }
+        }
+        // Remove a vinculação do usuário com o Tenant e Pacientes
+        await prisma_config_1.prisma.user.update({
+            where: { id: targetId },
+            data: {
+                tenantId: null,
+                patients: {
+                    set: []
+                }
+            }
+        });
+        // Tenta deletar fisicamente o usuário se não houver impedimentos de chave estrangeira (ex: histórico)
+        try {
+            await this.userRepository.delete(targetId);
+        }
+        catch (e) {
+            // Se houver histórico mantem o registro preservado mas 100% desvinculado do grupo
+        }
     }
     async updatePreferences(id, data) {
         const schema = zod_1.z.object({
