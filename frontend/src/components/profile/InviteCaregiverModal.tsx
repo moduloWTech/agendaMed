@@ -47,15 +47,15 @@ export function InviteCaregiverModal({ onClose, onSuccess }: InviteCaregiverModa
     setError('');
 
     try {
-      const response = await api.post('/api/users/invite', {
+      const data = await api.post('/api/users/invite', {
         phoneWhats: unformattedPhone,
         name: name,
         patientId: activePatient.id,
         patientName: activePatient.name
       });
       
-      if (response.data && response.data.inviteLink) {
-        setInviteLink(response.data.inviteLink);
+      if (data && data.inviteLink) {
+        setInviteLink(data.inviteLink);
         onSuccess();
       } else {
         setError('Não foi possível gerar o link de convite.');
