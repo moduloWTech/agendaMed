@@ -56,7 +56,6 @@ export function InviteCaregiverModal({ onClose, onSuccess }: InviteCaregiverModa
       
       if (data && data.inviteLink) {
         setInviteLink(data.inviteLink);
-        onSuccess();
       } else {
         setError('Não foi possível gerar o link de convite.');
       }
@@ -119,7 +118,10 @@ export function InviteCaregiverModal({ onClose, onSuccess }: InviteCaregiverModa
 
               {/* Botão de Fechar */}
               <button
-                onClick={onClose}
+                onClick={() => {
+                  onSuccess();
+                  onClose();
+                }}
                 className="w-full py-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 font-medium text-xs rounded-xl transition-all"
               >
                 Concluir
