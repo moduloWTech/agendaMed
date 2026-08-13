@@ -18,6 +18,8 @@ import { api } from '../services/api';
 import { usePwaInstall } from '../hooks/usePwaInstall';
 import { usePwaUpdate } from '../contexts/PwaUpdateContext';
 
+import { ConfirmCaregiverModal } from '../components/profile/ConfirmCaregiverModal';
+
 interface ProfileScreenProps {
   onLogout?: () => void;
 }
@@ -37,6 +39,14 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   const [newPatientName, setNewPatientName] = useState('');
   const [isSavingPatient, setIsSavingPatient] = useState(false);
 
+  // Estado para o Modal de Confirmação de Ações de Cuidadores (Remover / Cargo)
+  const [caregiverActionModal, setCaregiverActionModal] = useState<{
+    type: 'REMOVE' | 'TOGGLE_ROLE';
+    targetId: string;
+    caregiverName: string;
+    currentRole?: string;
+  } | null>(null);
+
   // Formata telefone se disponível
   const displayPhone = user?.phoneWhats || 'Sem telefone';
 
@@ -53,26 +63,21 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
     }
   };
 
-  const handleToggleRole = async (targetId: string, currentRole: string) => {
-    try {
-      const newRole = currentRole === 'ADMIN' ? 'CARE_GIVER' : 'ADMIN';
-      if (confirm(`Tem certeza que deseja alterar o cargo para ${newRole === 'ADMIN' ? 'Administrador' : 'Cuidador'}?`)) {
-        await api.patch(`/api/users/${targetId}/role`, { role: newRole });
-        loadCaregivers();
-      }
-    } catch (error: any) {
-      alert(error.response?.data?.error || 'Erro ao alterar cargo');
-    }
-  };
+  const handleConfirmAction = async () => {
+    if (!caregiverActionModal) return;
+    const { type, targetId, currentRole } = caregiverActionModal;
 
-  const handleRemoveCaregiver = async (targetId: string, caregiverName: string) => {
-    if (confirm(`Tem certeza que deseja remover ${caregiverName} da equipe de cuidados?`)) {
-      try {
+    try {
+      if (type === 'REMOVE') {
         await api.delete(`/api/users/${targetId}`);
-        loadCaregivers();
-      } catch (error: any) {
-        alert(error.response?.data?.error || error.message || 'Erro ao remover cuidador');
+      } else if (type === 'TOGGLE_ROLE') {
+        const newRole = currentRole === 'ADMIN' ? 'CARE_GIVER' : 'ADMIN';
+        await api.patch(`/api/users/${targetId}/role`, { role: newRole });
       }
+      loadCaregivers();
+    } catch (error: any) {
+      alert(error.response?.data?.error || error.message || 'Erro ao realizar ação');
+      throw error;
     }
   };
 
@@ -145,8 +150,8 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
             caregivers={caregivers}
             currentUserId={user?.id}
             currentUserRole={user?.role}
-            onToggleRole={handleToggleRole}
-            onRemoveCaregiver={handleRemoveCaregiver}
+            onToggleRole={(id, role, name) => setCaregiverActionModal({ type: 'TOGGLE_ROLE', targetId: id, currentRole: role, caregiverName: name })}
+            onRemoveCaregiver={(id, name) => setCaregiverActionModal({ type: 'REMOVE', targetId: id, caregiverName: name })}
           />
 
           <h2 className="text-sm font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-2 mt-6 px-2">Conta</h2>
@@ -252,6 +257,17 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
           patientId={activePatient.id}
           patientName={activePatient.name}
           onClose={() => setIsReportModalOpen(false)}
+        />
+      )}
+
+      {/* Modal de Confirmação de Ações na Equipe de Cuidadores */}
+      {caregiverActionModal && (
+        <ConfirmCaregiverModal
+          type={caregiverActionModal.type}
+          caregiverName={caregiverActionModal.caregiverName}
+          currentRole={caregiverActionModal.currentRole}
+          onClose={() => setCaregiverActionModal(null)}
+          onConfirm={handleConfirmAction}
         />
       )}
     </div>

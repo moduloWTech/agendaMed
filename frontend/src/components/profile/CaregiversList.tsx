@@ -11,7 +11,7 @@ interface CaregiversListProps {
   caregivers: Caregiver[];
   currentUserId?: string;
   currentUserRole?: string;
-  onToggleRole: (targetId: string, currentRole: string) => void;
+  onToggleRole: (targetId: string, currentRole: string, caregiverName: string) => void;
   onRemoveCaregiver?: (targetId: string, caregiverName: string) => void;
 }
 
@@ -49,7 +49,7 @@ export function CaregiversList({
           {currentUserRole === 'ADMIN' && cg.id !== currentUserId && (
             <div className="flex items-center gap-1.5">
               <button
-                onClick={() => onToggleRole(cg.id, cg.role)}
+                onClick={() => onToggleRole(cg.id, cg.role, cg.name || 'este cuidador')}
                 className={`text-xs font-bold px-2.5 py-1 rounded-full transition-colors ${
                   cg.role === 'ADMIN'
                     ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50'
