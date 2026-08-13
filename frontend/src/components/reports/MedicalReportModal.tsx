@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Printer, Calendar, AlertCircle, User, Activity, ChevronLeft } from 'lucide-react';
+import { Calendar, AlertCircle, User, Activity, ChevronLeft, Download } from 'lucide-react';
 import { api } from '../../services/api';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface MedicalReportModalProps {
   patientId: string;
@@ -50,12 +52,209 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
     fetchReportData();
   }, [startDate, endDate, patientId]);
 
-  // Dispara caixa de diálogo de impressão/salvar em PDF
-  const handlePrint = () => {
-    window.print();
+  // Gera e baixa o arquivo PDF nativo vetorial diretamente a partir dos dados da API
+  const handleDownloadPDF = () => {
+    if (!reportData) return;
+
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    const primaryColor = '#1E3A8A'; // Azul escuro corporativo/médico
+    const darkTextColor = '#0F172A';
+    const grayTextColor = '#64748B';
+
+    // 1. Cabeçalho Principal (Título e Subtítulo)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(24);
+    doc.setTextColor(primaryColor);
+    doc.text('AgendaMed', 14, 20);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(grayTextColor);
+    doc.text('Relatório Clínico de Adesão à Medicação', 14, 27);
+
+    // Data de Emissão à direita
+    const emitDate = new Date().toLocaleDateString('pt-BR');
+    doc.setFontSize(9);
+    doc.setTextColor(grayTextColor);
+    doc.text('Data de Emissão:', 196, 20, { align: 'right' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(darkTextColor);
+    doc.text(emitDate, 196, 26, { align: 'right' });
+
+    // Linha divisória sob o cabeçalho
+    doc.setDrawColor(30, 58, 138);
+    doc.setLineWidth(0.8);
+    doc.line(14, 31, 196, 31);
+
+    // 2. Ficha do Paciente
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(14, 35, 182, 22, 3, 3, 'F');
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(14, 35, 182, 22, 3, 3, 'S');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(grayTextColor);
+    doc.text('PACIENTE', 18, 41);
+    doc.text('PERÍODO DE ANÁLISE', 110, 41);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(darkTextColor);
+    doc.text(reportData.patient?.name || patientName || 'Paciente', 18, 49);
+
+    const startFormatted = new Date(reportData.period.startDate + 'T00:00:00').toLocaleDateString('pt-BR');
+    const endFormatted = new Date(reportData.period.endDate + 'T00:00:00').toLocaleDateString('pt-BR');
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${startFormatted} a ${endFormatted} (${reportData.period.daysCount} dias)`, 110, 49);
+
+    // 3. Métricas de Adesão ao Tratamento
+    let currentY = 64;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(grayTextColor);
+    doc.text('RESUMO DE ADESÃO AO TRATAMENTO', 14, currentY);
+
+    currentY += 4;
+    // Card 1: Taxa de Adesão (%)
+    doc.setFillColor(30, 58, 138);
+    doc.roundedRect(14, currentY, 56, 18, 3, 3, 'F');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor('#FFFFFF');
+    doc.text('TAXA DE SUCECO', 42, currentY + 6, { align: 'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text(`${reportData.metrics.adherencePercentage}%`, 42, currentY + 14, { align: 'center' });
+
+    // Card 2: Doses Programadas
+    doc.setFillColor(239, 246, 255);
+    doc.roundedRect(77, currentY, 56, 18, 3, 3, 'F');
+    doc.setDrawColor(191, 219, 254);
+    doc.roundedRect(77, currentY, 56, 18, 3, 3, 'S');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor('#1E40AF');
+    doc.text('DOSES PREVISTAS', 105, currentY + 6, { align: 'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text(`${reportData.metrics.totalScheduledDoses}`, 105, currentY + 14, { align: 'center' });
+
+    // Card 3: Doses Confirmadas
+    doc.setFillColor(236, 253, 245);
+    doc.roundedRect(140, currentY, 56, 18, 3, 3, 'F');
+    doc.setDrawColor(167, 243, 208);
+    doc.roundedRect(140, currentY, 56, 18, 3, 3, 'S');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor('#065F46');
+    doc.text('DOSES TOMADAS', 168, currentY + 6, { align: 'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text(`${reportData.metrics.takenDoses}`, 168, currentY + 14, { align: 'center' });
+
+    currentY += 24;
+
+    // 4. Tabela de Medicamentos Em Prescrição
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(grayTextColor);
+    doc.text('MEDICAMENTOS EM PRESCRIÇÃO', 14, currentY);
+    currentY += 3;
+
+    const medsData = (reportData.medications || []).map((m: any) => [
+      m.name,
+      m.dosage,
+      m.frequency,
+      m.times?.join(', ') || '-',
+      m.active ? 'Ativo' : 'Inativo',
+    ]);
+
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Medicamento', 'Dosagem', 'Frequência', 'Horários', 'Status']],
+      body: medsData.length > 0 ? medsData : [['Nenhum medicamento registrado', '-', '-', '-', '-']],
+      theme: 'grid',
+      headStyles: { fillColor: [30, 58, 138], textColor: 255, fontStyle: 'bold', fontSize: 9 },
+      styles: { fontSize: 8.5, cellPadding: 3 },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { left: 14, right: 14 },
+    });
+
+    currentY = (doc as any).lastAutoTable.finalY + 10;
+
+    // 5. Tabela de Registros Diários (Check-ins)
+    if (currentY > 220) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(grayTextColor);
+    doc.text('HISTÓRICO DIÁRIO DE REGISTROS (ÚLTIMOS CHECK-INS)', 14, currentY);
+    currentY += 3;
+
+    const logsData = (reportData.historyLogs || []).slice(0, 30).map((log: any) => [
+      new Date(log.date + 'T00:00:00').toLocaleDateString('pt-BR'),
+      log.time,
+      log.medicationName,
+      log.dosage,
+      log.registeredBy || 'Cuidador',
+    ]);
+
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Data', 'Hora', 'Medicamento', 'Dosagem', 'Registrado por']],
+      body: logsData.length > 0 ? logsData : [['Nenhum check-in registrado no período', '-', '-', '-', '-']],
+      theme: 'grid',
+      headStyles: { fillColor: [71, 85, 105], textColor: 255, fontStyle: 'bold', fontSize: 9 },
+      styles: { fontSize: 8.5, cellPadding: 2.5 },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { left: 14, right: 14 },
+    });
+
+    currentY = (doc as any).lastAutoTable.finalY + 12;
+
+    if (currentY > 230) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    // 6. Campo para Anotações Médicas & Assinatura
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(grayTextColor);
+    doc.text('ANOTAÇÕES E PRESCRIÇÃO MÉDICA (USO EXCLUSIVO DO MÉDICO):', 14, currentY);
+
+    currentY += 4;
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineDashPattern([2, 2], 0);
+    doc.setFillColor(250, 250, 250);
+    doc.roundedRect(14, currentY, 182, 20, 2, 2, 'FD');
+    doc.setLineDashPattern([], 0);
+
+    currentY += 28;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(grayTextColor);
+    doc.text('Documento gerado automaticamente pela plataforma AgendaMed', 14, currentY);
+    doc.text('Assinatura / Carimbo do Médico: ___________________________', 196, currentY, { align: 'right' });
+
+    // Salva e força o download direto do arquivo PDF
+    const filename = `Relatorio_Medico_${(patientName || 'Paciente').replace(/\s+/g, '_')}.pdf`;
+    doc.save(filename);
   };
 
-  // Avaliação textual da adesão
+  // Avaliação textual da adesão para visualização na tela
   const getAdherenceBadge = (percent: number) => {
     if (percent >= 90) return { label: 'Excelente Adesão', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
     if (percent >= 70) return { label: 'Boa Adesão', color: 'bg-blue-100 text-blue-800 border-blue-200' };
@@ -64,38 +263,13 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto print:p-0 print:static print:bg-white print:overflow-visible">
+    <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto">
       
-      {/* Estilos específicos para Impressão em PDF A4 */}
-      <style>{`
-        @media print {
-          @page {
-            size: A4 portrait;
-            margin: 10mm 12mm 10mm 12mm;
-          }
-          body {
-            background: white !important;
-            color: black !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          .print\\:hidden {
-            display: none !important;
-          }
-          .print\\:block {
-            display: block !important;
-          }
-          .page-break-avoid {
-            page-break-inside: avoid;
-          }
-        }
-      `}</style>
-
-      {/* Container Principal do Modal (Design Responsivo Mobile & Desktop) */}
-      <div className="relative w-full max-w-4xl h-full sm:h-auto sm:max-h-[90vh] bg-white dark:bg-slate-900 sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col print:max-h-none print:shadow-none print:rounded-none border-0 sm:border border-slate-100 dark:border-slate-800">
+      {/* Container Principal do Modal (Design Responsivo Mobile Native) */}
+      <div className="relative w-full max-w-4xl h-full sm:h-auto sm:max-h-[90vh] bg-white dark:bg-slate-900 sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border-0 sm:border border-slate-100 dark:border-slate-800">
         
-        {/* Cabeçalho Mobile Native Style (Oculto no Print) */}
-        <div className="flex items-center justify-between px-5 py-4 bg-[var(--color-primary)] text-white shadow-md print:hidden shrink-0">
+        {/* Cabeçalho Mobile Native Style */}
+        <div className="flex items-center justify-between px-5 py-4 bg-[var(--color-primary)] text-white shadow-md shrink-0">
           <div className="flex items-center gap-3">
             <button 
               onClick={onClose}
@@ -111,17 +285,17 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
           </div>
           
           <button
-            onClick={handlePrint}
+            onClick={handleDownloadPDF}
             disabled={loading || !!error}
             className="p-2.5 bg-white/15 hover:bg-white/25 active:scale-95 rounded-2xl text-white transition-all flex items-center gap-1.5 text-xs font-semibold sm:hidden"
           >
-            <Printer className="w-4 h-4" />
+            <Download className="w-4 h-4" />
             <span>PDF</span>
           </button>
         </div>
 
-        {/* Barra de Filtro de Período (Pills Flutuantes Responsivas - Oculto no Print) */}
-        <div className="px-5 py-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 overflow-x-auto print:hidden shrink-0">
+        {/* Barra de Filtro de Período (Pills Flutuantes Responsivas) */}
+        <div className="px-5 py-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 overflow-x-auto shrink-0">
           <div className="flex items-center gap-1.5 shrink-0">
             <Calendar className="w-4 h-4 text-slate-500" />
             <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">Período:</span>
@@ -144,16 +318,16 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
           </div>
 
           <button
-            onClick={handlePrint}
+            onClick={handleDownloadPDF}
             disabled={loading || !!error}
             className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] text-white font-semibold text-xs rounded-xl shadow-md hover:bg-[var(--color-accent)] active:scale-95 transition-all disabled:opacity-50 shrink-0"
           >
-            <Printer className="w-4 h-4" /> Imprimir / PDF
+            <Download className="w-4 h-4" /> Baixar Relatório PDF
           </button>
         </div>
 
-        {/* Área de Conteúdo do Relatório (Rolagem Suave) */}
-        <div className="flex-1 p-4 sm:p-8 overflow-y-auto print:overflow-visible print:p-0 bg-slate-50/50 dark:bg-slate-900 print:bg-white" ref={reportRef}>
+        {/* Área de Visualização do Conteúdo na Tela */}
+        <div className="flex-1 p-4 sm:p-8 overflow-y-auto bg-slate-50/50 dark:bg-slate-900" ref={reportRef}>
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 text-slate-400">
               <div className="w-10 h-10 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin mb-4" />
@@ -166,32 +340,31 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
             </div>
           ) : reportData ? (
             
-            /* DOCUMENTO MÉDICO (Formatado para A4 / Impressão Profissional) */
-            <div className="w-full max-w-3xl mx-auto bg-white text-slate-900 p-6 sm:p-8 rounded-2xl sm:shadow-sm border border-slate-200/80 print:border-0 print:p-0 print:shadow-none font-sans">
+            <div className="w-full max-w-3xl mx-auto bg-white text-slate-900 p-6 sm:p-8 rounded-2xl sm:shadow-sm border border-slate-200/80 font-sans">
               
-              {/* Header do Laudo/Relatório */}
+              {/* Header de Prévia na Tela */}
               <div className="flex items-center justify-between border-b-2 border-slate-800 pb-5 mb-6">
                 <div>
                   <div className="flex items-center gap-2">
-                    <Activity className="w-6 h-6 text-[var(--color-primary)] print:text-black" />
-                    <h1 className="text-2xl font-black tracking-tight text-slate-900 print:text-black">AgendaMed</h1>
+                    <Activity className="w-6 h-6 text-[var(--color-primary)]" />
+                    <h1 className="text-2xl font-black tracking-tight text-slate-900">AgendaMed</h1>
                   </div>
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mt-0.5">Relatório Clínico de Adesão à Medicação</p>
                 </div>
 
                 <div className="text-right">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Emissão</span>
-                  <span className="text-sm font-bold text-slate-800 print:text-black">{new Date().toLocaleDateString('pt-BR')}</span>
+                  <span className="text-sm font-bold text-slate-800">{new Date().toLocaleDateString('pt-BR')}</span>
                 </div>
               </div>
 
               {/* Ficha Resumo do Paciente */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 mb-6 print:bg-slate-50 print:border-slate-300">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 mb-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Paciente</span>
                     <span className="text-base font-bold text-slate-900 flex items-center gap-1.5 mt-0.5">
-                      <User className="w-4 h-4 text-[var(--color-primary)] print:text-black shrink-0" />
+                      <User className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
                       {reportData.patient.name}
                     </span>
                   </div>
@@ -205,7 +378,7 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
               </div>
 
               {/* Placa de Avaliação de Adesão */}
-              <div className="mb-7 page-break-avoid">
+              <div className="mb-7">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Índice de Adesão ao Tratamento</h3>
                   {(() => {
@@ -219,7 +392,7 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="p-3.5 rounded-xl bg-slate-900 text-white text-center print:bg-slate-900 print:text-white">
+                  <div className="p-3.5 rounded-xl bg-slate-900 text-white text-center">
                     <span className="text-[10px] font-bold uppercase tracking-wider opacity-80 block">Taxa Sucesso</span>
                     <span className="text-2xl font-black">{reportData.metrics.adherencePercentage}%</span>
                   </div>
@@ -237,7 +410,7 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
               </div>
 
               {/* Tabela 1: Medicamentos em Uso */}
-              <div className="mb-7 page-break-avoid">
+              <div className="mb-7">
                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">Medicamentos em Prescrição</h3>
                 {reportData.medications.length === 0 ? (
                   <p className="text-xs text-slate-400 italic">Nenhum medicamento registrado.</p>
@@ -274,7 +447,7 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
               </div>
 
               {/* Tabela 2: Registro Diário de Tomadas */}
-              <div className="mb-7 page-break-avoid">
+              <div className="mb-7">
                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">Histórico Diário de Registro (Últimos Check-ins)</h3>
                 {reportData.historyLogs.length === 0 ? (
                   <p className="text-xs text-slate-400 italic">Nenhum check-in registrado no período selecionado.</p>
@@ -297,7 +470,7 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
                               {new Date(log.date + 'T00:00:00').toLocaleDateString('pt-BR')}
                             </td>
                             <td className="p-2.5 font-bold text-slate-900">{log.time}</td>
-                            <td className="p-2.5 font-bold text-[var(--color-primary)] print:text-black">{log.medicationName}</td>
+                            <td className="p-2.5 font-bold text-[var(--color-primary)]">{log.medicationName}</td>
                             <td className="p-2.5 text-slate-600">{log.dosage}</td>
                             <td className="p-2.5 text-right text-slate-500 font-medium">{log.registeredBy}</td>
                           </tr>
@@ -308,32 +481,19 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
                 )}
               </div>
 
-              {/* Bloco de Anotações Médicas & Assinatura (Print Ready) */}
-              <div className="border-t-2 border-slate-200 pt-5 mt-6 page-break-avoid">
-                <h4 className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">Anotações do Médico & Prescrição:</h4>
-                <div className="min-h-[90px] border border-dashed border-slate-300 rounded-xl bg-slate-50/50 p-3 text-xs text-slate-400">
-                  Espaço reservado para observações da consulta, ajustes de dosagem ou carimbo/assinatura médica.
-                </div>
-
-                <div className="mt-8 pt-4 flex items-end justify-between text-[10px] text-slate-400 border-t border-slate-100">
-                  <span>Documento gerado automaticamente pela plataforma AgendaMed</span>
-                  <span>Assinatura / Carimbo do Médico: ___________________________</span>
-                </div>
-              </div>
-
             </div>
           ) : null}
         </div>
 
-        {/* Floating Mobile Bottom Action Bar (Oculto no Print) */}
-        <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 print:hidden shrink-0">
+        {/* Floating Mobile Bottom Action Bar */}
+        <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shrink-0">
           <button
-            onClick={handlePrint}
+            onClick={handleDownloadPDF}
             disabled={loading || !!error}
             className="w-full h-13 bg-[var(--color-primary)] text-white font-bold text-base rounded-2xl shadow-lg shadow-[var(--color-primary)]/25 hover:bg-[var(--color-accent)] active:scale-95 transition-all flex items-center justify-center gap-2.5 disabled:opacity-50"
           >
-            <Printer className="w-5 h-5" />
-            <span>Imprimir ou Salvar em PDF</span>
+            <Download className="w-5 h-5" />
+            <span>Baixar Relatório PDF</span>
           </button>
         </div>
 
