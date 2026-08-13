@@ -41,7 +41,7 @@ describe('InviteCaregiverModal', () => {
 
     const nameInput = screen.getByPlaceholderText(/Nome do cuidador/i);
     const phoneInput = screen.getByPlaceholderText(/\(DD\) 9XXXX-XXXX/i);
-    const submitBtn = screen.getByRole('button', { name: /Enviar Convite/i });
+    const submitBtn = screen.getByRole('button', { name: /Gerar Convite/i });
 
     fireEvent.change(nameInput, { target: { value: 'A' } });
     fireEvent.change(phoneInput, { target: { value: '11988887777' } });
