@@ -18,17 +18,20 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [error, setError] = useState('');
+
   const handleSave = async () => {
     if (!activePatient) {
-      alert('Selecione um paciente ativo primeiro.');
+      setError('Selecione um paciente ativo primeiro.');
       return;
     }
     if (!title) {
-      alert('Preencha o título do documento.');
+      setError('Preencha o título do documento.');
       return;
     }
 
     setIsLoading(true);
+    setError('');
     try {
       let finalFileUrl = 'https://example.com/mock-doc.pdf'; // Fallback
 
@@ -54,7 +57,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
       });
       window.location.reload();
     } catch (error: any) {
-      alert('Erro ao salvar documento: ' + (error.message || 'Erro desconhecido'));
+      setError('Erro ao salvar documento: ' + (error.message || 'Erro desconhecido'));
       setIsLoading(false);
     }
   };
@@ -89,6 +92,12 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar">
+
+          {error && (
+            <div className="p-3 bg-red-50 text-red-600 text-xs font-semibold rounded-xl border border-red-100">
+              {error}
+            </div>
+          )}
 
           {/* Câmera / Área de Foto */}
           <div 

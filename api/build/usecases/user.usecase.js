@@ -76,11 +76,14 @@ class UserUseCase {
         if (effectiveTenantId && targetUser.tenantId && targetUser.tenantId !== effectiveTenantId) {
             throw new Error('Acesso negado. O usuário não pertence à sua família.');
         }
-        // Verifica se é o dono do Tenant
+        // Se o usuário a ser removido for o owner do Tenant, transfere a posse para o Admin requisitante
         if (targetUser.tenantId) {
             const tenant = await prisma_config_1.prisma.tenant.findUnique({ where: { id: targetUser.tenantId } });
             if (tenant && tenant.ownerId === targetId) {
-                throw new Error('O proprietário da conta não pode ser removido.');
+                await prisma_config_1.prisma.tenant.update({
+                    where: { id: targetUser.tenantId },
+                    data: { ownerId: requesterId }
+                });
             }
         }
         // Remove a vinculação do usuário com o Tenant e Pacientes

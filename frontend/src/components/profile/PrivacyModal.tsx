@@ -81,7 +81,7 @@ export function PrivacyModal({ onClose }: PrivacyModalProps) {
               <p className="text-sm text-red-600/80 dark:text-red-400/80 mb-4 font-medium">
                 Ao excluir sua conta, você perderá acesso a todos os prontuários e agendamentos.
               </p>
-              <Button variant="alert" fullWidth onClick={() => alert('Confirmação de exclusão não implementada')}>
+              <Button variant="alert" fullWidth onClick={() => {}}>
                 Excluir Conta
               </Button>
             </div>

@@ -43,7 +43,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
       updateUserPreferences(payload);
     } catch (error) {
       console.error('Erro ao salvar preferências', error);
-      alert('Houve um erro ao tentar salvar as preferências.');
     } finally {
       setIsSaving(false);
       onClose();
@@ -119,7 +118,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           
           <button 
             className="flex items-center justify-center gap-2 py-3 px-4 w-full bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 hover:border-gray-200 dark:hover:border-slate-600 text-gray-600 dark:text-slate-300 font-bold rounded-[16px] transition-all"
-            onClick={() => alert('Central de Ajuda em breve')}
+            onClick={() => {}}
           >
             <HelpCircle className="w-5 h-5" />
             Central de Ajuda

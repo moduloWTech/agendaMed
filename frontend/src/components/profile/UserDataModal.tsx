@@ -17,15 +17,17 @@ export function UserDataModal({ onClose }: UserDataModalProps) {
   const [email, setEmail] = useState(user?.email || '');
   const phone = user?.phoneWhats || '';
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   
   const handleSave = async () => {
     if (!user) return;
     setIsLoading(true);
+    setError('');
     try {
       await api.put(`/api/users/${user.id}`, { name, email });
       window.location.reload();
     } catch (err: any) {
-      alert(err.message || 'Erro ao salvar os dados.');
+      setError(err.message || 'Erro ao salvar os dados.');
       setIsLoading(false);
     }
   };
@@ -52,6 +54,12 @@ export function UserDataModal({ onClose }: UserDataModalProps) {
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-600 text-xs font-semibold rounded-xl border border-red-100">
+            {error}
+          </div>
+        )}
 
         {/* Formulário com Dados Reais */}
         <div className="flex flex-col gap-4 overflow-y-auto max-h-[60vh] pb-2 custom-scrollbar">

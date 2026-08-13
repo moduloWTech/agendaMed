@@ -21,10 +21,12 @@ export function AddAppointmentModal({ onClose, onSaved, appointment }: AddAppoin
   const [notes, setNotes] = useState(appointment?.notes || '');
   const [intensiveAlerts, setIntensiveAlerts] = useState(appointment ? appointment.intensiveAlerts : (user?.defaultIntensiveAlerts ?? true));
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSave = async () => {
     if (!activePatient || !specialty || !date || !time) return;
     setIsSaving(true);
+    setError('');
     try {
       const payload = {
         patientId: activePatient.id,
@@ -44,9 +46,9 @@ export function AddAppointmentModal({ onClose, onSaved, appointment }: AddAppoin
         await api.post('/api/appointments', payload);
       }
       onSaved();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao salvar consulta', error);
-      alert('Não foi possível salvar a consulta. Verifique os dados.');
+      setError(error.message || 'Não foi possível salvar a consulta. Verifique os dados.');
     } finally {
       setIsSaving(false);
     }
@@ -54,14 +56,14 @@ export function AddAppointmentModal({ onClose, onSaved, appointment }: AddAppoin
 
   const handleDelete = async () => {
     if (!appointment) return;
-    if (!window.confirm('Deseja realmente excluir esta consulta?')) return;
     setIsSaving(true);
+    setError('');
     try {
       await api.delete(`/api/appointments/${appointment.id}`);
       onSaved();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao excluir consulta', error);
-      alert('Não foi possível excluir a consulta.');
+      setError(error.message || 'Não foi possível excluir a consulta.');
       setIsSaving(false);
     }
   };
@@ -84,6 +86,11 @@ export function AddAppointmentModal({ onClose, onSaved, appointment }: AddAppoin
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-6 scrollbar-hide">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-600 text-xs font-semibold rounded-xl border border-red-100">
+              {error}
+            </div>
+          )}
           <div className="space-y-6">
             
             {/* Especialidade */}

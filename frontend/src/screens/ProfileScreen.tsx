@@ -92,7 +92,6 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
     } catch (error) {
       console.error('Erro ao renomear', error);
       setIsSavingPatient(false);
-      alert('Erro ao renomear. Tente novamente.');
     }
   };
 
@@ -169,14 +168,10 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
                 title="Instalar Aplicativo"
                 subtitle="Tenha acesso rápido na tela inicial"
                 onClick={() => {
-                  if (isIOS) {
+                  if (isIOS || !isInstallable) {
                     setIsInstallModalOpen(true);
                   } else {
-                    if (isInstallable) {
-                      promptInstall();
-                    } else {
-                      alert('Para instalar, toque nos 3 pontinhos do menu do navegador e selecione "Instalar Aplicativo" ou "Adicionar à Tela Inicial".');
-                    }
+                    promptInstall();
                   }
                 }}
               />
@@ -206,7 +201,6 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
               danger
               onClick={() => {
                 if (onLogout) onLogout();
-                else alert("Logout não configurado.");
               }}
             />
           </div>
