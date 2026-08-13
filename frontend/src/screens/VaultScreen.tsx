@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, FileText } from 'lucide-react';
 import { DocumentCard } from '../components/vault/DocumentCard';
 import { AddDocumentModal } from '../components/vault/AddDocumentModal';
+import { MedicalReportModal } from '../components/reports/MedicalReportModal';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 
 export function VaultScreen() {
   const { activePatient } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [documents, setDocuments] = useState<any[]>([]);
 
   useEffect(() => {
@@ -49,6 +51,22 @@ export function VaultScreen() {
 
       {/* Conteúdo Principal */}
       <div className="flex-1 px-6 pt-8 pb-32">
+
+        {/* Banner Gerar Relatório Médico */}
+        <button
+          onClick={() => setIsReportModalOpen(true)}
+          className="w-full mb-6 p-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] text-white rounded-2xl flex items-center justify-between shadow-md hover:opacity-95 active:scale-95 transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <FileText className="w-6 h-6 shrink-0" />
+            <div className="text-left">
+              <span className="font-bold text-sm block">Gerar Relatório Médico (PDF)</span>
+              <span className="text-xs text-white/80 block">Histórico completo de adesão para a consulta</span>
+            </div>
+          </div>
+          <span className="text-xs bg-white/20 px-3 py-1.5 rounded-xl font-bold whitespace-nowrap">Gerar PDF</span>
+        </button>
+
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">Documentos Recentes</h2>
           <span className="text-sm font-bold text-[var(--color-accent)]">Ver Todos</span>
@@ -87,6 +105,15 @@ export function VaultScreen() {
       {isModalOpen && (
         <AddDocumentModal onClose={() => setIsModalOpen(false)} />
       )}
+
+      {isReportModalOpen && activePatient && (
+        <MedicalReportModal
+          patientId={activePatient.id}
+          patientName={activePatient.name}
+          onClose={() => setIsReportModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
+

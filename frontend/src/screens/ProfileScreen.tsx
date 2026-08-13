@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Settings, Lock, LogOut, Download } from 'lucide-react';
+import { User, Settings, Lock, LogOut, Download, FileText } from 'lucide-react';
 import HeaderImg from '../assets/login-header.png';
 import { ProfileMenuItem } from '../components/profile/ProfileMenuItem';
 import { UserDataModal } from '../components/profile/UserDataModal';
@@ -12,6 +12,7 @@ import { CareTeamHeader } from '../components/profile/CareTeamHeader';
 import { CaregiversList } from '../components/profile/CaregiversList';
 import { EditPatientModal } from '../components/profile/EditPatientModal';
 import { ActivePatientCard } from '../components/profile/ActivePatientCard';
+import { MedicalReportModal } from '../components/reports/MedicalReportModal';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { usePwaInstall } from '../hooks/usePwaInstall';
@@ -29,6 +30,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   // Estados para o Modal de Edição de Paciente
   const [isEditPatientModalOpen, setIsEditPatientModalOpen] = useState(false);
@@ -110,6 +112,17 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
               setIsEditPatientModalOpen(true);
             }}
           />
+
+          {activePatient && (
+            <div className="my-1">
+              <ProfileMenuItem
+                icon={<FileText className="text-[var(--color-primary)] dark:text-slate-300" />}
+                title="Relatório Médico em PDF"
+                subtitle="Histórico de adesão e medicações para a consulta"
+                onClick={() => setIsReportModalOpen(true)}
+              />
+            </div>
+          )}
 
           {/* Nova Seção: Equipe de Cuidados */}
           <CareTeamHeader
@@ -220,6 +233,16 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
           onSave={handleRenamePatient}
         />
       )}
+
+      {/* Modal de Relatório Médico */}
+      {isReportModalOpen && activePatient && (
+        <MedicalReportModal
+          patientId={activePatient.id}
+          patientName={activePatient.name}
+          onClose={() => setIsReportModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
+

@@ -35,6 +35,20 @@ export class PatientRouter {
       }
     });
 
+    // ROTA: Obter Dados do Relatório de Saúde do Paciente
+    scopedApp.get('/api/patients/:id/report-data', async (request, reply) => {
+      try {
+        const { id } = request.params as { id: string };
+        const { startDate, endDate } = request.query as { startDate?: string; endDate?: string };
+        const tenantId = (request as any).user.tenantId;
+        const reportData = await this.patientUseCase.getReportData(id, tenantId, startDate, endDate);
+        return reply.status(200).send(reportData);
+      } catch (error: any) {
+        app.log.error(error);
+        return reply.status(400).send({ error: error.message || 'Erro ao gerar dados do relatório' });
+      }
+    });
+
     // ROTA: Obter Paciente Específico
     scopedApp.get('/api/patients/:id', async (request, reply) => {
       try {
