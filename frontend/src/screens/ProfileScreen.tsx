@@ -65,29 +65,17 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
 
   const handleConfirmAction = async () => {
     if (!caregiverActionModal) return;
-    const { type, targetId, currentRole, caregiverName } = caregiverActionModal;
-
-    console.log(`🗑️ [Confirm Modal Action Triggered]`, {
-      type,
-      targetId,
-      caregiverName,
-      currentRole,
-      loggedUserContext: user,
-      storedToken: localStorage.getItem('@agendaMed:token') ? 'PRESENT' : 'MISSING',
-    });
+    const { type, targetId, currentRole } = caregiverActionModal;
 
     try {
       if (type === 'REMOVE') {
         await api.delete(`/api/users/${targetId}`);
-        console.log(`✅ [Caregiver Removed Successfully] targetId: ${targetId}`);
       } else if (type === 'TOGGLE_ROLE') {
         const newRole = currentRole === 'ADMIN' ? 'CARE_GIVER' : 'ADMIN';
         await api.patch(`/api/users/${targetId}/role`, { role: newRole });
-        console.log(`✅ [Caregiver Role Toggled] targetId: ${targetId}, newRole: ${newRole}`);
       }
       loadCaregivers();
     } catch (error: any) {
-      console.error(`🚨 [Caregiver Action Failed]`, error);
       throw error;
     }
   };

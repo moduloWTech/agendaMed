@@ -18,7 +18,6 @@ export const api = {
 
 async function request(endpoint: string, method: string, body?: any, options?: { isMultipart?: boolean }) {
   const token = localStorage.getItem('@agendaMed:token');
-  const user = localStorage.getItem('@agendaMed:user');
   
   const headers: Record<string, string> = {};
   
@@ -32,14 +31,6 @@ async function request(endpoint: string, method: string, body?: any, options?: {
   }
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3333';
-  
-  console.log(`🚀 [API Request] ${method} ${API_URL}${endpoint}`, {
-    headers,
-    body,
-    tokenPreview: token ? `${token.substring(0, 25)}...` : 'NONE',
-    currentUserInStorage: user ? JSON.parse(user) : null
-  });
-
   const response = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers,
@@ -48,21 +39,13 @@ async function request(endpoint: string, method: string, body?: any, options?: {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    console.error(`❌ [API Error Response] ${method} ${endpoint}`, {
-      status: response.status,
-      statusText: response.statusText,
-      errorData,
-    });
     throw new Error(errorData.message || errorData.error || `HTTP Error ${response.status}`);
   }
 
   // Se for 204 No Content, retorna nulo para não quebrar no JSON
   if (response.status === 204) {
-    console.log(`✅ [API Success] ${method} ${endpoint} (204 No Content)`);
     return null;
   }
 
-  const json = await response.json();
-  console.log(`✅ [API Success] ${method} ${endpoint}`, json);
-  return json;
+  return response.json();
 }
