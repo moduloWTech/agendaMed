@@ -22,7 +22,8 @@ async function request(endpoint: string, method: string, body?: any, options?: {
   
   const headers: Record<string, string> = {};
   
-  if (!options?.isMultipart) {
+  // Apenas define Content-Type como application/json se houver um corpo (body) a ser enviado
+  if (!options?.isMultipart && body !== undefined && body !== null) {
     headers['Content-Type'] = 'application/json';
   }
   
