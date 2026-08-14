@@ -74,7 +74,7 @@ export function AddAppointmentModal({ onClose, onSaved, appointment }: AddAppoin
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4 animate-in fade-in duration-300">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative bg-white dark:bg-slate-900 w-full max-w-md h-[90vh] sm:h-auto sm:max-h-[90vh] rounded-t-[32px] sm:rounded-[32px] shadow-2xl flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 overflow-hidden">
+      <div className="relative bg-white dark:bg-slate-900 w-full max-w-md md:max-w-2xl h-[90vh] sm:h-auto sm:max-h-[90vh] rounded-t-[32px] sm:rounded-[32px] shadow-2xl flex flex-col animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 overflow-hidden">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 z-10">
@@ -93,37 +93,40 @@ export function AddAppointmentModal({ onClose, onSaved, appointment }: AddAppoin
           )}
           <div className="space-y-6">
             
-            {/* Especialidade */}
-            <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Especialidade / Exame *</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Stethoscope className="w-5 h-5 text-gray-400 dark:text-slate-500" />
+            {/* Linha 1 no Desktop: Especialidade e Médico */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Especialidade */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Especialidade / Exame *</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Stethoscope className="w-5 h-5 text-gray-400 dark:text-slate-500" />
+                  </div>
+                  <input
+                    type="text"
+                    value={specialty}
+                    onChange={(e) => setSpecialty(e.target.value)}
+                    placeholder="Ex: Cardiologista, Hemograma..."
+                    className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[20px] pl-12 pr-4 py-4 text-gray-800 dark:text-slate-100 font-medium outline-none transition-all"
+                  />
                 </div>
-                <input
-                  type="text"
-                  value={specialty}
-                  onChange={(e) => setSpecialty(e.target.value)}
-                  placeholder="Ex: Cardiologista, Hemograma..."
-                  className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[20px] pl-12 pr-4 py-4 text-gray-800 dark:text-slate-100 font-medium outline-none transition-all"
-                />
               </div>
-            </div>
 
-            {/* Nome do Médico */}
-            <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Médico (Opcional)</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="w-5 h-5 text-gray-400 dark:text-slate-500" />
+              {/* Nome do Médico */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Médico (Opcional)</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <User className="w-5 h-5 text-gray-400 dark:text-slate-500" />
+                  </div>
+                  <input
+                    type="text"
+                    value={doctorName}
+                    onChange={(e) => setDoctorName(e.target.value)}
+                    placeholder="Nome do profissional"
+                    className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[20px] pl-12 pr-4 py-4 text-gray-800 dark:text-slate-100 font-medium outline-none transition-all"
+                  />
                 </div>
-                <input
-                  type="text"
-                  value={doctorName}
-                  onChange={(e) => setDoctorName(e.target.value)}
-                  placeholder="Nome do profissional"
-                  className="w-full bg-[#F8FAFC] dark:bg-slate-800 border-2 border-transparent focus:border-[var(--color-primary)] dark:focus:border-slate-500 rounded-[20px] pl-12 pr-4 py-4 text-gray-800 dark:text-slate-100 font-medium outline-none transition-all"
-                />
               </div>
             </div>
 
