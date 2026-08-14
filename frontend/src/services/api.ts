@@ -38,6 +38,11 @@ async function request(endpoint: string, method: string, body?: any, options?: {
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('@agendaMed:token');
+      localStorage.removeItem('@agendaMed:user');
+      window.dispatchEvent(new Event('auth:unauthorized'));
+    }
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || errorData.error || `HTTP Error ${response.status}`);
   }

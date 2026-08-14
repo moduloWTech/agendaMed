@@ -98,6 +98,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     loadStoredData();
+
+    const handleUnauthorized = () => {
+      setUser(null);
+      setActivePatient(null);
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+    };
   }, []);
 
   // Sync dark mode
