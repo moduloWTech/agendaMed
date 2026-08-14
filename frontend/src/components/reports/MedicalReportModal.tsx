@@ -415,34 +415,70 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
                 {reportData.medications.length === 0 ? (
                   <p className="text-xs text-slate-400 italic">Nenhum medicamento registrado.</p>
                 ) : (
-                  <div className="border border-slate-200 rounded-xl overflow-hidden">
-                    <table className="w-full text-left text-xs border-collapse">
-                      <thead>
-                        <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                          <th className="p-2.5">Medicamento</th>
-                          <th className="p-2.5">Dosagem</th>
-                          <th className="p-2.5">Frequência</th>
-                          <th className="p-2.5">Horários</th>
-                          <th className="p-2.5 text-right">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {reportData.medications.map((med: any) => (
-                          <tr key={med.id} className="hover:bg-slate-50">
-                            <td className="p-2.5 font-bold text-slate-900">{med.name}</td>
-                            <td className="p-2.5 text-slate-600">{med.dosage}</td>
-                            <td className="p-2.5 text-slate-600">{med.frequency}</td>
-                            <td className="p-2.5 font-semibold text-slate-800">{med.times?.join(', ') || '-'}</td>
-                            <td className="p-2.5 text-right">
-                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${med.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
-                                {med.active ? 'Ativo' : 'Inativo'}
-                              </span>
-                            </td>
+                  <>
+                    {/* Visualização Mobile: Cards Verticais */}
+                    <div className="flex flex-col gap-2.5 sm:hidden">
+                      {reportData.medications.map((med: any) => (
+                        <div key={med.id} className="p-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xs flex flex-col gap-2">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-sm text-slate-900 dark:text-slate-100">{med.name}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${med.active ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400'}`}>
+                              {med.active ? 'Ativo' : 'Inativo'}
+                            </span>
+                          </div>
+                          
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600 dark:text-slate-300">
+                            <span><strong className="text-slate-400 font-semibold">Dosagem:</strong> {med.dosage}</span>
+                            <span>•</span>
+                            <span><strong className="text-slate-400 font-semibold">Frequência:</strong> {med.frequency}</span>
+                          </div>
+
+                          {med.times && med.times.length > 0 && (
+                            <div className="flex items-center gap-1.5 pt-1.5 border-t border-slate-100 dark:border-slate-700/60">
+                              <span className="text-[11px] font-semibold text-slate-400">⏰ Horários:</span>
+                              <div className="flex flex-wrap gap-1">
+                                {med.times.map((time: string, i: number) => (
+                                  <span key={i} className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 rounded-md text-[11px] font-bold">
+                                    {time}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Visualização Desktop: Tabela Tradicional */}
+                    <div className="hidden sm:block border border-slate-200 rounded-xl overflow-hidden bg-white">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+                            <th className="p-2.5">Medicamento</th>
+                            <th className="p-2.5">Dosagem</th>
+                            <th className="p-2.5">Frequência</th>
+                            <th className="p-2.5">Horários</th>
+                            <th className="p-2.5 text-right">Status</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {reportData.medications.map((med: any) => (
+                            <tr key={med.id} className="hover:bg-slate-50 transition-colors">
+                              <td className="p-2.5 font-bold text-slate-900">{med.name}</td>
+                              <td className="p-2.5 text-slate-700 font-medium">{med.dosage}</td>
+                              <td className="p-2.5 text-slate-700 font-medium">{med.frequency}</td>
+                              <td className="p-2.5 font-semibold text-slate-800">{med.times?.join(', ') || '-'}</td>
+                              <td className="p-2.5 text-right">
+                                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${med.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
+                                  {med.active ? 'Ativo' : 'Inativo'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
                 )}
               </div>
 
@@ -452,32 +488,65 @@ export function MedicalReportModal({ patientId, patientName, onClose }: MedicalR
                 {reportData.historyLogs.length === 0 ? (
                   <p className="text-xs text-slate-400 italic">Nenhum check-in registrado no período selecionado.</p>
                 ) : (
-                  <div className="border border-slate-200 rounded-xl overflow-hidden">
-                    <table className="w-full text-left text-xs border-collapse">
-                      <thead>
-                        <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                          <th className="p-2.5">Data</th>
-                          <th className="p-2.5">Hora</th>
-                          <th className="p-2.5">Medicamento</th>
-                          <th className="p-2.5">Dosagem</th>
-                          <th className="p-2.5 text-right">Registrado por</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {reportData.historyLogs.slice(0, 25).map((log: any) => (
-                          <tr key={log.id} className="hover:bg-slate-50">
-                            <td className="p-2.5 font-medium text-slate-700">
-                              {new Date(log.date + 'T00:00:00').toLocaleDateString('pt-BR')}
-                            </td>
-                            <td className="p-2.5 font-bold text-slate-900">{log.time}</td>
-                            <td className="p-2.5 font-bold text-[var(--color-primary)]">{log.medicationName}</td>
-                            <td className="p-2.5 text-slate-600">{log.dosage}</td>
-                            <td className="p-2.5 text-right text-slate-500 font-medium">{log.registeredBy}</td>
+                  <>
+                    {/* Visualização Mobile: Cards de Check-in */}
+                    <div className="flex flex-col gap-2 sm:hidden">
+                      {reportData.historyLogs.slice(0, 30).map((log: any) => (
+                        <div key={log.id} className="p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xs flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md text-[11px] font-semibold">
+                                📅 {new Date(log.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                              </span>
+                              <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] rounded-md">
+                                ⏰ {log.time}
+                              </span>
+                            </div>
+                            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                              {log.dosage}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 dark:border-slate-700/60">
+                            <span className="font-bold text-xs text-[var(--color-primary)] dark:text-blue-400">
+                              💊 {log.medicationName}
+                            </span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                              👤 {log.registeredBy}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Visualização Desktop: Tabela Tradicional */}
+                    <div className="hidden sm:block border border-slate-200 rounded-xl overflow-hidden bg-white">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+                            <th className="p-2.5">Data</th>
+                            <th className="p-2.5">Hora</th>
+                            <th className="p-2.5">Medicamento</th>
+                            <th className="p-2.5">Dosagem</th>
+                            <th className="p-2.5 text-right">Registrado por</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {reportData.historyLogs.slice(0, 25).map((log: any) => (
+                            <tr key={log.id} className="hover:bg-slate-50 transition-colors">
+                              <td className="p-2.5 font-semibold text-slate-700">
+                                {new Date(log.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                              </td>
+                              <td className="p-2.5 font-black text-slate-900">{log.time}</td>
+                              <td className="p-2.5 font-bold text-[var(--color-primary)]">{log.medicationName}</td>
+                              <td className="p-2.5 text-slate-700 font-medium">{log.dosage}</td>
+                              <td className="p-2.5 text-right text-slate-700 font-medium">{log.registeredBy}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
                 )}
               </div>
 
