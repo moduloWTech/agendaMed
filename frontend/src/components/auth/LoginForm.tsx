@@ -61,22 +61,33 @@ export function LoginForm() {
 
   return (
     <div 
-      className="fixed inset-0 w-full h-full bg-cover bg-center flex items-center justify-center p-4 sm:p-8"
+      className="fixed md:static inset-0 w-full h-full md:h-auto bg-cover bg-center md:bg-none flex items-center justify-center p-4 sm:p-8 md:p-0 z-50 md:z-auto"
       style={{ backgroundImage: `url(${bgImage})` }}
       aria-label="Fundo desfocado com tema de saúde e bem-estar"
     >
-      <div className="absolute inset-0 bg-[var(--color-primary)]/20 backdrop-blur-sm" aria-hidden="true" />
+      <div className="absolute md:hidden inset-0 bg-[var(--color-primary)]/20 backdrop-blur-sm" aria-hidden="true" />
       
-      <div className="relative w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/50 animate-in fade-in zoom-in-95 duration-500 overflow-y-auto max-h-[90vh]">
+      <div className="relative w-full max-w-md bg-white/95 dark:bg-slate-800/95 md:bg-white md:dark:bg-slate-800 backdrop-blur-md rounded-3xl shadow-2xl md:shadow-xl p-6 sm:p-8 border border-white/50 dark:border-slate-700/60 animate-in fade-in zoom-in-95 duration-500 overflow-y-auto max-h-[90vh] md:max-h-none">
         
-        <div className="text-center mb-6">
+        {/* Mobile-only Branding Header */}
+        <div className="text-center mb-6 md:hidden">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">AgendaMed</h2>
-          <p className="text-gray-500 mt-2 text-lg">Cuidado e carinho em família</p>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">AgendaMed</h2>
+          <p className="text-gray-500 dark:text-slate-400 mt-2 text-lg">Cuidado e carinho em família</p>
+        </div>
+
+        {/* Desktop-only Title & Subtitle */}
+        <div className="hidden md:block mb-6">
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+            {mode === 'login' ? 'Acesse sua conta' : 'Crie sua conta familiar'}
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {mode === 'login' ? 'Entre com seu e-mail ou Google para continuar' : 'Cadastre-se para coordenar os cuidados do seu familiar'}
+          </p>
         </div>
 
         <div className="flex flex-col gap-4 mb-6">
@@ -94,9 +105,9 @@ export function LoginForm() {
             />
           </div>
           <div className="relative flex py-2 items-center">
-            <div className="flex-grow border-t border-gray-200"></div>
-            <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">ou continue com e-mail</span>
-            <div className="flex-grow border-t border-gray-200"></div>
+            <div className="flex-grow border-t border-gray-200 dark:border-slate-700"></div>
+            <span className="flex-shrink-0 mx-4 text-gray-400 dark:text-slate-500 text-xs uppercase font-medium">ou continue com e-mail</span>
+            <div className="flex-grow border-t border-gray-200 dark:border-slate-700"></div>
           </div>
         </div>
 
