@@ -33,14 +33,14 @@ describe('LoginScreen', () => {
     renderWithContext(<LoginScreen />);
     expect(screen.getByRole('heading', { name: /Acesse sua conta/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/E-mail/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Senha/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Senha$/i)).toBeInTheDocument();
   });
 
   it('allows user to type and submit login form', async () => {
     renderWithContext(<LoginScreen />);
     
     const emailInput = screen.getByLabelText(/E-mail/i);
-    const passwordInput = screen.getByLabelText(/Senha/i);
+    const passwordInput = screen.getByLabelText(/^Senha$/i);
     const submitBtn = screen.getByRole('button', { name: /Entrar/i });
 
     fireEvent.change(emailInput, { target: { value: 'test@test.com' } });
@@ -51,6 +51,22 @@ describe('LoginScreen', () => {
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith('test@test.com', '123456');
     });
+  });
+
+  it('toggles password visibility when eye button is clicked', () => {
+    renderWithContext(<LoginScreen />);
+    
+    const passwordInput = screen.getByLabelText(/^Senha$/i);
+    expect(passwordInput).toHaveAttribute('type', 'password');
+
+    const toggleBtn = screen.getByLabelText(/Exibir senha/i);
+    fireEvent.click(toggleBtn);
+
+    expect(passwordInput).toHaveAttribute('type', 'text');
+    expect(screen.getByLabelText(/Ocultar senha/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText(/Ocultar senha/i));
+    expect(passwordInput).toHaveAttribute('type', 'password');
   });
 
   it('switches to register mode', () => {

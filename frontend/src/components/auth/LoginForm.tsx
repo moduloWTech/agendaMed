@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -11,6 +12,7 @@ export function LoginForm() {
   
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Form Fields
   const [name, setName] = useState('');
@@ -162,13 +164,29 @@ export function LoginForm() {
 
           <Input
             label="Senha"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
             aria-required="true"
+            rightElement={
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="text-gray-400 hover:text-[var(--color-primary)] dark:hover:text-slate-200 transition-colors p-1.5 focus:outline-none cursor-pointer"
+                aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                title={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            }
           />
 
           {error && (
