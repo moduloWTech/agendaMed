@@ -77,7 +77,7 @@ export function AddDocumentModal({ onClose }: AddDocumentModalProps) {
       />
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-t-[40px] sm:rounded-[40px] shadow-2xl flex flex-col max-h-[90vh] animate-in slide-in-from-bottom duration-300">
+      <div className="relative w-full max-w-md md:max-w-xl bg-white dark:bg-slate-900 rounded-t-[40px] sm:rounded-[36px] shadow-2xl flex flex-col max-h-[90vh] animate-in slide-in-from-bottom duration-300 border border-slate-100 dark:border-slate-800">
 
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100 dark:border-slate-800">
