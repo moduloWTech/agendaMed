@@ -29,6 +29,9 @@ import { AuthUseCase } from './usecases/auth.usecase';
 
 import { WhatsappRouter } from './routes/whatsapp.router';
 import { PushRouter } from './routes/push.router';
+import { CronRouter } from './routes/cron.router';
+import { CronUseCase } from './usecases/cron.usecase';
+import { CronRepository } from './repositories/cron.repository';
 import { cronService } from './services/cron.service';
 
 export class App {
@@ -132,6 +135,11 @@ export class App {
     // Injeção de Dependências Manual (OOP) - PUSH
     const pushRouter = new PushRouter();
 
+    // Injeção de Dependências Manual (OOP) - CRON / SCHEDULER
+    const cronRepository = new CronRepository();
+    const cronUseCase = new CronUseCase(cronRepository);
+    const cronRouter = new CronRouter(cronUseCase);
+
     // Registrando rotas
     userRouter.register(this.app);
     patientRouter.register(this.app);
@@ -141,6 +149,7 @@ export class App {
     authRouter.register(this.app);
     whatsappRouter.register(this.app);
     pushRouter.register(this.app);
+    cronRouter.register(this.app);
 
     this.app.register(uploadRoutes, { prefix: '/api/upload' });
   }
