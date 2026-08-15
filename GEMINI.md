@@ -15,3 +15,10 @@
 
 ## 3. Segurança e Permissões
 - Ações administrativas (como remover membros da equipe ou alterar cargos) devem ser visíveis e permitidas exclusivamente para usuários com cargo `role === 'ADMIN'`.
+
+## 4. Arquitetura Multi-Dispositivo (Mobile vs. Desktop/Tablet)
+- **Regra de Ouro do Modo Mobile:** O layout mobile está 100% homologado e finalizado. NUNCA alterar, quebrar ou regredir o layout mobile existente a menos que expressamente solicitado pelo usuário.
+- **Modo Desktop & Tablet Dedicado:**
+  - Criar interfaces ricas e pensadas para telas médias e grandes (`md:`, `lg:`, `xl:`), aproveitando todo o espaço horizontal da tela (Sidebar/Header superior, Hero, cards em grid, efeitos suaves de scroll e micro-animações).
+  - Remover elementos exclusivos de mobile (como a Bottom Navigation Bar fixa no rodapé) na visualização desktop/tablet.
+  - Manter 100% da lógica de negócio e regras já existentes, focando as melhorias puramente no design e apresentação visual desktop.

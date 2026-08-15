@@ -28,6 +28,9 @@ const auth_router_1 = require("./routes/auth.router");
 const auth_usecase_1 = require("./usecases/auth.usecase");
 const whatsapp_router_1 = require("./routes/whatsapp.router");
 const push_router_1 = require("./routes/push.router");
+const cron_router_1 = require("./routes/cron.router");
+const cron_usecase_1 = require("./usecases/cron.usecase");
+const cron_repository_1 = require("./repositories/cron.repository");
 const cron_service_1 = require("./services/cron.service");
 class App {
     app;
@@ -114,6 +117,10 @@ class App {
         const whatsappRouter = new whatsapp_router_1.WhatsappRouter();
         // Injeção de Dependências Manual (OOP) - PUSH
         const pushRouter = new push_router_1.PushRouter();
+        // Injeção de Dependências Manual (OOP) - CRON / SCHEDULER
+        const cronRepository = new cron_repository_1.CronRepository();
+        const cronUseCase = new cron_usecase_1.CronUseCase(cronRepository);
+        const cronRouter = new cron_router_1.CronRouter(cronUseCase);
         // Registrando rotas
         userRouter.register(this.app);
         patientRouter.register(this.app);
@@ -123,6 +130,7 @@ class App {
         authRouter.register(this.app);
         whatsappRouter.register(this.app);
         pushRouter.register(this.app);
+        cronRouter.register(this.app);
         this.app.register(upload_router_1.uploadRoutes, { prefix: '/api/upload' });
     }
     async start() {
