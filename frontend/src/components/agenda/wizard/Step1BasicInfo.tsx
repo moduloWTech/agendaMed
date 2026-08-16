@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-import { Pill, Droplet, Beaker, Syringe, Box, Minus, Plus } from 'lucide-react';
 import { Input } from '../../ui/Input';
 
 interface Step1BasicInfoProps {
@@ -11,114 +9,70 @@ interface Step1BasicInfoProps {
   setInstructions: (instructions: string) => void;
 }
 
-const MED_TYPES = [
-  { id: 'comprimido', label: 'Comprimido', icon: Pill },
-  { id: 'gotas', label: 'Gotas', icon: Droplet },
-  { id: 'ml', label: 'Líquido (ml)', icon: Beaker },
-  { id: 'injecao', label: 'Injeção', icon: Syringe },
-  { id: 'outro', label: 'Outro', icon: Box },
-];
-
-export function Step1BasicInfo({ name, setName, dosage, setDosage, setInstructions }: Step1BasicInfoProps) {
-  // Estados locais para montar a instrução de forma visual
-  const [medType, setMedType] = useState('comprimido');
-  const [quantity, setQuantity] = useState(1);
-  const [customDosage, setCustomDosage] = useState('');
-
-  // Sincroniza os controles visuais com a string final de instructions
-  useEffect(() => {
-    if (medType === 'outro') {
-      setInstructions(customDosage);
-    } else {
-      const typeLabel = MED_TYPES.find(t => t.id === medType)?.label.split(' ')[0].toLowerCase() || '';
-      // Ex: "1 comprimido", "20 gotas", "5 ml"
-      const suffix = quantity > 1 && medType === 'comprimido' ? 'comprimidos' : typeLabel;
-      setInstructions(`${quantity} ${suffix}`);
-    }
-  }, [medType, quantity, customDosage, setInstructions]);
-
+export function Step1BasicInfo({
+  name,
+  setName,
+  dosage,
+  setDosage,
+  instructions,
+  setInstructions,
+}: Step1BasicInfoProps) {
   return (
     <div className="flex flex-col gap-6 animate-in slide-in-from-right-4 duration-300">
       <div>
-        <h3 className="text-xl font-bold text-gray-800 mb-1">O que vamos tomar?</h3>
-        <p className="text-gray-500 text-sm mb-4">Preencha o nome e a dosagem (em mg/ml).</p>
-        
+        <h3 className="text-xl font-bold text-gray-800 dark:text-slate-100 mb-1">
+          O que vamos tomar?
+        </h3>
+        <p className="text-gray-500 dark:text-slate-400 text-sm mb-4">
+          Preencha o nome, dosagem e observações do medicamento.
+        </p>
+
         <div className="flex flex-col gap-4">
+          {/* Nome do Medicamento */}
           <Input
             label="Nome do Remédio"
             placeholder="Ex: Losartana Potássica"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <Input
-            label="Dosagem"
-            placeholder="Ex: 50mg"
-            value={dosage}
-            onChange={(e) => setDosage(e.target.value)}
-          />
-        </div>
-      </div>
 
-      <div>
-        <label className="text-gray-700 font-medium text-[15px] ml-1 mb-3 block">Instruções de Uso</label>
-        <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar snap-x">
-          {MED_TYPES.map((type) => {
-            const Icon = type.icon;
-            const isSelected = medType === type.id;
-            return (
-              <button
-                key={type.id}
-                onClick={() => setMedType(type.id)}
-                className={`flex flex-col items-center justify-center gap-2 min-w-[88px] p-3 rounded-[24px] border-2 transition-all snap-start ${
-                  isSelected 
-                    ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 text-[var(--color-primary)]' 
-                    : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'
-                }`}
-              >
-                <Icon className="w-6 h-6" />
-                <span className="font-semibold text-xs">{type.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {medType !== 'outro' ? (
-        <div>
-          <label className="text-gray-700 font-medium text-[15px] ml-1 mb-3 block">Quantidade por vez</label>
-          <div className="flex items-center justify-between bg-[#F8FAFC] p-2 rounded-[24px] border border-gray-100">
-            <button 
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-gray-600 shadow-sm hover:text-[var(--color-primary)] transition-colors"
-            >
-              <Minus className="w-6 h-6" />
-            </button>
-            
-            <div className="text-2xl font-bold text-gray-800 flex items-baseline gap-2">
-              {quantity}
-              <span className="text-base font-medium text-gray-500">
-                {medType === 'comprimido' ? (quantity > 1 ? 'comprimidos' : 'comprimido') : medType === 'ml' ? 'ml' : medType}
+          {/* Dosagem (Estritamente máx 5 caracteres) */}
+          <div>
+            <div className="flex items-center justify-between mb-1 ml-1">
+              <span className="text-gray-700 dark:text-slate-300 font-medium text-[16px]">
+                Dosagem
+              </span>
+              <span className="text-xs text-gray-400 dark:text-slate-500">
+                {dosage.length}/5 caracteres
               </span>
             </div>
+            <Input
+              placeholder="Ex: 50mg, 20ml, 1cp"
+              maxLength={5}
+              value={dosage}
+              onChange={(e) => setDosage(e.target.value.slice(0, 5))}
+            />
+          </div>
 
-            <button 
-              onClick={() => setQuantity(quantity + 1)}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-[var(--color-primary)] shadow-sm hover:bg-[var(--color-primary)]/5 transition-colors"
-            >
-              <Plus className="w-6 h-6" />
-            </button>
+          {/* Recomendações / Comentários (Estritamente máx 50 caracteres) */}
+          <div>
+            <div className="flex items-center justify-between mb-1 ml-1">
+              <span className="text-gray-700 dark:text-slate-300 font-medium text-[16px]">
+                Recomendações / Observações
+              </span>
+              <span className="text-xs text-gray-400 dark:text-slate-500">
+                {instructions.length}/50 caracteres
+              </span>
+            </div>
+            <Input
+              placeholder="Ex: Tomar após o almoço com água"
+              maxLength={50}
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value.slice(0, 50))}
+            />
           </div>
         </div>
-      ) : (
-        <div className="animate-in fade-in slide-in-from-top-2">
-          <Input
-            label="Instrução Personalizada"
-            placeholder="Ex: Aplicar na pele 2x"
-            value={customDosage}
-            onChange={(e) => setCustomDosage(e.target.value)}
-          />
-        </div>
-      )}
+      </div>
     </div>
   );
 }

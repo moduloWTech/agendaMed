@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Clock, CheckCircle2, X } from 'lucide-react';
+import { Clock, CheckCircle2, X, FileText } from 'lucide-react';
+import { RecommendationsModal } from './RecommendationsModal';
 
 interface MedicationCardProps {
   time: string;
@@ -16,6 +17,7 @@ interface MedicationCardProps {
 
 export function MedicationCard({ time, name, dosage, instructions, frequency, photoUrl, status, onCheck, onCardClick }: MedicationCardProps) {
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
+  const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(false);
   const isCompleted = status === 'completed';
   const isLate = status === 'late';
 
@@ -77,13 +79,26 @@ export function MedicationCard({ time, name, dosage, instructions, frequency, ph
                 )}
               </h3>
               
-              {instructions && (
-                <p className="text-gray-600 dark:text-slate-300 font-medium text-[14px] sm:text-[15px] mt-1 flex items-center gap-1.5 flex-wrap">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]/50 dark:bg-slate-500 flex-shrink-0"></span>
-                  {instructions}
-                  {frequency && <span className="text-[13px] sm:text-sm text-gray-400 dark:text-slate-400 ml-1 whitespace-nowrap">• {formatFrequency(frequency)}</span>}
-                </p>
-              )}
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                {frequency && (
+                  <span className="text-[13px] sm:text-sm text-gray-500 dark:text-slate-400 font-medium">
+                    {formatFrequency(frequency)}
+                  </span>
+                )}
+                {instructions && instructions.trim().length > 0 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsRecommendationsOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1 text-[12px] sm:text-[13px] font-semibold text-[var(--color-primary)] dark:text-blue-400 hover:underline bg-[var(--color-primary)]/5 dark:bg-slate-700/60 px-2.5 py-0.5 rounded-full transition-colors cursor-pointer"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    Recomendações
+                  </button>
+                )}
+              </div>
 
               {isLate && (
                 <p className="text-[var(--color-alert)] text-sm font-bold flex items-center gap-1 mt-1.5">
@@ -137,6 +152,15 @@ export function MedicationCard({ time, name, dosage, instructions, frequency, ph
         </div>,
         document.body
       )}
+
+      {/* Modal de Recomendações */}
+      <RecommendationsModal
+        isOpen={isRecommendationsOpen}
+        onClose={() => setIsRecommendationsOpen(false)}
+        medicationName={name}
+        dosage={dosage}
+        instructions={instructions || ''}
+      />
     </>
   );
 }

@@ -10,7 +10,10 @@ Este documento registra o histórico de desenvolvimento, a situação atual da a
 - **Regra de Ouro do Mobile Mantida:** O layout mobile PWA/TWA permaneceu 100% homologado e intocado.
 - **Login Split-Screen (60/40):** Hero de branding à esquerda com card institucional e formulário limpo à direita com suporte a OAuth do Google.
 - **Desktop Navbar & AuthLayout:** Header superior integrado com alternador de tema Dark/Light, badge do paciente ativo, links de navegação e menu de usuário com logout. Ocultação automática da BottomNav no desktop (`md:hidden`).
-- **Agenda Médica Desktop:** Split-grid de 2 colunas com widget de calendário semanal interativo à esquerda e linha do tempo de medicamentos à direita.
+- **Agenda Médica & Cards Inteligentes:**
+  - Split-grid de 2 colunas no desktop com widget de calendário semanal interativo à esquerda e linha do tempo de medicamentos à direita.
+  - **Campos Estruturados no Formulário:** Separação estrita de Dosagem (limite rígido de 5 caracteres, ex: `50mg`, `20ml`, `1cp`) e Recomendações/Comentários (limite de 50 caracteres, ex: `Tomar após o almoço com água`).
+  - **Card de Medicamento Limpo com Modal de Recomendações:** A dosagem curta fica visível no badge do card, e quando há recomendações cadastradas, é exibido o link interativo *"Recomendações"* que abre um modal limpo e acessível (`RecommendationsModal.tsx`), mantendo a linha do tempo organizada e sem quebras de layout.
 - **Consultas Médicas & Exames:** Hero banner institucional, cards em grid de 3 colunas, badges de alerta intensivo pulsante e modal de agendamento expandido em 2 colunas (`max-w-2xl`).
 - **Prontuário & Cofre Digital:** Busca em tempo real por título, filtros rápidos por categoria (*Todos, Receitas, Exames, Laudos*), grid de 3 colunas com visualizador de anexos e atalho direto para download do relatório médico em PDF.
 - **Equipe de Cuidados & Perfil:** Split-grid de 2 colunas distribuindo 7/12 para Paciente + Cuidadores e 5/12 para Minha Conta + Configurações e PWA.

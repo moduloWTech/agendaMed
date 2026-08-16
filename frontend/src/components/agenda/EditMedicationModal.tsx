@@ -248,17 +248,19 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
             />
           </div>
           <Input
-            label="Dosagem (Ex: 50mg)"
+            label={`Dosagem (${dosage.length}/5)`}
             placeholder="Ex: 50mg"
+            maxLength={5}
             value={dosage}
-            onChange={(e) => setDosage(e.target.value)}
+            onChange={(e) => setDosage(e.target.value.slice(0, 5))}
             disabled={!isAdmin}
           />
           <Input
-            label="Instruções (Ex: 1 comprimido)"
-            placeholder="Ex: 1 comprimido"
+            label={`Recomendações / Comentários (${instructions.length}/50)`}
+            placeholder="Ex: Tomar após o almoço com água"
+            maxLength={50}
             value={instructions}
-            onChange={(e) => setInstructions(e.target.value)}
+            onChange={(e) => setInstructions(e.target.value.slice(0, 50))}
             disabled={!isAdmin}
           />
 
