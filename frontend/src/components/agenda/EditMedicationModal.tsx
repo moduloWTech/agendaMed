@@ -92,7 +92,7 @@ export function EditMedicationModal({ medication, uniqueId, isCompleted, onClose
         dosage, 
         instructions,
         frequency,
-        startDate: frequency === 'manual' ? new Date().toISOString() : new Date(startDate).toISOString(),
+        startDate: frequency === 'manual' ? new Date().toISOString() : `${startDate}T12:00:00.000Z`,
         startTime: frequency === 'manual' ? times[0] : startTime,
         times: frequency === 'manual' ? times : [],
         photoUrl: uploadedPhotoUrl

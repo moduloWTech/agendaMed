@@ -17,11 +17,12 @@ Este documento registra o histórico de desenvolvimento, a situação atual da a
 
 ### 🏗️ Arquitetura Limpa, Testes Rigorosos & Motor de Cron
 - **Padrão Strict Clean Architecture (R-U-R):** Interfaces ➔ Repositories ➔ UseCases ➔ Routers.
-- **Normalização de Frequências (Inglês):**
+- **Normalização de Frequências (Inglês) & Blindagem de Fuso:**
   - O `CronUseCase` normaliza e padroniza todas as variações em português e legadas para chaves oficiais em inglês (`daily`, `single`, `manual`, `weekly`, `monthly`, `4h`, `6h`, `8h`, `12h`).
   - Resolução resiliente dos horários de doses utilizando `med.times` ou calculando as doses do dia a partir de `startTime` e do intervalo de horas.
+  - Blindagem contra recuo de fuso horário UTC em datas de início (`extractCalendarDate`), garantindo que medicamentos cadastrados para o dia de hoje (incluindo Dose Única) disparem imediatamente.
 - **Suíte de Testes Automatizados da API (`api/src/usecases/cron.usecase.test.ts`):**
-  - 6 testes unitários com o Node/TSX test runner cobrindo normalização, cálculo de horários, disparo no minuto 0, insistência/tolerância de atraso, cancelamento após check-in e segurança de `CRON_SECRET`.
+  - 7 testes unitários com o Node/TSX test runner cobrindo normalização, extração de data neutra a fuso, cálculo de horários, disparo no minuto 0, insistência/tolerância de atraso, cancelamento após check-in e segurança de `CRON_SECRET`.
 - **Diretrizes Rigorosas de Testes (Filosofia da Fonte da Verdade):**
   - Diretrizes oficiais do Notion integradas a [`.specify/memory/constitution.md`](file:///home/beth/Documentos/MWT/agendaMed/.specify/memory/constitution.md), [`AGENTS.md`](file:///home/beth/Documentos/MWT/agendaMed/AGENTS.md) e [`GEMINI.md`](file:///home/beth/Documentos/MWT/agendaMed/GEMINI.md).
   - O teste é o contrato inviolável e nunca deve ser alterado para contornar falhas de código.

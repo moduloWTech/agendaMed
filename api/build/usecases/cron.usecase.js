@@ -31,7 +31,7 @@ class CronUseCase {
             const medications = await this.cronRepository.findActiveMedicationsWithUsers();
             report.totalActiveMedications = medications.length;
             for (const med of medications) {
-                const { dateStr: medStartDateStr } = this.getFortalezaTime(med.startDate);
+                const medStartDateStr = this.extractCalendarDate(med.startDate);
                 const todayTimes = this.getTimesForToday(med, todayStr, medStartDateStr);
                 for (const scheduledTime of todayTimes) {
                     const diffMinutes = this.getDiffMinutes(currentTimeStr, scheduledTime);
@@ -106,6 +106,13 @@ class CronUseCase {
             dateStr: `${getPart('year')}-${getPart('month')}-${getPart('day')}`,
             timeStr: `${getPart('hour')}:${getPart('minute')}`,
         };
+    }
+    extractCalendarDate(date) {
+        const isoStr = date.toISOString();
+        if (isoStr.endsWith('T00:00:00.000Z')) {
+            return isoStr.split('T')[0];
+        }
+        return this.getFortalezaTime(date).dateStr;
     }
     getDiffMinutes(currentTime, scheduledTime) {
         const [cHours, cMinutes] = currentTime.split(':').map(Number);

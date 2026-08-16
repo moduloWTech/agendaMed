@@ -32,7 +32,7 @@ export class CronUseCase implements ICronUseCase {
       report.totalActiveMedications = medications.length;
 
       for (const med of medications) {
-        const { dateStr: medStartDateStr } = this.getFortalezaTime(med.startDate);
+        const medStartDateStr = this.extractCalendarDate(med.startDate);
         const todayTimes = this.getTimesForToday(med, todayStr, medStartDateStr);
 
         for (const scheduledTime of todayTimes) {
@@ -119,6 +119,14 @@ export class CronUseCase implements ICronUseCase {
       dateStr: `${getPart('year')}-${getPart('month')}-${getPart('day')}`,
       timeStr: `${getPart('hour')}:${getPart('minute')}`,
     };
+  }
+
+  private extractCalendarDate(date: Date): string {
+    const isoStr = date.toISOString();
+    if (isoStr.endsWith('T00:00:00.000Z')) {
+      return isoStr.split('T')[0];
+    }
+    return this.getFortalezaTime(date).dateStr;
   }
 
   private getDiffMinutes(currentTime: string, scheduledTime: string): number {

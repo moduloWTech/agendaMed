@@ -47,6 +47,20 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
     assert.equal(normalize('4h'), '4h');
   });
 
+  it('deve extrair a data do calendário sem sofrer recuo de fuso horário na meia-noite UTC', () => {
+    const repo = new MockCronRepository();
+    const useCase = new CronUseCase(repo);
+    const extractDate = (useCase as any).extractCalendarDate.bind(useCase);
+
+    // Data salva como meia-noite UTC (ex: 2026-08-16T00:00:00.000Z)
+    const dateUtcMidnight = new Date('2026-08-16T00:00:00.000Z');
+    assert.equal(extractDate(dateUtcMidnight), '2026-08-16');
+
+    // Data salva com meio-dia UTC (ex: 2026-08-16T12:00:00.000Z)
+    const dateMidday = new Date('2026-08-16T12:00:00.000Z');
+    assert.equal(extractDate(dateMidday), '2026-08-16');
+  });
+
   it('deve calcular corretamente os horários do dia para medicamentos diários e intervalados', () => {
     const repo = new MockCronRepository();
     const useCase = new CronUseCase(repo);
