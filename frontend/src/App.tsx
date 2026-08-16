@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SplashScreen } from './screens/SplashScreen';
 import { LoginScreen } from './screens/LoginScreen';
 import { PatientSetupScreen } from './screens/PatientSetupScreen';
@@ -13,7 +13,16 @@ import { useAuth } from './contexts/AuthContext';
 export default function App() {
   const { isAuthenticated, activePatient, isLoading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'agenda' | 'consultas' | 'cofre' | 'perfil'>('agenda');
-  if (isLoading) {
+  const [initialSplash, setInitialSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setInitialSplash(false);
+    }, 1600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading || initialSplash) {
     return <SplashScreen />;
   }
 
