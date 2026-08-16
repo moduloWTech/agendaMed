@@ -4,8 +4,10 @@ exports.CronUseCase = void 0;
 const push_service_1 = require("../services/push.service");
 class CronUseCase {
     cronRepository;
-    constructor(cronRepository) {
+    pushService;
+    constructor(cronRepository, pushService) {
         this.cronRepository = cronRepository;
+        this.pushService = pushService || push_service_1.pushService;
     }
     async execute(dto) {
         // 1. Regra de Negócio de Segurança (Validação do Segredo de Execução no UseCase)
@@ -44,7 +46,7 @@ class CronUseCase {
                             const userIds = med.patient.users.map((u) => u.id);
                             if (userIds.length > 0) {
                                 const { title, body } = this.buildNotificationContent(med.name, med.dosage, med.patient.name, diffMinutes);
-                                await push_service_1.pushService.sendNotificationToUsers(userIds, {
+                                await this.pushService.sendNotificationToUsers(userIds, {
                                     title,
                                     body,
                                     url: '/',

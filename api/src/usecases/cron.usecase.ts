@@ -1,8 +1,23 @@
-import { ICronRepository, ICronUseCase, CronExecutionReport, CronExecutionDetail, ScheduledMedicationWithPatient, CronExecuteDTO } from '../interfaces/cron.interface';
-import { pushService } from '../services/push.service';
+import {
+  ICronRepository,
+  ICronUseCase,
+  CronExecutionReport,
+  CronExecutionDetail,
+  ScheduledMedicationWithPatient,
+  CronExecuteDTO,
+  IPushService,
+} from '../interfaces/cron.interface';
+import { pushService as defaultPushService } from '../services/push.service';
 
 export class CronUseCase implements ICronUseCase {
-  constructor(private cronRepository: ICronRepository) {}
+  private pushService: IPushService;
+
+  constructor(
+    private cronRepository: ICronRepository,
+    pushService?: IPushService
+  ) {
+    this.pushService = pushService || defaultPushService;
+  }
 
   public async execute(dto?: CronExecuteDTO): Promise<CronExecutionReport> {
     // 1. Regra de Negócio de Segurança (Validação do Segredo de Execução no UseCase)
@@ -51,7 +66,7 @@ export class CronUseCase implements ICronUseCase {
               if (userIds.length > 0) {
                 const { title, body } = this.buildNotificationContent(med.name, med.dosage, med.patient.name, diffMinutes);
 
-                await pushService.sendNotificationToUsers(userIds, {
+                await this.pushService.sendNotificationToUsers(userIds, {
                   title,
                   body,
                   url: '/',

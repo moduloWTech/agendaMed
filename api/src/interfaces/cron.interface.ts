@@ -45,6 +45,18 @@ export interface ICronRepository {
   hasTakenMedication(medicationId: string, dateStr: string, timeStr: string): Promise<boolean>;
 }
 
+export interface IPushNotificationPayload {
+  title: string;
+  body: string;
+  url?: string;
+  icon?: string;
+  data?: any;
+}
+
+export interface IPushService {
+  sendNotificationToUsers(userIds: string[], payload: IPushNotificationPayload): Promise<void>;
+}
+
 export interface CronExecuteDTO {
   providedSecret?: string;
 }

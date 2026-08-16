@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { CronUseCase } from './cron.usecase';
-import { ICronRepository, ScheduledMedicationWithPatient } from '../interfaces/cron.interface';
+import { ICronRepository, ScheduledMedicationWithPatient, IPushService, IPushNotificationPayload } from '../interfaces/cron.interface';
 
 class MockCronRepository implements ICronRepository {
   public medications: ScheduledMedicationWithPatient[] = [];
@@ -13,6 +13,14 @@ class MockCronRepository implements ICronRepository {
 
   async hasTakenMedication(medicationId: string, dateStr: string, timeStr: string): Promise<boolean> {
     return this.takenRecords.has(`${medicationId}_${dateStr}_${timeStr}`);
+  }
+}
+
+class MockPushService implements IPushService {
+  public sentNotifications: Array<{ userIds: string[]; payload: IPushNotificationPayload }> = [];
+
+  async sendNotificationToUsers(userIds: string[], payload: IPushNotificationPayload): Promise<void> {
+    this.sentNotifications.push({ userIds, payload });
   }
 }
 
@@ -28,7 +36,8 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
 
   it('deve normalizar frequências em português e inglês para o padrão oficial em inglês', () => {
     const repo = new MockCronRepository();
-    const useCase = new CronUseCase(repo);
+    const mockPush = new MockPushService();
+    const useCase = new CronUseCase(repo, mockPush);
     const normalize = (useCase as any).normalizeFrequency.bind(useCase);
 
     assert.equal(normalize('diário'), 'daily');
@@ -49,7 +58,8 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
 
   it('deve extrair a data do calendário sem sofrer recuo de fuso horário na meia-noite UTC', () => {
     const repo = new MockCronRepository();
-    const useCase = new CronUseCase(repo);
+    const mockPush = new MockPushService();
+    const useCase = new CronUseCase(repo, mockPush);
     const extractDate = (useCase as any).extractCalendarDate.bind(useCase);
 
     // Data salva como meia-noite UTC (ex: 2026-08-16T00:00:00.000Z)
@@ -63,7 +73,8 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
 
   it('deve calcular corretamente os horários do dia para medicamentos diários e intervalados', () => {
     const repo = new MockCronRepository();
-    const useCase = new CronUseCase(repo);
+    const mockPush = new MockPushService();
+    const useCase = new CronUseCase(repo, mockPush);
     const getTimes = (useCase as any).getTimesForToday.bind(useCase);
 
     const todayStr = '2026-08-16';
@@ -111,6 +122,8 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
 
   it('deve disparar notificação quando o horário atual coincidir com a dose (minuto 0)', async () => {
     const repo = new MockCronRepository();
+    const mockPush = new MockPushService();
+
     repo.medications = [
       {
         id: 'med-1',
@@ -130,7 +143,7 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
       } as any
     ];
 
-    const useCase = new CronUseCase(repo);
+    const useCase = new CronUseCase(repo, mockPush);
     // Simula horário exato 12:00
     (useCase as any).getFortalezaTime = () => ({ dateStr: '2026-08-16', timeStr: '12:00' });
 
@@ -142,10 +155,17 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
     assert.equal(report.details.length, 1);
     assert.equal(report.details[0].medicationName, 'Metformina');
     assert.equal(report.details[0].delayMinutes, 0);
+
+    // Valida que o serviço de push recebeu a chamada com o payload correto
+    assert.equal(mockPush.sentNotifications.length, 1);
+    assert.deepEqual(mockPush.sentNotifications[0].userIds, ['user-admin-1', 'user-care-1']);
+    assert.match(mockPush.sentNotifications[0].payload.title, /Hora do Medicamento/);
   });
 
   it('deve disparar na janela de atraso/insistência (ex: 2 min de atraso)', async () => {
     const repo = new MockCronRepository();
+    const mockPush = new MockPushService();
+
     repo.medications = [
       {
         id: 'med-1',
@@ -165,7 +185,7 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
       } as any
     ];
 
-    const useCase = new CronUseCase(repo);
+    const useCase = new CronUseCase(repo, mockPush);
     // Simula 12:02 (2 min após o horário)
     (useCase as any).getFortalezaTime = () => ({ dateStr: '2026-08-16', timeStr: '12:02' });
 
@@ -174,10 +194,15 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
     assert.equal(report.success, true);
     assert.equal(report.totalNotificationsSent, 2);
     assert.equal(report.details[0].delayMinutes, 2);
+
+    assert.equal(mockPush.sentNotifications.length, 1);
+    assert.match(mockPush.sentNotifications[0].payload.title, /Lembrete Pendente/);
   });
 
   it('NÃO deve disparar notificação se a dose já foi registrada como tomada no histórico', async () => {
     const repo = new MockCronRepository();
+    const mockPush = new MockPushService();
+
     repo.medications = [
       {
         id: 'med-1',
@@ -200,7 +225,7 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
     // Registra que a dose de 12:00 de hoje já foi tomada
     repo.takenRecords.add('med-1_2026-08-16_12:00');
 
-    const useCase = new CronUseCase(repo);
+    const useCase = new CronUseCase(repo, mockPush);
     (useCase as any).getFortalezaTime = () => ({ dateStr: '2026-08-16', timeStr: '12:00' });
 
     const report = await useCase.execute();
@@ -208,11 +233,13 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
     assert.equal(report.success, true);
     assert.equal(report.totalNotificationsSent, 0);
     assert.equal(report.details.length, 0);
+    assert.equal(mockPush.sentNotifications.length, 0);
   });
 
   it('deve validar o segredo CRON_SECRET quando configurado nas variáveis de ambiente', async () => {
     const repo = new MockCronRepository();
-    const useCase = new CronUseCase(repo);
+    const mockPush = new MockPushService();
+    const useCase = new CronUseCase(repo, mockPush);
 
     process.env.CRON_SECRET = 'segredo_forte_mwt_2026';
 
