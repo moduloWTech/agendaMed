@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { User, Settings, Lock, LogOut, Download, FileText, Users, UserPlus } from 'lucide-react';
 import HeaderImg from '../assets/login-header.png';
 import { ProfileMenuItem } from '../components/profile/ProfileMenuItem';
@@ -15,6 +15,7 @@ import { ActivePatientCard } from '../components/profile/ActivePatientCard';
 import { MedicalReportModal } from '../components/reports/MedicalReportModal';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { useRealtimeSync } from '../services/supabase';
 import { usePwaInstall } from '../hooks/usePwaInstall';
 import { usePwaUpdate } from '../contexts/PwaUpdateContext';
 import { ConfirmCaregiverModal } from '../components/profile/ConfirmCaregiverModal';
@@ -52,7 +53,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [caregivers, setCaregivers] = useState<any[]>([]);
 
-  const loadCaregivers = async () => {
+  const loadCaregivers = useCallback(async () => {
     if (!activePatient) return;
     try {
       const response = await api.get(`/api/users/family/${activePatient.id}`);
@@ -60,7 +61,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [activePatient]);
 
   const handleConfirmAction = async () => {
     if (!caregiverActionModal) return;
@@ -81,7 +82,10 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
 
   useEffect(() => {
     loadCaregivers();
-  }, [activePatient]);
+  }, [loadCaregivers]);
+
+  // Sincronização em tempo real multi-dispositivo para Equipe e Paciente
+  useRealtimeSync(['Patient', 'User'], loadCaregivers);
 
   const handleRenamePatient = async () => {
     if (!activePatient || !newPatientName.trim()) return;

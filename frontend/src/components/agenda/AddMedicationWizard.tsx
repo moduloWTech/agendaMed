@@ -107,7 +107,8 @@ export function AddMedicationWizard({ onClose }: AddMedicationWizardProps) {
         photoUrl,
         active: true
       });
-      window.location.reload(); // Recarrega a tela para buscar novos dados
+      setIsLoading(false);
+      onClose();
     } catch (error: any) {
       setFeedback({
         isOpen: true,

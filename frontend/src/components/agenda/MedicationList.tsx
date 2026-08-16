@@ -1,9 +1,10 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { CalendarX2 } from 'lucide-react';
 import { MedicationCard } from './MedicationCard';
 import { EditMedicationModal } from './EditMedicationModal';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../services/api';
+import { useRealtimeSync } from '../../services/supabase';
 
 export interface Medication {
   id: string;
@@ -38,25 +39,29 @@ export function MedicationList({ selectedDate }: MedicationListProps) {
   const selectedDateStr = formatDateStr(selectedDate);
   const today = new Date();
 
-  useEffect(() => {
-    async function fetchMedications() {
-      if (!activePatient) return;
-      try {
-        const data = await api.get(`/api/patients/${activePatient.id}/medications`);
-        setMedications(data || []);
+  const fetchMedications = useCallback(async () => {
+    if (!activePatient) return;
+    try {
+      const data = await api.get(`/api/patients/${activePatient.id}/medications`);
+      setMedications(data || []);
 
-        const historyData = await api.get(`/api/patients/${activePatient.id}/medications/history?date=${selectedDateStr}`);
-        const completed = new Set<string>();
-        historyData.forEach((h: any) => {
-          completed.add(`${h.medicationId}-${h.date}-${h.time}`);
-        });
-        setCompletedIds(completed);
-      } catch (error) {
-        console.error('Falha ao buscar medicamentos', error);
-      }
+      const historyData = await api.get(`/api/patients/${activePatient.id}/medications/history?date=${selectedDateStr}`);
+      const completed = new Set<string>();
+      historyData.forEach((h: any) => {
+        completed.add(`${h.medicationId}-${h.date}-${h.time}`);
+      });
+      setCompletedIds(completed);
+    } catch (error) {
+      console.error('Falha ao buscar medicamentos', error);
     }
-    fetchMedications();
   }, [activePatient, selectedDateStr]);
+
+  useEffect(() => {
+    fetchMedications();
+  }, [fetchMedications]);
+
+  // Sincronização multi-dispositivo em tempo real (Supabase WebSockets + Focus)
+  useRealtimeSync(['Medication', 'MedicationHistory'], fetchMedications);
   
   const generatedSchedule = useMemo(() => {
     if (!medications || medications.length === 0) return [];

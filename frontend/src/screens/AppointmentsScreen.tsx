@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus, Stethoscope, Clock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { useRealtimeSync } from '../services/supabase';
 import { AddAppointmentModal } from '../components/appointments/AddAppointmentModal';
 
 interface Appointment {
@@ -24,7 +25,7 @@ export function AppointmentsScreen() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = useCallback(async () => {
     if (!activePatient) return;
     try {
       setIsLoading(true);
@@ -35,11 +36,14 @@ export function AppointmentsScreen() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activePatient]);
 
   useEffect(() => {
     fetchAppointments();
-  }, [activePatient]);
+  }, [fetchAppointments]);
+
+  // Sincronização em tempo real multi-dispositivo para Consultas
+  useRealtimeSync(['Appointment'], fetchAppointments);
 
   return (
     <div className="w-full">

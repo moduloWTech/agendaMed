@@ -15,6 +15,18 @@ Este documento registra o histórico de desenvolvimento, a situação atual da a
 - **Prontuário & Cofre Digital:** Busca em tempo real por título, filtros rápidos por categoria (*Todos, Receitas, Exames, Laudos*), grid de 3 colunas com visualizador de anexos e atalho direto para download do relatório médico em PDF.
 - **Equipe de Cuidados & Perfil:** Split-grid de 2 colunas distribuindo 7/12 para Paciente + Cuidadores e 5/12 para Minha Conta + Configurações e PWA.
 
+### ⚡ Sincronização Multi-Dispositivo em Tempo Real (Supabase Realtime)
+- **Publicação Postgres Ativada:** `ALTER PUBLICATION supabase_realtime` configurada nas tabelas `Medication`, `MedicationHistory`, `Appointment`, `Document` e `Patient`.
+- **Arquitetura Híbrida de Tempo Real (`useRealtimeSync`):**
+  - *WebSockets Instantâneo:* Clientes recebem notificações de alteração de dados (CDC) via Supabase Realtime em menos de 100ms.
+  - *Refetch ao Focar/Destravar:* Atualização automática no evento `visibilitychange` e `focus` da janela.
+  - *Fallback de Polling Silencioso:* Checagem a cada 10 segundos quando a janela estiver visível.
+- **Telas Integradas em Tempo Real:**
+  - *Agenda & Medicamentos:* Check-in de remédios e inclusão/edição de medicamentos refletem instantaneamente em todos os celulares e computadores da família.
+  - *Consultas & Exames:* Atualização imediata de agendamentos.
+  - *Prontuário:* Sincronização de novos documentos e laudos.
+  - *Equipe de Cuidados:* Sincronização em tempo real de novos cuidadores convidados e cargos.
+
 ### 🏗️ Arquitetura Limpa, Testes Rigorosos & Motor de Cron
 - **Padrão Strict Clean Architecture (R-U-R):** Interfaces ➔ Repositories ➔ UseCases ➔ Routers.
 - **Normalização de Frequências (Inglês) & Blindagem de Fuso:**

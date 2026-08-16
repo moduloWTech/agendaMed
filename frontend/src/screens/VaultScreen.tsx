@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus, Search, FileText } from 'lucide-react';
 import { DocumentCard } from '../components/vault/DocumentCard';
 import { AddDocumentModal } from '../components/vault/AddDocumentModal';
 import { MedicalReportModal } from '../components/reports/MedicalReportModal';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { useRealtimeSync } from '../services/supabase';
 
 export function VaultScreen() {
   const { activePatient } = useAuth();
@@ -14,18 +15,22 @@ export function VaultScreen() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  useEffect(() => {
-    async function fetchDocuments() {
-      if (!activePatient) return;
-      try {
-        const data = await api.get(`/api/patients/${activePatient.id}/documents`);
-        setDocuments(data || []);
-      } catch (error) {
-        console.error('Falha ao buscar documentos', error);
-      }
+  const fetchDocuments = useCallback(async () => {
+    if (!activePatient) return;
+    try {
+      const data = await api.get(`/api/patients/${activePatient.id}/documents`);
+      setDocuments(data || []);
+    } catch (error) {
+      console.error('Falha ao buscar documentos', error);
     }
-    fetchDocuments();
   }, [activePatient]);
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [fetchDocuments]);
+
+  // Sincronização em tempo real multi-dispositivo para Documentos
+  useRealtimeSync(['Document'], fetchDocuments);
 
   const filteredDocuments = documents.filter((doc) => {
     const matchesSearch = doc.title?.toLowerCase().includes(searchTerm.toLowerCase());
