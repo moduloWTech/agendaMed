@@ -22,3 +22,9 @@
   - Criar interfaces ricas e pensadas para telas médias e grandes (`md:`, `lg:`, `xl:`), aproveitando todo o espaço horizontal da tela (Sidebar/Header superior, Hero, cards em grid, efeitos suaves de scroll e micro-animações).
   - Remover elementos exclusivos de mobile (como a Bottom Navigation Bar fixa no rodapé) na visualização desktop/tablet.
   - Manter 100% da lógica de negócio e regras já existentes, focando as melhorias puramente no design e apresentação visual desktop.
+
+## 5. Diretrizes Rigorosas de Testes de Software (Filosofia da Fonte da Verdade)
+- **O Teste é o Contrato Inviolável:** Na MW Technology, os testes automatizados representam a especificação e as regras de negócio escritas em pedra.
+- **NUNCA alterar o teste para mascarar falhas de código:** Se um teste que antes passava começar a falhar após uma alteração no código, NUNCA altere o teste para se adequar ao erro ou enfraquecer asserções. O erro está no código da aplicação e é a aplicação que deve ser corrigida para atender ao teste.
+- **Evolução de Requisitos (TDD):** Caso uma regra de negócio mude intencionalmente por decisão de produto, o teste deve ser atualizado primeiro para refletir o novo contrato e o código implementado em seguida.
+- **Proteção Anti-Regressão:** Toda funcionalidade crítica (cálculo de doses, rotas de cron, autenticação, permissões, multi-tenant) deve possuir cobertura de testes automatizados isolados e passar 100% no CI antes de qualquer deploy.

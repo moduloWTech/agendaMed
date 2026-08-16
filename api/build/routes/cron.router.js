@@ -32,9 +32,11 @@ class CronRouter {
                 });
             }
         };
-        // Suporta tanto GET quanto POST para compatibilidade total com o Cloud Scheduler
+        // Suporta tanto GET quanto POST e múltiplos aliases para compatibilidade total com o Cloud Scheduler
         app.get('/api/cron/check-medications', handler);
         app.post('/api/cron/check-medications', handler);
+        app.get('/api/cron/process-schedules', handler);
+        app.post('/api/cron/process-schedules', handler);
     }
 }
 exports.CronRouter = CronRouter;

@@ -12,8 +12,8 @@ class PushService {
         const privateKey = process.env.VAPID_PRIVATE_KEY?.replace(/"/g, '') || '';
         if (publicKey && privateKey) {
             try {
-                // Sujeito é tipicamente um URL ou "mailto:admin@dominio.com"
-                web_push_1.default.setVapidDetails('mailto:suporte@agendamed.com', publicKey, privateKey);
+                const subject = process.env.VAPID_SUBJECT?.replace(/"/g, '') || 'mailto:contato.moduloweb@gmail.com';
+                web_push_1.default.setVapidDetails(subject, publicKey, privateKey);
             }
             catch (err) {
                 console.error('[WebPush] Erro ao configurar VAPID details. Chaves inválidas?', err);

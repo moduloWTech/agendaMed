@@ -15,12 +15,20 @@ Este documento registra o histórico de desenvolvimento, a situação atual da a
 - **Prontuário & Cofre Digital:** Busca em tempo real por título, filtros rápidos por categoria (*Todos, Receitas, Exames, Laudos*), grid de 3 colunas com visualizador de anexos e atalho direto para download do relatório médico em PDF.
 - **Equipe de Cuidados & Perfil:** Split-grid de 2 colunas distribuindo 7/12 para Paciente + Cuidadores e 5/12 para Minha Conta + Configurações e PWA.
 
-### 🏗️ Arquitetura Limpa & Motor de Cron
+### 🏗️ Arquitetura Limpa, Testes Rigorosos & Motor de Cron
 - **Padrão Strict Clean Architecture (R-U-R):** Interfaces ➔ Repositories ➔ UseCases ➔ Routers.
-- **Cron Engine Desacoplado:**
+- **Normalização de Frequências (Inglês):**
+  - O `CronUseCase` normaliza e padroniza todas as variações em português e legadas para chaves oficiais em inglês (`daily`, `single`, `manual`, `weekly`, `monthly`, `4h`, `6h`, `8h`, `12h`).
+  - Resolução resiliente dos horários de doses utilizando `med.times` ou calculando as doses do dia a partir de `startTime` e do intervalo de horas.
+- **Suíte de Testes Automatizados da API (`api/src/usecases/cron.usecase.test.ts`):**
+  - 6 testes unitários com o Node/TSX test runner cobrindo normalização, cálculo de horários, disparo no minuto 0, insistência/tolerância de atraso, cancelamento após check-in e segurança de `CRON_SECRET`.
+- **Diretrizes Rigorosas de Testes (Filosofia da Fonte da Verdade):**
+  - Diretrizes oficiais do Notion integradas a [`.specify/memory/constitution.md`](file:///home/beth/Documentos/MWT/agendaMed/.specify/memory/constitution.md), [`AGENTS.md`](file:///home/beth/Documentos/MWT/agendaMed/AGENTS.md) e [`GEMINI.md`](file:///home/beth/Documentos/MWT/agendaMed/GEMINI.md).
+  - O teste é o contrato inviolável e nunca deve ser alterado para contornar falhas de código.
+- **Cron Engine Desacoplado & Aliases:**
   - `ICronRepository` e `CronRepository` encapsulando as consultas ao Prisma ORM.
-  - `ICronUseCase` e `CronUseCase` centralizando a regra de fuso horário `America/Fortaleza`, cálculo de intervalos de medicamentos (`single`, `daily`, `manual`, `4h`, `6h`, `8h`, `12h`) e validação de `CRON_SECRET`.
-  - `CronRouter` atuando como puro adaptador HTTP (`GET` e `POST /api/cron/check-medications`).
+  - `ICronUseCase` e `CronUseCase` centralizando a regra de fuso horário `America/Fortaleza`.
+  - `CronRouter` suportando tanto `/api/cron/check-medications` quanto `/api/cron/process-schedules`.
 - **Alertas Escaláveis e Insistentes:**
   - *Minuto 0:* Notificação pontual de dose.
   - *Minutos 1 a 4:* Lembretes de insistência com contagem de atraso.
@@ -28,11 +36,11 @@ Este documento registra o histórico de desenvolvimento, a situação atual da a
   - *Cancelamento Automático:* Para no exato segundo em que qualquer familiar/cuidador confirmar a dose no app.
 
 ### 🚀 Infraestrutura & Nuvem (Custo $0,00/mês)
-- **Frontend (Vercel):** Hospedado no domínio `agendamed.moduloweb.com.br` com CDN global e PWA Service Worker.
+- **Frontend (Vercel):** Hospedado no domínio `agendamed.moduloweb.com.br` com CDN global e PWA Service Worker atualizado.
 - **Backend (Google Cloud Run):** Container Docker escalável operando no *Always Free Tier* do Google Cloud (`us-central1`), com tempo de resposta em milissegundos e SSL nativo.
-- **Disparador Automático (Google Cloud Scheduler):** Job `agendamed-cron-remedios` rodando a cada 1 minuto (`* * * * *`) no fuso `America/Fortaleza`.
+- **Disparador Automático (Google Cloud Scheduler):** Job rodando a cada 1 minuto (`* * * * *`) no fuso `America/Fortaleza`.
 - **Banco de Dados & Storage (Supabase):** PostgreSQL relacional com tipagem Prisma e bucket seguro para fotos de receitas e documentos.
-- **Esteira de CI/CD (GitHub Actions):** Validação de qualidade contínua com Typecheck TypeScript, Oxlint e testes unitários Vitest.
+- **Esteira de CI/CD (GitHub Actions):** Validação contínua com Typecheck, Lint e **testes automatizados obrigatórios do Frontend (Vitest) e da API (TSX Test Runner)** antes de qualquer build.
 
 ### 📄 Relatório Médico Inteligente em PDF (Adesão & Histórico)
 - **Endpoint Dedicado na API:** `GET /api/patients/:id/report-data` com cálculo do índice de adesão (%), contagem de doses previstas vs. tomadas e histórico clínico.

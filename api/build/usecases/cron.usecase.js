@@ -114,42 +114,73 @@ class CronUseCase {
         const sTotal = sHours * 60 + sMinutes;
         return cTotal - sTotal;
     }
+    normalizeFrequency(rawFrequency) {
+        if (!rawFrequency)
+            return 'daily';
+        const clean = rawFrequency.trim().toLowerCase();
+        if (clean === 'diário' || clean === 'diario' || clean === 'daily')
+            return 'daily';
+        if (clean === 'única' || clean === 'unica' || clean === 'dose única' || clean === 'dose unica' || clean === 'single')
+            return 'single';
+        if (clean === 'semanal' || clean === 'weekly')
+            return 'weekly';
+        if (clean === 'mensal' || clean === 'monthly')
+            return 'monthly';
+        if (clean === 'manual')
+            return 'manual';
+        const hourMatch = clean.match(/(\d+)\s*(?:em\s*\d+\s*horas?|horas?|h)/i);
+        if (hourMatch && hourMatch[1]) {
+            return `${hourMatch[1]}h`;
+        }
+        if (clean.endsWith('h')) {
+            return clean;
+        }
+        return clean;
+    }
     getTimesForToday(med, todayStr, medStartDateStr) {
-        const freq = med.frequency;
-        if (freq === 'single') {
+        const normFreq = this.normalizeFrequency(med.frequency);
+        if (todayStr < medStartDateStr) {
+            return [];
+        }
+        if (normFreq === 'single') {
             return todayStr === medStartDateStr ? [med.startTime] : [];
         }
-        if (freq === 'daily') {
-            return todayStr >= medStartDateStr ? [med.startTime] : [];
+        if (normFreq === 'weekly') {
+            const medStartDate = new Date(`${medStartDateStr}T12:00:00-03:00`);
+            const todayDate = new Date(`${todayStr}T12:00:00-03:00`);
+            if (todayDate.getDay() !== medStartDate.getDay())
+                return [];
+            return med.times && med.times.length > 0 ? med.times : [med.startTime];
         }
-        if (freq === 'manual') {
-            return todayStr >= medStartDateStr ? med.times || [] : [];
+        if (normFreq === 'monthly') {
+            const medStartDate = new Date(`${medStartDateStr}T12:00:00-03:00`);
+            const todayDate = new Date(`${todayStr}T12:00:00-03:00`);
+            if (todayDate.getDate() !== medStartDate.getDate())
+                return [];
+            return med.times && med.times.length > 0 ? med.times : [med.startTime];
         }
-        // Intervalos em horas (ex: 4h, 6h, 8h, 12h)
-        if (freq.endsWith('h')) {
-            if (todayStr < medStartDateStr)
-                return [];
-            const intervalHours = parseInt(freq.replace('h', ''), 10);
-            if (isNaN(intervalHours) || intervalHours <= 0)
-                return [];
-            const timesForToday = [];
-            const startDateTime = new Date(`${medStartDateStr}T${med.startTime}:00-03:00`);
-            const currentDayStart = new Date(`${todayStr}T00:00:00-03:00`);
-            const currentDayEnd = new Date(`${todayStr}T23:59:59-03:00`);
-            if (startDateTime > currentDayEnd)
-                return [];
-            let currentDose = new Date(startDateTime);
-            while (currentDose < currentDayStart) {
-                currentDose.setHours(currentDose.getHours() + intervalHours);
+        if (med.times && Array.isArray(med.times) && med.times.length > 0) {
+            return med.times;
+        }
+        if (normFreq === 'daily') {
+            return [med.startTime];
+        }
+        if (normFreq.endsWith('h')) {
+            const intervalHours = parseInt(normFreq.replace('h', ''), 10);
+            if (isNaN(intervalHours) || intervalHours <= 0 || intervalHours > 24) {
+                return [med.startTime];
             }
-            while (currentDose <= currentDayEnd) {
-                const { timeStr } = this.getFortalezaTime(currentDose);
-                timesForToday.push(timeStr);
-                currentDose.setHours(currentDose.getHours() + intervalHours);
+            const [startH, startM] = (med.startTime || '08:00').split(':').map(Number);
+            const times = [];
+            const count = Math.min(Math.floor(24 / intervalHours), 24);
+            for (let i = 0; i < count; i++) {
+                const h = ((startH || 0) + i * intervalHours) % 24;
+                const m = startM || 0;
+                times.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
             }
-            return timesForToday;
+            return times.sort();
         }
-        return [];
+        return [med.startTime];
     }
 }
 exports.CronUseCase = CronUseCase;

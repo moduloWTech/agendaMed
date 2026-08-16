@@ -11,8 +11,12 @@ O **AgendaMed** é uma aplicação voltada para a gestão de medicamentos e da r
 - **Notificações:** Service Workers integrados ao Firebase Cloud Messaging (FCM) e API do WhatsApp.
 - **Backend/Banco de Dados:** Node.js/TypeScript.
 
-## 3. Diretrizes de UI/UX e Design
-- **Padrões Mobile Nativos:** Layout focado em uso mobile (Bottom Navigation Bar, Splash Screen, Bottom Sheets, etc).
+## 3. Diretrizes de UI/UX e Design (Multi-Dispositivo)
+- **Regra de Ouro do Modo Mobile:** O layout mobile está 100% homologado e finalizado. NUNCA alterar, quebrar ou regredir o layout mobile existente a menos que expressamente solicitado pelo usuário.
+- **Modo Desktop & Tablet Dedicado:**
+  - Criar interfaces ricas e pensadas para telas médias e grandes (`md:`, `lg:`, `xl:`), aproveitando todo o espaço horizontal da tela (Sidebar/Header superior, Hero, cards em grid, efeitos suaves de scroll e micro-animações).
+  - Remover elementos exclusivos de mobile (como a Bottom Navigation Bar fixa no rodapé) na visualização desktop/tablet.
+  - Manter 100% da lógica de negócio e regras já existentes, focando as melhorias puramente no design e apresentação visual desktop.
 - **Acessibilidade e Usabilidade:** Elementos grandes (áreas de toque generosas de 48px+), botões largos, e fontes legíveis (tamanho mínimo do corpo de texto de 18px).
 - **Paleta de Cores de Saúde e Calma:** Foco na clareza (fundo branco/off-white) e cores para reduzir carga cognitiva: Azul suave para botões principais, Verde esmeralda para sucesso/check e vermelho estritamente para atrasos ou falhas.
 
@@ -46,11 +50,17 @@ Todo microsserviço Node.js/TypeScript deve ser estruturado em 3 camadas (Router
 - O build gera uma imagem Docker que é enviada ao GHCR (GitHub Container Registry).
 - O deploy ocorre automaticamente via conexão SSH na máquina virtual (GCP), puxando a nova imagem Docker, injetando as variáveis via `--env-file` e limpando os resíduos (prune).
 
-## 8. Regras Comportamentais Estritas para Agente de IA
-- **Idioma:** Sempre se comunicar em `pt-br`.
-- **Componentização Estrita:** Sempre componentizar a estrutura para evitar ter arquivos com mais de 150 linhas de código.
-- **Verificação de Regressão Obrigatória:** Sempre que for fazer uma alteração, o agente deve se perguntar ativamente: *"Essa alteração vai modificar o que já está funcionando na aplicação?"* e mitigar riscos.
-- **Prevenção e Permissão:** Sempre explique a alteração que vai fazer *antes* e pergunte se deve fazer essa alteração.
-- **Modo Somente Leitura Inicial:** Sempre responda as perguntas que o usuário fizer *sem* mudar o código. Modifique o código *somente* se o usuário autorizar explicitamente.
-- **Registro de Progresso Obrigatório:** Sempre antes de subir uma nova versão para o GitHub (git push), atualize o arquivo `docs/PROGRESS_APLICATION.md` detalhando as alterações.
-- **Testes Automatizados Isolados:** Ao final de cada implementação, o agente deve criar scripts de teste na pasta `api/testes` para verificar a nova funcionalidade separadamente, e rodar também os testes anteriores para garantir que a nova implementação não quebrou nada.
+## 8. Diretrizes Rigorosas de Testes de Software (Filosofia da Fonte da Verdade)
+- **O Teste é o Contrato Inviolável:** Na MW Technology, os testes automatizados representam a especificação e as regras de negócio escritas em pedra.
+- **NUNCA alterar o teste para mascarar falhas de código:** Se um teste que antes passava começar a falhar após uma alteração no código, NUNCA altere o teste para se adequar ao erro ou enfraquecer asserções. O erro está no código da aplicação e é a aplicação que deve ser corrigida para atender ao teste.
+- **Evolução de Requisitos (TDD):** Caso uma regra de negócio mude intencionalmente por decisão de produto, o teste deve ser atualizado primeiro para refletir o novo contrato e o código implementado em seguida.
+- **Proteção Anti-Regressão:** Toda funcionalidade crítica (cálculo de doses, rotas de cron, autenticação, permissões, multi-tenant) deve possuir cobertura de testes automatizados isolados e passar 100% no CI antes de qualquer deploy.
+- **Barreira de Qualidade em CI/CD:** O pipeline do GitHub Actions roda obrigatoriamente os testes do frontend e da API a cada push/PR. Se qualquer teste falhar (`exit code 1`), o deploy é abortado imediatamente.
+
+## 9. Regras Comportamentais Estritas para Agente de IA
+- **Controle de Versão (Git & Deploy):** O assistente NUNCA deve criar commits ou realizar `git push` automaticamente sem antes perguntar e receber autorização explícita do usuário.
+- **Padrões de UI/UX:** Proibido o uso de `alert()` nativo. Sempre utilizar componentes de modais do design system e exibir mensagens de erro amigáveis em português (`error.message`).
+- **Segurança e Permissões:** Ações administrativas visíveis e permitidas exclusivamente para usuários com cargo `role === 'ADMIN'`.
+- **Regra de Ouro do Modo Mobile:** O layout mobile é 100% homologado e finalizado. NUNCA alterar, quebrar ou regredir o layout mobile existente a menos que expressamente solicitado.
+- **Modo Somente Leitura Inicial:** Responda as perguntas que o usuário fizer sem alterar o código. Modifique o código somente quando autorizado.
+- **Registro de Progresso Obrigatório:** Antes de subir uma nova versão para o repositório, atualizar a documentação de progresso detalhando as alterações.

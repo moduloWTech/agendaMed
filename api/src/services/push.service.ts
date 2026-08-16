@@ -8,9 +8,9 @@ export class PushService {
     
     if (publicKey && privateKey) {
       try {
-        // Sujeito é tipicamente um URL ou "mailto:admin@dominio.com"
+        const subject = process.env.VAPID_SUBJECT?.replace(/"/g, '') || 'mailto:contato.moduloweb@gmail.com';
         webpush.setVapidDetails(
-          'mailto:suporte@agendamed.com',
+          subject,
           publicKey,
           privateKey
         );
