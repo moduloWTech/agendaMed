@@ -5,8 +5,7 @@ import type { User } from '../generated/prisma/client';
 import { IRegisterData, ILoginData, IAcceptInviteData } from '../types/auth.types';
 import { OAuth2Client } from 'google-auth-library';
 import bcrypt from 'bcrypt';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
+import { getRequiredEnv } from '../config/env';
 
 export class AuthUseCase {
   constructor(private userRepository: IUserRepository) {}
@@ -43,7 +42,7 @@ export class AuthUseCase {
 
     const accessToken = jwt.sign(
       { id: result.user.id, role: result.user.role, tenantId: result.user.tenantId },
-      JWT_SECRET,
+      getRequiredEnv('JWT_SECRET'),
       { expiresIn: '7d' }
     );
 
@@ -70,7 +69,7 @@ export class AuthUseCase {
 
     const accessToken = jwt.sign(
       { id: user.id, role: user.role, tenantId: user.tenantId },
-      JWT_SECRET,
+      getRequiredEnv('JWT_SECRET'),
       { expiresIn: '7d' }
     );
 
@@ -119,7 +118,7 @@ export class AuthUseCase {
 
     const accessToken = jwt.sign(
       { id: user.id, role: user.role, tenantId: user.tenantId },
-      JWT_SECRET,
+      getRequiredEnv('JWT_SECRET'),
       { expiresIn: '7d' }
     );
 
@@ -140,7 +139,7 @@ export class AuthUseCase {
     // Valida o Token de Convite
     let inviteData: any;
     try {
-      inviteData = jwt.verify(parsed.token, JWT_SECRET);
+      inviteData = jwt.verify(parsed.token, getRequiredEnv('JWT_SECRET'));
     } catch (e: any) {
       console.error('JWT VERIFY ERROR:', e);
       throw new Error(`Convite inválido ou expirado. Detalhe: ${e.message}`);
@@ -172,7 +171,7 @@ export class AuthUseCase {
 
     const accessToken = jwt.sign(
       { id: user.id, role: user.role, tenantId: user.tenantId },
-      JWT_SECRET,
+      getRequiredEnv('JWT_SECRET'),
       { expiresIn: '7d' }
     );
 

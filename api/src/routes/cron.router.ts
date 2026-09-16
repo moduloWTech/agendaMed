@@ -10,9 +10,8 @@ export class CronRouter {
       const headerSecret = request.headers['x-cron-secret'] as string | undefined;
       const authHeader = request.headers['authorization'];
       const bearerSecret = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : undefined;
-      const query = request.query as { secret?: string };
 
-      const providedSecret = headerSecret || bearerSecret || query?.secret;
+      const providedSecret = headerSecret || bearerSecret;
 
       // 2. Execução do UseCase de Verificação de Medicamentos
       try {

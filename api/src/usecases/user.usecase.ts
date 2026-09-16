@@ -1,5 +1,6 @@
 import { IUserRepository } from '../interfaces/user.interface';
 import { z } from 'zod';
+import { getRequiredEnv } from '../config/env';
 import type { User } from '../generated/prisma/client';
 import { prisma } from '../DB/prisma.config';
 
@@ -160,7 +161,6 @@ export class UserUseCase {
 
     // Gera Token JWT para o convite (duração 48 horas)
     const jwt = require('jsonwebtoken');
-    const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
     const inviteToken = jwt.sign(
       {
         tenantId: admin.tenantId,
@@ -168,7 +168,7 @@ export class UserUseCase {
         invitedPhone: parsedData.phoneWhats,
         invitedName: parsedData.name
       },
-      JWT_SECRET,
+      getRequiredEnv('JWT_SECRET'),
       { expiresIn: '48h' }
     );
 

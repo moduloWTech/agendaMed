@@ -6,7 +6,11 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: 'api/.env' });
 
 const API_URL = 'http://localhost:3333';
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET deve estar configurado para executar este teste.');
+}
 
 async function runTests() {
   console.log('🧪 Iniciando testes do Fluxo de Convites (B2C)...');

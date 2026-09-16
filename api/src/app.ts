@@ -76,18 +76,18 @@ export class App {
     });
 
     const allowedOrigins = [
-      'http://localhost:5173',
       'https://agendamed.moduloweb.com.br',
       process.env.FRONTEND_URL,
-    ].filter(Boolean);
+      ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:5173'] : []),
+    ].filter((origin): origin is string => Boolean(origin));
 
     this.app.register(cors, {
       origin: (origin, cb) => {
-        if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+        if (!origin || allowedOrigins.includes(origin)) {
           cb(null, true);
           return;
         }
-        cb(null, true); // Fallback amigável
+        cb(new Error('Origem não permitida'), false);
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

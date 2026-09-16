@@ -147,7 +147,7 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
     // Simula horário exato 12:00
     (useCase as any).getFortalezaTime = () => ({ dateStr: '2026-08-16', timeStr: '12:00' });
 
-    const report = await useCase.execute();
+    const report = await useCase.execute({ providedSecret: 'test-cron-secret' });
 
     assert.equal(report.success, true);
     assert.equal(report.totalActiveMedications, 1);
@@ -189,7 +189,7 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
     // Simula 12:02 (2 min após o horário)
     (useCase as any).getFortalezaTime = () => ({ dateStr: '2026-08-16', timeStr: '12:02' });
 
-    const report = await useCase.execute();
+    const report = await useCase.execute({ providedSecret: 'test-cron-secret' });
 
     assert.equal(report.success, true);
     assert.equal(report.totalNotificationsSent, 2);
@@ -228,7 +228,7 @@ describe('CronUseCase - Diretrizes Rigorosas de Testes (MW Technology)', () => {
     const useCase = new CronUseCase(repo, mockPush);
     (useCase as any).getFortalezaTime = () => ({ dateStr: '2026-08-16', timeStr: '12:00' });
 
-    const report = await useCase.execute();
+    const report = await useCase.execute({ providedSecret: 'test-cron-secret' });
 
     assert.equal(report.success, true);
     assert.equal(report.totalNotificationsSent, 0);

@@ -12,8 +12,7 @@ class CronRouter {
             const headerSecret = request.headers['x-cron-secret'];
             const authHeader = request.headers['authorization'];
             const bearerSecret = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : undefined;
-            const query = request.query;
-            const providedSecret = headerSecret || bearerSecret || query?.secret;
+            const providedSecret = headerSecret || bearerSecret;
             // 2. Execução do UseCase de Verificação de Medicamentos
             try {
                 const report = await this.cronUseCase.execute({ providedSecret });

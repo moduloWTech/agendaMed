@@ -1,8 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../DB/prisma.config';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
+import { getRequiredEnv } from '../config/env';
 
 export async function authMiddleware(request: FastifyRequest, reply: FastifyReply) {
   try {
@@ -17,7 +16,7 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
     }
 
     const token = parts[1];
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = jwt.verify(token, getRequiredEnv('JWT_SECRET')) as any;
     
     const userId = decoded.id || decoded.userId || decoded.sub;
     if (!userId) {

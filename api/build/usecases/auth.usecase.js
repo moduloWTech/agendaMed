@@ -8,7 +8,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const zod_1 = require("zod");
 const google_auth_library_1 = require("google-auth-library");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
+const env_1 = require("../config/env");
 class AuthUseCase {
     userRepository;
     constructor(userRepository) {
@@ -39,7 +39,7 @@ class AuthUseCase {
             phoneWhats: parsed.phoneWhats,
             passwordHash: passwordHash
         }, tenantName);
-        const accessToken = jsonwebtoken_1.default.sign({ id: result.user.id, role: result.user.role, tenantId: result.user.tenantId }, JWT_SECRET, { expiresIn: '7d' });
+        const accessToken = jsonwebtoken_1.default.sign({ id: result.user.id, role: result.user.role, tenantId: result.user.tenantId }, (0, env_1.getRequiredEnv)('JWT_SECRET'), { expiresIn: '7d' });
         return { user: result.user, accessToken };
     }
     async login(data) {
@@ -56,7 +56,7 @@ class AuthUseCase {
         if (!isMatch) {
             throw new Error('E-mail ou senha incorretos.');
         }
-        const accessToken = jsonwebtoken_1.default.sign({ id: user.id, role: user.role, tenantId: user.tenantId }, JWT_SECRET, { expiresIn: '7d' });
+        const accessToken = jsonwebtoken_1.default.sign({ id: user.id, role: user.role, tenantId: user.tenantId }, (0, env_1.getRequiredEnv)('JWT_SECRET'), { expiresIn: '7d' });
         return { user, accessToken };
     }
     async loginWithGoogle(credential) {
@@ -93,7 +93,7 @@ class AuthUseCase {
             }, tenantName);
             user = result.user;
         }
-        const accessToken = jsonwebtoken_1.default.sign({ id: user.id, role: user.role, tenantId: user.tenantId }, JWT_SECRET, { expiresIn: '7d' });
+        const accessToken = jsonwebtoken_1.default.sign({ id: user.id, role: user.role, tenantId: user.tenantId }, (0, env_1.getRequiredEnv)('JWT_SECRET'), { expiresIn: '7d' });
         return { user, accessToken };
     }
     async acceptInvite(data) {
@@ -108,7 +108,7 @@ class AuthUseCase {
         // Valida o Token de Convite
         let inviteData;
         try {
-            inviteData = jsonwebtoken_1.default.verify(parsed.token, JWT_SECRET);
+            inviteData = jsonwebtoken_1.default.verify(parsed.token, (0, env_1.getRequiredEnv)('JWT_SECRET'));
         }
         catch (e) {
             console.error('JWT VERIFY ERROR:', e);
@@ -135,7 +135,7 @@ class AuthUseCase {
             tenantId: inviteData.tenantId,
             patientId: inviteData.patientId
         });
-        const accessToken = jsonwebtoken_1.default.sign({ id: user.id, role: user.role, tenantId: user.tenantId }, JWT_SECRET, { expiresIn: '7d' });
+        const accessToken = jsonwebtoken_1.default.sign({ id: user.id, role: user.role, tenantId: user.tenantId }, (0, env_1.getRequiredEnv)('JWT_SECRET'), { expiresIn: '7d' });
         return { user, accessToken };
     }
 }

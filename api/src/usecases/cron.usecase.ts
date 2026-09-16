@@ -8,6 +8,7 @@ import {
   IPushService,
 } from '../interfaces/cron.interface';
 import { pushService as defaultPushService } from '../services/push.service';
+import { getRequiredEnv } from '../config/env';
 
 export class CronUseCase implements ICronUseCase {
   private pushService: IPushService;
@@ -21,8 +22,8 @@ export class CronUseCase implements ICronUseCase {
 
   public async execute(dto?: CronExecuteDTO): Promise<CronExecutionReport> {
     // 1. Regra de Negócio de Segurança (Validação do Segredo de Execução no UseCase)
-    const expectedSecret = process.env.CRON_SECRET;
-    if (expectedSecret && dto?.providedSecret !== expectedSecret) {
+    const expectedSecret = getRequiredEnv('CRON_SECRET');
+    if (dto?.providedSecret !== expectedSecret) {
       throw new Error('Acesso não autorizado. Chave de segurança do Cron inválida.');
     }
 

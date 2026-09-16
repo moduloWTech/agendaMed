@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CronUseCase = void 0;
 const push_service_1 = require("../services/push.service");
+const env_1 = require("../config/env");
 class CronUseCase {
     cronRepository;
     pushService;
@@ -11,8 +12,8 @@ class CronUseCase {
     }
     async execute(dto) {
         // 1. Regra de Negócio de Segurança (Validação do Segredo de Execução no UseCase)
-        const expectedSecret = process.env.CRON_SECRET;
-        if (expectedSecret && dto?.providedSecret !== expectedSecret) {
+        const expectedSecret = (0, env_1.getRequiredEnv)('CRON_SECRET');
+        if (dto?.providedSecret !== expectedSecret) {
             throw new Error('Acesso não autorizado. Chave de segurança do Cron inválida.');
         }
         const now = new Date();

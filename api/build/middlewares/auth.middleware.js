@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = authMiddleware;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma_config_1 = require("../DB/prisma.config");
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
+const env_1 = require("../config/env");
 async function authMiddleware(request, reply) {
     try {
         const authHeader = request.headers.authorization;
@@ -18,7 +18,7 @@ async function authMiddleware(request, reply) {
             return reply.status(401).send({ error: 'Token mal formatado', message: 'Token mal formatado' });
         }
         const token = parts[1];
-        const decoded = jsonwebtoken_1.default.verify(token, JWT_SECRET);
+        const decoded = jsonwebtoken_1.default.verify(token, (0, env_1.getRequiredEnv)('JWT_SECRET'));
         const userId = decoded.id || decoded.userId || decoded.sub;
         if (!userId) {
             return reply.status(401).send({ error: 'Token inválido', message: 'Identificador ausente no token' });

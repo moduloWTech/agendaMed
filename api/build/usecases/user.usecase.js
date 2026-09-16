@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserUseCase = void 0;
 const zod_1 = require("zod");
+const env_1 = require("../config/env");
 const prisma_config_1 = require("../DB/prisma.config");
 class UserUseCase {
     userRepository;
@@ -138,13 +139,12 @@ class UserUseCase {
         }
         // Gera Token JWT para o convite (duração 48 horas)
         const jwt = require('jsonwebtoken');
-        const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-mwt-2026';
         const inviteToken = jwt.sign({
             tenantId: admin.tenantId,
             patientId: parsedData.patientId,
             invitedPhone: parsedData.phoneWhats,
             invitedName: parsedData.name
-        }, JWT_SECRET, { expiresIn: '48h' });
+        }, (0, env_1.getRequiredEnv)('JWT_SECRET'), { expiresIn: '48h' });
         // Monta a mensagem de WhatsApp
         const message = `Olá, ${parsedData.name}! 👋\n\nVocê foi convidado(a) por *${admin.name || 'um administrador'}* para fazer parte da equipe de cuidados de *${parsedData.patientName}* no aplicativo *AgendaMed*.\n\nAcesse o link abaixo para criar sua conta de cuidador(a):\n${process.env.FRONTEND_URL || 'http://localhost:5173'}/convite?token=${inviteToken}`;
         // Formata o número (remover caracteres especiais e adicionar 55 se precisar)
